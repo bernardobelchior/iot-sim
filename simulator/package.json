@@ -1,0 +1,33 @@
+{
+  "name": "iot-simulator",
+  "version": "0.1.0",
+  "description": "Main controller for IoT simulator",
+  "author": "#####",
+  "license": "MIT",
+  "scripts": {
+    "start": "npm run serve",
+    "build": "npm run build-ts && npm run tslint",
+    "serve": "node dist/server.js",
+    "watch-node": "nodemon dist/server.js",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "tslint": "tslint -c tslint.json -p tsconfig.json --fix"
+  },
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "mongoose": "^5.4.12",
+    "winston": "^2.4.4"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^4.0.3",
+    "@types/mongodb": "^3.1.19",
+    "@types/mongoose": "^5.3.16",
+    "@types/node": "^11.9.4",
+    "concurrently": "^4.1.0",
+    "nodemon": "^1.18.10",
+    "ts-node": "^8.0.2",
+    "tslint": "^5.12.1",
+    "typescript": "^3.3.3"
+  }
+}

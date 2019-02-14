@@ -1,0 +1,59 @@
+version: '3.4'
+
+services:
+  simulator:
+    image: iot-sim
+    container_name: iot-sim
+    build:
+        context: ./simulator
+    restart: always
+    volumes:
+      - ./simulator:/usr/src/app
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3000:30000
+    networks:
+      - backend
+      - middleware
+      
+  middleware:
+    image: iot-sim.middleware
+    container_name: iot-sim.middleware
+    build:
+      context: ./middleware
+    ports:
+      - 5671:5671
+      - 5672:5672
+      - 25672:25672
+      - 15671:15671
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_VHOST: vhost
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - middleware
+        
+  mongo: 
+    container_name: iot-sim.mongo
+    image: mongo
+    restart: always
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: password
+    ports: 
+      - 27017:27017
+    networks:
+      - backend
+
+networks:
+  middleware:
+    driver: bridge
+  backend: 
+    driver: bridge
