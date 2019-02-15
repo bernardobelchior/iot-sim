@@ -1,7 +1,7 @@
 import amqp = require('amqplib');
 import { vars } from '../util/vars';
 
-const createExchange = async () => {
+export const createExchange = async () => {
   const conn = await amqp.connect(vars.AMQP_URI);
   const ch = await conn.createChannel();
   await ch.assertExchange('source', 'topic', {
@@ -9,7 +9,7 @@ const createExchange = async () => {
   });
 }
 
-const publishMessage = async (msg: string) => {
+export const publishMessage = async (msg: string) => {
   const conn = await amqp.connect(vars.AMQP_URI);
   conn.createChannel()
     .tap((ch: amqp.Channel) => ch.checkExchange('source'))
@@ -17,7 +17,7 @@ const publishMessage = async (msg: string) => {
     .finally(() => conn.close());
 };
 
-const consumeMessage = async (queue: string) => {
+export const consumeMessage = async (queue: string) => {
   const conn = await amqp.connect(vars.AMQP_URI);
   conn.createChannel()
     .tap((ch: amqp.Channel) => ch.checkExchange('source'))
@@ -31,10 +31,4 @@ const consumeMessage = async (queue: string) => {
     }))
     .finally(() => conn.close());
 
-}
-
-module.exports = {
-  publishMessage,
-  consumeMessage,
-  createExchange
 }

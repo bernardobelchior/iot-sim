@@ -1,4 +1,5 @@
 import logger from "./util/logger";
+import http from 'http';
 import mongo from "./config/mongo";
 import { vars } from "./util/vars";
 
@@ -7,7 +8,6 @@ mongo();
 /**
  * Start Node server.
  */
-const http = require("http");
 const server = http.createServer();
 const port = vars.PORT;
 const env = vars.ENVIRONMENT;
