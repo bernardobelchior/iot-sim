@@ -1,26 +1,20 @@
 import logger from "./util/logger";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-import { MONGODB_URI } from "./util/secrets";
+import mongo from "./config/mongo";
+import { vars } from "./util/vars";
 
-// Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: ".env.example" });
-
-// Connect to MongoDB
-const mongoUrl = MONGODB_URI;
-mongoose.connect(mongoUrl);
+mongo();
 
 /**
  * Start Node server.
  */
 const http = require("http");
 const server = http.createServer();
-const port = process.env.PORT;
-const env = process.env.NODE_ENV;
+const port = vars.PORT;
+const env = vars.ENVIRONMENT;
 
 server.listen(port, (err: any) => {
   if (err) {
-    return console.log("something bad happened", err);
+    return console.log(`Error while starting server: ${err}`);
   }
 
   console.log("App is running at http://localhost:%d in %s mode", port, env);
@@ -28,3 +22,4 @@ server.listen(port, (err: any) => {
 });
 
 export default server;
+ 

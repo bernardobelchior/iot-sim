@@ -1,5 +1,6 @@
 import winston, { LoggerInstance, Logger } from "winston";
-import { ENVIRONMENT } from "./secrets";
+
+const ENVIRONMENT = process.env.ENVIRONMENT;
 
 const logger: LoggerInstance = new Logger({
     transports: [
