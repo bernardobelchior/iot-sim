@@ -58,6 +58,67 @@
           "links": [{ "href": "/things/lamp/actions/fade" }]
         }
       }
+    },
+    {
+      "name": "WoT Pi",
+      "description": "A WoT-connected Raspberry Pi",
+      "properties": {
+        "temperature": {
+          "title": "Temperature",
+          "type": "number",
+          "unit": "degree celsius",
+          "readOnly": true,
+          "description": "An ambient temperature sensor",
+          "links": [{ "href": "/things/pi/properties/temperature" }]
+        },
+        "humidity": {
+          "title": "Humidity",
+          "type": "number",
+          "unit": "percent",
+          "readOnly": true,
+          "links": [{ "href": "/things/pi/properties/humidity" }]
+        },
+        "led": {
+          "title": "LED",
+          "type": "boolean",
+          "description": "A red LED",
+          "links": [{ "href": "/things/pi/properties/led" }]
+        }
+      },
+      "actions": {
+        "reboot": {
+          "title": "Reboot",
+          "description": "Reboot the device"
+        }
+      },
+      "events": {
+        "reboot": {
+          "description": "Going down for reboot"
+        }
+      },
+      "links": [
+        {
+          "rel": "properties",
+          "href": "/things/pi/properties"
+        },
+        {
+          "rel": "actions",
+          "href": "/things/pi/actions"
+        },
+        {
+          "rel": "events",
+          "href": "/things/pi/events"
+        },
+        {
+          "rel": "alternate",
+          "href": "wss://mywebthingserver.com/things/pi"
+        },
+        {
+          "rel": "alternate",
+          "mediaType": "text/html",
+          "href": "/things/pi"
+        }
+      ]
     }
   ]
 }

@@ -1,9 +1,11 @@
 import logger from "./util/logger";
 import http from 'http';
 import mongo from "./config/mongo";
+import manager from './api/manager';
 import { vars } from "./util/vars";
 
 mongo();
+manager();
 
 /**
  * Start Node server.

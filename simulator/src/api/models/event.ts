@@ -4,18 +4,19 @@ import { Link } from './link';
  * An event object describes a kind of event which may be emitted by a device
  */
 export class Event {
-  private title: string;
-  private description: string;
+  id: string;
+  title: string;
+  description: string;
 
-  private semanticType: string;
-  private type: string = null;
+  semanticType: string;
+  type: string = null;
 
-  private unit: string;
-  private minimum?: number;
-  private maximum?: number;
-  private multipleOf?: number;
+  unit: string;
+  minimum?: number;
+  maximum?: number;
+  multipleOf?: number;
 
-  private links: Link[] = [];
+  links: Link[] = [];
 
   /**
    * 
@@ -24,10 +25,23 @@ export class Event {
    * @param {String} unit SI unit
    * @param {String} semanticType String identifying a type from the linked context
    */
-  constructor(title: string, description: string, unit: string, semanticType: string) {
+  constructor(id: string, title: string, description: string, unit: string, semanticType: string, type?: string) {
+    this.id = id;
     this.title = title;
     this.description = description;
     this.unit = unit;
     this.semanticType = semanticType;
+    this.type = type;
+  }
+
+  addLinks(links: any): any {
+    links.forEach((obj: any) => {
+      const l = new Link(obj.href, obj.rel, obj.mediatype || null);
+      this.links.push(l);
+    });
+  }
+
+  defineMetadata(metadata: { minimum?: number; maximum?: number; multipleOf?: number; }): any {
+  
   }
 }

@@ -36,7 +36,7 @@ const AMQP_URI = prod ? process.env['AMQP_URI'] : process.env['AMQP_URI_LOCAL'];
 if (!AMQP_URI) {
   logger.error('Invalid AMQP config specified. Set AMQP_URI environment variable.');
   process.exit(1);
-}
+} 
 
 export const vars: VarsDefinition = {
   ENVIRONMENT,

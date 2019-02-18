@@ -8,14 +8,14 @@ import { Link } from './link';
  * in a machine readable format with a default JSON encoding.
  */
 export class Thing {
-  private context?: string;
-  private type?: string[] = [];
-  private name: string;
-  private description: string;
-  private properties: Map<string, Property>;
-  private actions: Map<string, Action>;
-  private events: Map<String, Event>;
-  private links: Link[] = [];
+  context?: string;
+  type?: string[] = [];
+  name: string;
+  description: string;
+  properties: Map<string, Property> = new Map<string, Property>();
+  actions: Map<string, Action> = new Map<string, Action>();
+  events: Map<string, Event> = new Map<string, Event>();
+  links: Link[] = [];
 
   /**
    *
@@ -29,5 +29,45 @@ export class Thing {
     this.description = description;
     this.context = context;
     this.type = type;
+  }
+
+  addProperties(properties: any): any {
+    for(let key in properties) {
+      let obj = properties[key];
+      let p = new Property(key, obj.title, obj.description, obj.unit, obj["@type"], obj.type || null)
+      p.addLinks(obj.links || []);
+      p.defineMetadata();
+
+      this.properties.set(key, p);
+    }
+  }
+
+  addActions(actions: any): any {
+    for(let key in actions) {
+      let obj = actions[key];
+      let a = new Action(key, obj.title, obj.description);
+      a.defineInput(obj.input);
+      a.addLinks(obj.links || []);
+      
+      this.actions.set(key, a);
+    }
+  }
+
+  addEvents(events: any): any {
+    for(let key in events) {
+      let obj = events[key];
+      let e = new Event(key, obj.title, obj.description, obj.unit, obj["@type"], obj.type || null)
+      e.defineMetadata({ minimum: obj.minimum, maximum: obj.maximum, multipleOf: obj.multipleOf });
+      e.addLinks(obj.links || []);
+      
+      this.events.set(key, e);
+    }
+  }
+
+  addLinks(links: any): any {
+    links.forEach((obj: any) => {
+      const l = new Link(obj.href, obj.rel, obj.mediatype || null)
+      this.links.push(l);
+    });
   }
 }

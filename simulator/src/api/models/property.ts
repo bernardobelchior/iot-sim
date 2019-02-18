@@ -4,35 +4,47 @@ import { Link } from './link';
  * A property object describes an attribute of a Thing and is indexed by a property id.
  */
 export class Property {
-  private id: string;
-  private title: string;
-  private description: string;
-  private unit: string;
+  id: string;
+  title: string;
+  description: string;
+  unit: string;
 
-  private type: string = null;
-  private semanticType: string;
-  
-  private enum?: number[] = [];
-  private readOnly?: boolean = false;
-  private minimum?: number;
-  private maximum?: number;
-  private multipleOf?: number;
+  type: string = null;
+  semanticType: string;
 
-  private links: Link[] = [];
+  enum?: number[] = [];
+  readOnly?: boolean = false;
+  minimum?: number;
+  maximum?: number;
+  multipleOf?: number;
+
+  links: Link[] = [];
 
   /**
-   * 
+   *
    * @param {String} id Property identifier
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    * @param {String} unit SI unit
    * @param {String} semanticType String identifying a type from the linked context
+   * @param {String} type Identifies the data type
    */
-  constructor(id: string, title: string, description: string, unit: string, semanticType: string) {
+  constructor(id: string, title: string, description: string, unit: string, semanticType: string, type?: string) {
     this.id = id;
     this.title = title;
     this.description = description;
     this.unit = unit;
     this.semanticType = semanticType;
+    this.type = type;
+  }
+
+  addLinks(links: any): any {
+    links.forEach((obj: any) => {
+      const l = new Link(obj.href, obj.rel, obj.mediatype || null);
+      this.links.push(l);
+    });
+  }
+
+  defineMetadata(): any {
   }
 }

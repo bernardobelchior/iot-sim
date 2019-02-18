@@ -2,9 +2,9 @@
  * A link object represents a link relation
  */
 export class Link {
-  private href: string;
-  private rel: string;
-  private mediatype?: string;
+  public href: string;
+  public rel: string;
+  public mediatype?: string;
 
   /**
    *

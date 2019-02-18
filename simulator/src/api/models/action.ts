@@ -4,18 +4,30 @@ import { Link } from './link';
  * An action object describes a function which can be carried out on a device
  */
 export class Action {
-  private title: string;
-  private description: string;
-  private links: Link[] = [];
-  private input: string; // TODO define
+  id: string;
+  title: string;
+  description: string;
+  links: Link[] = [];
+  input: string; // TODO define
 
   /**
    * 
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    */
-  constructor(title: string, description: string) {
+  constructor(id: string, title: string, description: string) {
+    this.id = id;
     this.title = title;
     this.description = description;
+  }
+
+  addLinks(links: any): any {
+    links.forEach((obj: any) => {
+      const l = new Link(obj.href, obj.rel, obj.mediatype || null);
+      this.links.push(l);
+    });
+  }
+
+  defineInput(input: any): any {
   }
 }
