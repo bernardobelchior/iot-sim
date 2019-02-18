@@ -57,7 +57,40 @@
           },
           "links": [{ "href": "/things/lamp/actions/fade" }]
         }
-      }
+      },
+      "events": {
+        "overheated": {
+          "title": "Overheated",
+          "@type": "OverheatedEvent",
+          "type": "number",
+          "unit": "degree celsius",
+          "description": "The lamp has exceeded its safe operating temperature",
+          "links": [{ "href": "/things/lamp/events/overheated" }]
+        }
+      },
+      "links": [
+        {
+          "rel": "properties",
+          "href": "/things/lamp/properties"
+        },
+        {
+          "rel": "actions",
+          "href": "/things/lamp/actions"
+        },
+        {
+          "rel": "events",
+          "href": "/things/lamp/events"
+        },
+        {
+          "rel": "alternate",
+          "href": "wss://mywebthingserver.com/things/lamp"
+        },
+        {
+          "rel": "alternate",
+          "mediaType": "text/html",
+          "href": "/things/lamp"
+        }
+      ]
     },
     {
       "name": "WoT Pi",

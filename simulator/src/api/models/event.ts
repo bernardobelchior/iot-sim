@@ -1,4 +1,4 @@
-import { Link } from './link';
+import { Link, ILink } from './link';
 
 /**
  * An event object describes a kind of event which may be emitted by a device
@@ -11,7 +11,7 @@ export class Event {
   semanticType: string;
   type: string = null;
 
-  unit: string;
+  unit?: string;
   minimum?: number;
   maximum?: number;
   multipleOf?: number;
@@ -19,29 +19,30 @@ export class Event {
   links: Link[] = [];
 
   /**
-   * 
+   *
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
-   * @param {String} unit SI unit
    * @param {String} semanticType String identifying a type from the linked context
    */
-  constructor(id: string, title: string, description: string, unit: string, semanticType: string, type?: string) {
+  constructor(id: string, title: string, description: string, semanticType: string, type?: string) {
     this.id = id;
     this.title = title;
     this.description = description;
-    this.unit = unit;
     this.semanticType = semanticType;
     this.type = type;
   }
 
-  addLinks(links: any): any {
-    links.forEach((obj: any) => {
-      const l = new Link(obj.href, obj.rel, obj.mediatype || null);
-      this.links.push(l);
-    });
+  defineMetadata(metadata: { unit?: string; minimum?: number; maximum?: number; multipleOf?: number }) {
+    this.unit = metadata.unit;
+    this.minimum = metadata.minimum;
+    this.maximum = metadata.maximum;
+    this.multipleOf = metadata.multipleOf;
   }
 
-  defineMetadata(metadata: { minimum?: number; maximum?: number; multipleOf?: number; }): any {
-  
+  addLinks(links: ILink[]): any {
+    links.forEach((linkData: ILink) => {
+      const link = new Link(linkData);
+      this.links.push(link);
+    });
   }
 }

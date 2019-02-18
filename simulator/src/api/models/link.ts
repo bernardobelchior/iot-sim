@@ -1,10 +1,16 @@
+export interface ILink {
+  href: string;
+  rel: string;
+  mediatype?: string;
+}
+
 /**
  * A link object represents a link relation
  */
 export class Link {
-  public href: string;
-  public rel: string;
-  public mediatype?: string;
+  href: string;
+  rel: string;
+  mediatype?: string;
 
   /**
    *
@@ -12,9 +18,9 @@ export class Link {
    * @param {String} rel A string describing a relationship
    * @param {String} mediatype A string identifying a media type
    */
-  constructor(href: string, rel: string, mediatype?: string) {
-    this.href = href;
-    this.rel = rel;
-    this.mediatype = mediatype;
+  constructor(data: ILink) {
+    this.href = data.href;
+    this.rel = data.rel;
+    this.mediatype = data.mediatype;
   }
 }

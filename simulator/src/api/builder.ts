@@ -14,13 +14,13 @@ export interface IEnvironment {
  * Returns the entities
  */
 
-export function Builder(): IEnvironment {
+export function builder(): IEnvironment {
   const path = `${process.cwd()}/src/environment`;
 
   const things: Thing[] = readSensorsConfigs(`${path}/sensors.json`);
   const spatial = readSpatialConfigs(`${path}/spatial.json`);
   return { things, spatial };
-};
+}
 
 const readSensorsConfigs = (filePath: string): Thing[] => {
   let data = JSON.parse(fs.readFileSync(filePath));
@@ -54,5 +54,5 @@ const readSensorsConfigs = (filePath: string): Thing[] => {
 };
 
 const readSpatialConfigs = (filePath: string): [] => {
-  return []
+  return [];
 };
