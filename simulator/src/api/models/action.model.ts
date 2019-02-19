@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
  * @private
  */
 
-const actionSchema = mongoose.Schema({
+const actionSchema = new mongoose.Schema({
   id: {
     type: String,
     required: true
@@ -25,9 +25,8 @@ const actionSchema = mongoose.Schema({
   status: {
     type: String,
     required: true
-  },
-  timestamps: true
-})
+  }
+}, { timestamps: true })
 
 /**
  * @typedef Action

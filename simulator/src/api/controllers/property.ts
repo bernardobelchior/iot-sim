@@ -1,5 +1,5 @@
 import { Link, ILink } from "./link";
-import { Value } from "./value";
+import EventEmitter from 'events';
 import Ajv from 'ajv';
 let ajv = new Ajv();
 
@@ -18,14 +18,15 @@ export interface IPropertyMetadata {
 /**
  * A property object describes an attribute of a Thing and is indexed by a property id.
  */
-export class Property {
+export class Property extends EventEmitter {
   id: string;
   title: string;
   description: string;
   semanticType: string;
 
   metadata?: IPropertyMetadata;
-  value: Value;
+  value: any;
+  valueForwarder: Function | null;
 
   links: Link[] = [];
 
@@ -42,11 +43,14 @@ export class Property {
     description: string,
     semanticType: string
   ) {
+    super();
     this.id = id;
     this.title = title;
     this.description = description;
     this.semanticType = semanticType;
-    this.value = new Value(0);
+
+    this.value = 0;
+    this.valueForwarder = null;
   }
 
   /**
@@ -78,15 +82,40 @@ export class Property {
    * Get the property current value
    */
   getValue(): any {
-    return this.value.get();
+    return this.value;
   }
 
   /**
    * Set the property current value
    */
   setValue(newValue: any): void {
-    this.validateValue(newValue);
-    this.value.set(newValue);
+    if (this.valueForwarder) {
+      this.valueForwarder(newValue);
+    }
+
+    this.notifyOfExternalUpdate(newValue);
+  }
+
+  /**
+ * Defines a new value forwarder
+ * @param {Function} f Function that define the method to update the value
+ */
+  setValueForwarder(f: Function) {
+    this.valueForwarder = f;
+  }
+
+  /**
+   * Notify observers of a new value.
+   *
+   * @param {*} value New value
+   */
+  notifyOfExternalUpdate(v: any) {
+    if (typeof v !== 'undefined' &&
+      v !== null &&
+      v !== this.value) {
+      this.value = v;
+      super.emit('update', v);
+    }
   }
 
   /**

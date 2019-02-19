@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
  * @private
  */
 
-const messageSchema = mongoose.Schema({
+const messageSchema = new mongoose.Schema({
   messageType: {
     type: String,
     required: true
@@ -13,9 +13,8 @@ const messageSchema = mongoose.Schema({
   data: {
     type: Object,
     required: true
-  },
-  timestamps: true
-})
+  }
+}, { timestamps: true })
 
 /**
  * @typedef Message

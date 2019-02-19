@@ -1,8 +1,10 @@
 import { Property } from "./property";
-import { Action, IInputProperty } from "./action";
+import { Action } from "./action";
 import { Event } from "./event";
 import { Link, ILink } from "./link";
+import { ActionRequest } from "./actionRequest";
 import * as amqp from '../amqp';
+
 import Ajv from 'ajv';
 let ajv = new Ajv();
 
@@ -19,6 +21,8 @@ export class Thing {
   actions: Map<string, Action> = new Map<string, Action>();
   events: Map<string, Event> = new Map<string, Event>();
   links: Link[] = [];
+
+  actionsQueue: ActionRequest[] = [];
 
   /**
    *
@@ -54,6 +58,7 @@ export class Thing {
         multipleOf: obj.multipleOf
       });
       p.addLinks(obj.links);
+      p.on('update', () => this.propertyNotify(p.id));
 
       this.properties.set(key, p);
     }
@@ -99,6 +104,9 @@ export class Thing {
     });
   }
 
+  /**
+   * 
+   */
   public getProperties() {
     let propsValues: { [key: string]: number } = {};
     this.properties.forEach((p: Property, key: string) => {
@@ -107,6 +115,10 @@ export class Thing {
     return propsValues;
   }
 
+  /**
+   * 
+   * @param id 
+   */
   public getPropertyValue(id: string): any { 
     const p = this.properties.get(id);
     if(p) {
@@ -116,11 +128,15 @@ export class Thing {
     throw new Error('Property specified doesn\'t exists');
   }
 
+  /**
+   * 
+   * @param id 
+   * @param propertyValue 
+   */
   public setProperty(id: string, propertyValue: any): void { 
     const p = this.properties.get(id);
     if(p) {
       p.setValue(propertyValue);
-      this.propertyNotify(p.id);
     } else {
       throw new Error('Property specified doesn\'t exists');
     }
@@ -130,10 +146,10 @@ export class Thing {
    * Requests an action to be executed.
    *
    * @param {String} actionName Name of the action
-   * @param {IInputProperty} input Action inputs
+   * @param {} input Action inputs
    * @returns {Object} The action that was created.
    */
-  requestAction(actionId: string, input: IInputProperty): void  {
+  requestAction(actionId: string, input: {}): void  {
     const action = this.actions.get(actionId);
     if (!action) {
       return;
@@ -141,7 +157,10 @@ export class Thing {
 
     if (action.input && action.input.properties) {
       const valid = ajv.validate(action.input.properties, input);
-      // to finish. Include actions queue in device class
+      let actionRequest = new ActionRequest(this.name, actionId, input);
+      this.actionsQueue.push(actionRequest);
+      this.actionNotify(actionRequest.getActionRequest());
+
       if (!valid) {
         return;
       }
@@ -169,10 +188,10 @@ export class Thing {
    *
    * @param {Object} action
    */
-  actionNotify({}): void {
+  actionNotify(actionRequest: {}): void {
     const data = JSON.stringify({
       messageType: 'actionStatus',
-      data: 'tbd',
+      data: actionRequest,
     });
     amqp.publishMessage(data);
   }
