@@ -26,7 +26,7 @@ export class Property extends EventEmitter {
 
   metadata?: IPropertyMetadata;
   value: any;
-  valueForwarder: Function | null;
+  valueGenerator: Function;
 
   links: Link[] = [];
 
@@ -50,7 +50,16 @@ export class Property extends EventEmitter {
     this.semanticType = semanticType;
 
     this.value = 0;
-    this.valueForwarder = null;
+    this.valueGenerator = (value: any): any => {
+      return value;
+    };
+
+
+    setInterval(() => {
+      const newValue = this.valueGenerator(1);
+      this.setValue(newValue);
+    }, 2000);
+
   }
 
   /**
@@ -89,27 +98,26 @@ export class Property extends EventEmitter {
    * Set the property current value
    */
   setValue(newValue: any): void {
-    if (this.valueForwarder) {
-      this.valueForwarder(newValue);
+    const valid = this.validateValue(newValue);
+    if (valid) {
+      this.notifyValue(newValue);
     }
-
-    this.notifyOfExternalUpdate(newValue);
   }
 
   /**
  * Defines a new value forwarder
- * @param {Function} f Function that define the method to update the value
+ * @param {Function} g Function that define the method to update the value
  */
-  setValueForwarder(f: Function) {
-    this.valueForwarder = f;
+  setValueGenerator(g: Function) {
+    this.valueGenerator = g;
   }
 
   /**
-   * Notify observers of a new value.
+   * Notify observers of a value.
    *
-   * @param {*} value New value
+   * @param {*} value value
    */
-  notifyOfExternalUpdate(v: any) {
+  notifyValue(v: any) {
     if (typeof v !== 'undefined' &&
       v !== null &&
       v !== this.value) {
@@ -122,16 +130,15 @@ export class Property extends EventEmitter {
    * 
    * @param {Any} newValue Value to be checked against the metadata
    */
-  validateValue(newValue: any): void {
-    if (this.metadata && this.metadata.hasOwnProperty('readOnly') && this.metadata.readOnly) {
-      throw new Error('Property is defined as read-only.');
-    }
+  validateValue(newValue: any): Boolean {
+    /*     if (this.metadata && this.metadata.hasOwnProperty('readOnly') && this.metadata.readOnly) {
+          throw new Error('Property is defined as read-only.');
+        } */
 
     if (this.metadata) {
       let valid = ajv.validate(this.metadata, newValue);
-      if (!valid) {
-        throw new Error("Invalid property.");
-      }
+      return valid;
     }
+    return true;
   }
 }

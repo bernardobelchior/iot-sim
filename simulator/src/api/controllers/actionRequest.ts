@@ -1,44 +1,98 @@
+import { Thing } from "./thing";
+
+/**
+ * 
+ */
 enum ActionRequestStatus {
   "created",
   "pending",
-  "completed"
+  "completed",
+  "cancelled"
 }
 
+/**
+ * 
+ */
 export class ActionRequest {
   id: string;
-  thingId: string;
+  thing: Thing;
   href: string;
   status: ActionRequestStatus;
   timeRequested: Date;
   timeCompleted?: Date;
   input?: {};
 
-  constructor(thingId: string, actionId: string, input?: {}) {
+  /**
+   * 
+   * @param thing 
+   * @param actionId 
+   * @param input 
+   */
+  constructor(thing: Thing, actionId: string, input?: {}) {
     this.id = actionId;
-    this.thingId = thingId;
-    this.href = `/actions/${this.thingId}/${this.id}`;
+    this.thing = thing;
+    this.href = `/actions/${this.thing.name}/${this.id}`;
     this.status = ActionRequestStatus.created;
     this.timeRequested = new Date();
     this.input = input;
+
+    this.thing.actionNotify(this.getActionRequest());
   }
 
+  /**
+   * 
+   */
   getActionRequest(): any {
-    let data:any = {
+    let request: any = {
       [this.id]: {
         "href": this.href,
-        "status": this.status,
-        "timeRequested": this.timeRequested
+        "status": ActionRequestStatus[this.status],
+        "timeRequested": this.timeRequested.toISOString()
       }
     }
 
     if(this.timeCompleted !== null) {
-      data[this.id].timeCompleted = this.timeCompleted;
+      request[this.id].timeCompleted = this.timeCompleted;
     }
 
     if(this.input !== null) {
-      data[this.id].input = this.input;
+      request[this.id].input = this.input;
     }
 
-    return data;
+    return request;
+  }
+
+  /**
+   * 
+   */
+  startAction() {
+    this.status = ActionRequestStatus.pending;
+    this.thing.actionNotify(this.getActionRequest());
+  }
+
+  /**
+   * 
+   */
+  performAction() {
+    // Do something according to input.
+    this.finishAction();
+  }
+
+  /**
+   * 
+   */
+  cancelAction() {
+    this.status = ActionRequestStatus.cancelled;
+    this.thing.actionNotify(this.getActionRequest());
+  }
+
+  /**
+   * 
+   */
+  finishAction() {
+    this.timeCompleted = new Date();
+    this.status = ActionRequestStatus.completed;
+    this.thing.actionNotify(this.getActionRequest());
+    // remove from queue
   }
 }

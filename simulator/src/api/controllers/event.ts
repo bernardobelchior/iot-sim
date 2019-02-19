@@ -25,7 +25,7 @@ export class Event {
   links: Link[] = [];
 
   /**
-   *
+   * Event constructor 
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    * @param {String} semanticType String identifying a type from the linked context
@@ -37,6 +37,10 @@ export class Event {
     this.semanticType = semanticType;
   }
 
+  /**
+   * Define the event's parameters that are option
+   * @param metadata 
+   */
   defineMetadata(metadata: IEventMetadata) {
     Object.keys(metadata).forEach((key: string) =>
       metadata[key] === undefined ? delete metadata[key] : ""
@@ -44,6 +48,10 @@ export class Event {
     this.metadata = metadata;
   }
 
+  /**
+   * Add relationships between events and remaining entities
+   * @param {ILink[]} links 
+   */
   addLinks(links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {

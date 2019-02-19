@@ -35,6 +35,10 @@ export class Action {
     this.description = description;
   }
 
+  /**
+   * Add relationships between events and remaining entities
+   * @param {ILink[]} links 
+   */
   addLinks(links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
@@ -45,6 +49,10 @@ export class Action {
     }
   }
 
+  /**
+   * 
+   * @param {IInput} inputData 
+   */
   defineInput(inputData: IInput): any {
     if (inputData !== undefined) {
       this.input = inputData;

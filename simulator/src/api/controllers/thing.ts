@@ -147,9 +147,9 @@ export class Thing {
    *
    * @param {String} actionName Name of the action
    * @param {} input Action inputs
-   * @returns {Object} The action that was created.
+   * @returns {ActionRequest} The action that was created.
    */
-  requestAction(actionId: string, input: {}): void  {
+  requestAction(actionId: string, input?: any): ActionRequest | undefined  {
     const action = this.actions.get(actionId);
     if (!action) {
       return;
@@ -157,14 +157,34 @@ export class Thing {
 
     if (action.input && action.input.properties) {
       const valid = ajv.validate(action.input.properties, input);
-      let actionRequest = new ActionRequest(this.name, actionId, input);
-      this.actionsQueue.push(actionRequest);
-      this.actionNotify(actionRequest.getActionRequest());
-
+      
       if (!valid) {
         return;
       }
+
+      let actionRequest = new ActionRequest(this, actionId, input);
+      this.actionsQueue.push(actionRequest);
+
+      return actionRequest;
     }
+
+    let actionRequest = new ActionRequest(this, actionId, input);
+    this.actionsQueue.push(actionRequest);
+    return actionRequest;
+  }
+
+  /**
+   * Cancel an action currently in the process of being executed.
+   *
+   * @param {String} actionName Name of the action
+   */
+  cancelAction(actionId: string): void  {
+    const actionRequest = this.actionsQueue.find(x => x.id === actionId);
+    if (!actionRequest) {
+      return;
+    }
+
+
   }
 
   /**
@@ -175,10 +195,10 @@ export class Thing {
   propertyNotify(propertyId: string): void {
     const p = this.properties.get(propertyId);
     if(p) {
-      const data = JSON.stringify({
+      const data = {
         messageType: 'propertyStatus',
         [p.id]: p.getValue(),
-      });
+      };
       amqp.publishMessage(data);
     } 
   }
@@ -188,11 +208,11 @@ export class Thing {
    *
    * @param {Object} action
    */
-  actionNotify(actionRequest: {}): void {
-    const data = JSON.stringify({
+  actionNotify(actionRequest: any): void {
+    const data = {
       messageType: 'actionStatus',
       data: actionRequest,
-    });
+    }
     amqp.publishMessage(data);
   }
 
@@ -202,14 +222,32 @@ export class Thing {
    * @param {Object} event The event that occurred
    */
   eventNotify(eventId: string): void {
-    if (!this.events.has(eventId)) {
-      return;
-    }
+    const event = this.events.get(eventId) 
 
-    const data = {
-      messageType: 'event',
-      data: eventId,
-    };
-    amqp.publishMessage(data);
+    if(event) {
+      const data = {
+        messageType: 'event',
+        data: {
+          [event.id]: {
+            "timestamp": new Date().toISOString()
+          }
+        },
+      };
+      amqp.publishMessage(data);
+    }
+  }
+  
+  /**
+   * Get the available events for this thing
+   */
+  getEvents() {
+    return this.events;
+  }
+
+  /**
+   * Get the available actions for this thing
+   */
+  getActions() {
+    return this.actions;
   }
 }

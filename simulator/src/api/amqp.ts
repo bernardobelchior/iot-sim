@@ -33,7 +33,9 @@ export const consumeMessage = async (queue: string) => {
     await ch.assertQueue(queue, { exclusive: true });
     await ch.bindQueue(queue, 'source', '#');
     ch.consume(queue, (data: any) => {
-      //console.log(data)
+      const content = data.content.toString();
+      let message = JSON.parse(content);
+      console.log(message)
     })
   } catch (error) {
     throw new Error(error);
