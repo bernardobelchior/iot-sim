@@ -1,6 +1,6 @@
 export interface ILink {
   href: string;
-  rel: string;
+  rel?: string;
   mediatype?: string;
 }
 
@@ -9,7 +9,7 @@ export interface ILink {
  */
 export class Link {
   href: string;
-  rel: string;
+  rel?: string;
   mediatype?: string;
 
   /**
@@ -22,5 +22,13 @@ export class Link {
     this.href = data.href;
     this.rel = data.rel;
     this.mediatype = data.mediatype;
+  }
+
+  /**
+   * Set the relationship associated to the link
+   * @param {String} rel The relationship parameter
+   */
+  setRel(rel: string): void {
+    this.rel = rel;
   }
 }

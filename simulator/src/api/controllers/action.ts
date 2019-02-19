@@ -1,6 +1,6 @@
 import { Link, ILink } from './link';
 
-interface IInputProperty {
+export interface IInputProperty {
   type: string;
   unit?: string;
   minimum?: number;
@@ -8,7 +8,7 @@ interface IInputProperty {
   multipleOf?: number;
 }
 
-interface IInput {
+export interface IInput {
   '@type': string;
   type: string;
   properties?: { [property: string]: IInputProperty };
@@ -36,10 +36,13 @@ export class Action {
   }
 
   addLinks(links: ILink[]): any {
-    links.forEach((linkData: ILink) => {
-      const link = new Link(linkData);
-      this.links.push(link);
-    });
+    if (Array.isArray(links)) {
+      links.forEach((linkData: ILink) => {
+        let link = new Link(linkData);
+        link.setRel('action');
+        this.links.push(link);
+      });
+    }
   }
 
   defineInput(inputData: IInput): any {

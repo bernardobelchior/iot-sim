@@ -1,6 +1,5 @@
 import fs from 'fs';
-import path from 'path';
-import { Thing } from './models/thing';
+import { Thing } from './controllers/thing';
 
 export interface IEnvironment {
   // other general configs
@@ -32,7 +31,7 @@ const readSensorsConfigs = (filePath: string): Thing[] => {
   // Parse IoT things definition
   data.things.forEach((obj: any) => {
     const context: string = '@context' in obj ? obj['@context'] : null;
-    let type: string[] = null;
+    let type: string[] = [];
     if ('@type' in obj) {
       if (Array.isArray(obj['@type'])) {
         type = obj['@type'];

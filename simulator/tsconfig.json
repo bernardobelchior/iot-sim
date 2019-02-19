@@ -8,6 +8,10 @@
             "dom"
         ],
         "noImplicitAny": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "strict": true,
+        "noUnusedLocals": true,
         "moduleResolution": "node",
         "sourceMap": true,
         "outDir": "dist",
