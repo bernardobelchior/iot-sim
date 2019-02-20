@@ -12,7 +12,8 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
-    "tslint": "tslint -c tslint.json -p tsconfig.json --fix"
+    "tslint": "tslint -c tslint.json -p tsconfig.json --fix",
+    "prettier": "prettier src/**/*.ts --fix --write"
   },
   "dependencies": {
     "ajv": "^6.9.1",
@@ -28,6 +29,7 @@
     "@types/mongoose": "^5.3.16",
     "@types/node": "^11.9.4",
     "nodemon": "^1.18.10",
+    "prettier": "1.16.4",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
     "typescript": "^3.3.3"
