@@ -1,4 +1,3 @@
-import logger from "./util/logger";
 import http from "http";
 import mongo from "./config/mongo";
 import manager from "./api/manager";

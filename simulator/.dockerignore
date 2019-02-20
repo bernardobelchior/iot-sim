@@ -1,0 +1,4 @@
+node_modules
+Dockerfile
+tslint.json
+debug.log
