@@ -1,7 +1,7 @@
 import { Thing } from "./thing";
 
 /**
- * 
+ *
  */
 enum ActionRequestStatus {
   "created",
@@ -11,7 +11,7 @@ enum ActionRequestStatus {
 }
 
 /**
- * 
+ *
  */
 export class ActionRequest {
   id: string;
@@ -23,10 +23,10 @@ export class ActionRequest {
   input?: {};
 
   /**
-   * 
-   * @param thing 
-   * @param actionId 
-   * @param input 
+   *
+   * @param thing
+   * @param actionId
+   * @param input
    */
   constructor(thing: Thing, actionId: string, input?: {}) {
     this.id = actionId;
@@ -40,22 +40,22 @@ export class ActionRequest {
   }
 
   /**
-   * 
+   *
    */
   getActionRequest(): any {
-    let request: any = {
+    const request: any = {
       [this.id]: {
         "href": this.href,
         "status": ActionRequestStatus[this.status],
         "timeRequested": this.timeRequested.toISOString()
       }
-    }
+    };
 
-    if(this.timeCompleted !== null) {
+    if (this.timeCompleted !== null) {
       request[this.id].timeCompleted = this.timeCompleted;
     }
 
-    if(this.input !== null) {
+    if (this.input !== null) {
       request[this.id].input = this.input;
     }
 
@@ -63,7 +63,7 @@ export class ActionRequest {
   }
 
   /**
-   * 
+   *
    */
   startAction() {
     this.status = ActionRequestStatus.pending;
@@ -71,7 +71,7 @@ export class ActionRequest {
   }
 
   /**
-   * 
+   *
    */
   performAction() {
     // Do something according to input.
@@ -79,7 +79,7 @@ export class ActionRequest {
   }
 
   /**
-   * 
+   *
    */
   cancelAction() {
     this.status = ActionRequestStatus.cancelled;
@@ -87,7 +87,7 @@ export class ActionRequest {
   }
 
   /**
-   * 
+   *
    */
   finishAction() {
     this.timeCompleted = new Date();

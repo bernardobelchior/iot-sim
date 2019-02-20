@@ -1,5 +1,5 @@
-import fs from 'fs';
-import { Thing } from './controllers/thing';
+import fs from "fs";
+import { Thing } from "./controllers/thing";
 
 export interface IEnvironment {
   // other general configs
@@ -22,24 +22,25 @@ export function builder(): IEnvironment {
 }
 
 const readSensorsConfigs = (filePath: string): Thing[] => {
-  let data = JSON.parse(fs.readFileSync(filePath));
+  const data = JSON.parse(fs.readFileSync(filePath).toString());
 
-  let things: Thing[] = [];
+  const things: Thing[] = [];
 
   // Parse general configs
 
   // Parse IoT things definition
   data.things.forEach((obj: any) => {
-    const context: string = '@context' in obj ? obj['@context'] : null;
+    const context: string | undefined = obj["@context"];
     let type: string[] = [];
-    if ('@type' in obj) {
-      if (Array.isArray(obj['@type'])) {
-        type = obj['@type'];
+
+    if ("@type" in obj) {
+      if (Array.isArray(obj["@type"])) {
+        type = obj["@type"];
       } else {
-        type = [obj['@type']];
+        type = [obj["@type"]];
       }
     }
-    let t = new Thing(obj.name, obj.description, context, type);
+    const t = new Thing(obj.name, obj.description, context, type);
 
     t.addProperties(obj.properties || []);
     t.addActions(obj.actions || []);

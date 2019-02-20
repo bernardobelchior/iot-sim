@@ -1,4 +1,4 @@
-import { Link, ILink } from './link';
+import { Link, ILink } from "./link";
 
 export interface IInputProperty {
   type: string;
@@ -9,7 +9,7 @@ export interface IInputProperty {
 }
 
 export interface IInput {
-  '@type': string;
+  "@type": string;
   type: string;
   properties?: { [property: string]: IInputProperty };
 }
@@ -37,21 +37,21 @@ export class Action {
 
   /**
    * Add relationships between events and remaining entities
-   * @param {ILink[]} links 
+   * @param {ILink[]} links
    */
   addLinks(links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        let link = new Link(linkData);
-        link.setRel('action');
+        const link = new Link(linkData);
+        link.setRel("action");
         this.links.push(link);
       });
     }
   }
 
   /**
-   * 
-   * @param {IInput} inputData 
+   *
+   * @param {IInput} inputData
    */
   defineInput(inputData: IInput): any {
     if (inputData !== undefined) {

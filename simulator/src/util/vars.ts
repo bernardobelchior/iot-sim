@@ -1,9 +1,9 @@
-import logger from './logger';
-import dotenv from 'dotenv';
-import fs from 'fs';
+import logger from "./logger";
+import dotenv from "dotenv";
+import fs from "fs";
 
 // Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: '.env.example' });
+dotenv.config({ path: ".env.example" });
 
 interface VarsDefinition {
   ENVIRONMENT: string;
@@ -12,35 +12,35 @@ interface VarsDefinition {
   PORT: number;
 }
 
-if (fs.existsSync('.env')) {
-  logger.debug('Using .env file to supply config environment variables');
-  dotenv.config({ path: '.env' });
+if (fs.existsSync(".env")) {
+  logger.debug("Using .env file to supply config environment variables");
+  dotenv.config({ path: ".env" });
 } else {
-  logger.debug('Using .env.example file to supply config environment variables');
-  dotenv.config({ path: '.env.example' });
+  logger.debug("Using .env.example file to supply config environment variables");
+  dotenv.config({ path: ".env.example" });
 }
 
-const ENVIRONMENT = process.env.NODE_ENV;
-const prod = ENVIRONMENT === 'production';
+const ENVIRONMENT: string = process.env.NODE_ENV || "development";
+const prod = ENVIRONMENT === "production";
 
-const MONGODB_URI = prod ? process.env['MONGODB_URI'] : process.env['MONGODB_URI_LOCAL'];
+const MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
 
-if (!MONGODB_URI) {
-  logger.error('No mongo connection string. Set MONGODB_URI environment variable.');
-  process.exit(1);
+if (MONGODB_URI === undefined) {
+  logger.error("No mongo connection string. Set MONGODB_URI environment variable.");
+  throw new Error("No mongo connection string. Set MONGODB_URI environment variable.");
 }
 
-const PORT = parseInt(process.env.PORT);
+const PORT = parseInt(process.env.PORT || "8080");
 
-const AMQP_URI = prod ? process.env['AMQP_URI'] : process.env['AMQP_URI_LOCAL'];
+const AMQP_URI = prod ? process.env["AMQP_URI"] : process.env["AMQP_URI_LOCAL"];
 if (!AMQP_URI) {
-  logger.error('Invalid AMQP config specified. Set AMQP_URI environment variable.');
-  process.exit(1);
-} 
+  logger.error("Invalid AMQP config specified. Set AMQP_URI environment variable.");
+  throw new Error("Invalid AMQP config specified. Set AMQP_URI environment variable.");
+}
 
 export const vars: VarsDefinition = {
   ENVIRONMENT,
-  MONGODB_URI,
+  MONGODB_URI ,
   PORT,
   AMQP_URI
 };

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /**
  * Action Schema
@@ -26,10 +26,10 @@ const actionSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
 /**
  * @typedef Action
  */
-const Action = mongoose.model('Action', actionSchema);
+const Action = mongoose.model("Action", actionSchema);
 export default Action;

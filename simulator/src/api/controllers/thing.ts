@@ -3,10 +3,10 @@ import { Action } from "./action";
 import { Event } from "./event";
 import { Link, ILink } from "./link";
 import { ActionRequest } from "./actionRequest";
-import * as amqp from '../amqp';
+import * as amqp from "../amqp";
 
-import Ajv from 'ajv';
-let ajv = new Ajv();
+import Ajv from "ajv";
+const ajv = new Ajv();
 
 /**
  * The Thing Description provides a vocabulary for describing physical devices connected to the World Wide Web
@@ -44,9 +44,9 @@ export class Thing {
   }
 
   addProperties(properties: any): void {
-    for (let key in properties) {
-      let obj = properties[key];
-      let p = new Property(key, obj.title, obj.description, obj["@type"]);
+    for (const key in properties) {
+      const obj = properties[key];
+      const p = new Property(key, obj.title, obj.description, obj["@type"]);
 
       p.defineMetadata({
         type: obj.type,
@@ -58,16 +58,16 @@ export class Thing {
         multipleOf: obj.multipleOf
       });
       p.addLinks(obj.links);
-      p.on('update', () => this.propertyNotify(p.id));
+      p.on("update", () => this.propertyNotify(p.id));
 
       this.properties.set(key, p);
     }
   }
 
   addActions(actions: any): void {
-    for (let key in actions) {
-      let obj = actions[key];
-      let a = new Action(key, obj.title, obj.description);
+    for (const key in actions) {
+      const obj = actions[key];
+      const a = new Action(key, obj.title, obj.description);
       a.defineInput(obj.input);
       a.addLinks(obj.links);
 
@@ -76,9 +76,9 @@ export class Thing {
   }
 
   addEvents(events: any): void {
-    for (let key in events) {
-      let obj = events[key];
-      let e = new Event(
+    for (const key in events) {
+      const obj = events[key];
+      const e = new Event(
         key,
         obj.title,
         obj.description,
@@ -105,10 +105,10 @@ export class Thing {
   }
 
   /**
-   * 
+   *
    */
   public getProperties() {
-    let propsValues: { [key: string]: number } = {};
+    const propsValues: { [key: string]: number } = {};
     this.properties.forEach((p: Property, key: string) => {
       propsValues[key] = p.getValue();
     });
@@ -116,29 +116,29 @@ export class Thing {
   }
 
   /**
-   * 
-   * @param id 
+   *
+   * @param id
    */
-  public getPropertyValue(id: string): any { 
+  public getPropertyValue(id: string): any {
     const p = this.properties.get(id);
-    if(p) {
+    if (p) {
       return p.getValue();
-    } 
+    }
 
-    throw new Error('Property specified doesn\'t exists');
+    throw new Error("Property specified doesn't exists");
   }
 
   /**
-   * 
-   * @param id 
-   * @param propertyValue 
+   *
+   * @param id
+   * @param propertyValue
    */
-  public setProperty(id: string, propertyValue: any): void { 
+  public setProperty(id: string, propertyValue: any): void {
     const p = this.properties.get(id);
-    if(p) {
+    if (p) {
       p.setValue(propertyValue);
     } else {
-      throw new Error('Property specified doesn\'t exists');
+      throw new Error("Property specified doesn't exists");
     }
   }
 
@@ -157,18 +157,18 @@ export class Thing {
 
     if (action.input && action.input.properties) {
       const valid = ajv.validate(action.input.properties, input);
-      
+
       if (!valid) {
         return;
       }
 
-      let actionRequest = new ActionRequest(this, actionId, input);
+      const actionRequest = new ActionRequest(this, actionId, input);
       this.actionsQueue.push(actionRequest);
 
       return actionRequest;
     }
 
-    let actionRequest = new ActionRequest(this, actionId, input);
+    const actionRequest = new ActionRequest(this, actionId, input);
     this.actionsQueue.push(actionRequest);
     return actionRequest;
   }
@@ -194,13 +194,13 @@ export class Thing {
    */
   propertyNotify(propertyId: string): void {
     const p = this.properties.get(propertyId);
-    if(p) {
+    if (p) {
       const data = {
-        messageType: 'propertyStatus',
+        messageType: "propertyStatus",
         [p.id]: p.getValue(),
       };
       amqp.publishMessage(data);
-    } 
+    }
   }
 
   /**
@@ -210,9 +210,9 @@ export class Thing {
    */
   actionNotify(actionRequest: any): void {
     const data = {
-      messageType: 'actionStatus',
+      messageType: "actionStatus",
       data: actionRequest,
-    }
+    };
     amqp.publishMessage(data);
   }
 
@@ -222,11 +222,11 @@ export class Thing {
    * @param {Object} event The event that occurred
    */
   eventNotify(eventId: string): void {
-    const event = this.events.get(eventId) 
+    const event = this.events.get(eventId);
 
-    if(event) {
+    if (event) {
       const data = {
-        messageType: 'event',
+        messageType: "event",
         data: {
           [event.id]: {
             "timestamp": new Date().toISOString()
@@ -236,7 +236,7 @@ export class Thing {
       amqp.publishMessage(data);
     }
   }
-  
+
   /**
    * Get the available events for this thing
    */

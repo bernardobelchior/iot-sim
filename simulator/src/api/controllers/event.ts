@@ -1,4 +1,4 @@
-import { Link, ILink } from './link';
+import { Link, ILink } from "./link";
 
 
 interface IEventMetadata {
@@ -25,7 +25,7 @@ export class Event {
   links: Link[] = [];
 
   /**
-   * Event constructor 
+   * Event constructor
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    * @param {String} semanticType String identifying a type from the linked context
@@ -39,7 +39,7 @@ export class Event {
 
   /**
    * Define the event's parameters that are option
-   * @param metadata 
+   * @param metadata
    */
   defineMetadata(metadata: IEventMetadata) {
     Object.keys(metadata).forEach((key: string) =>
@@ -50,13 +50,13 @@ export class Event {
 
   /**
    * Add relationships between events and remaining entities
-   * @param {ILink[]} links 
+   * @param {ILink[]} links
    */
   addLinks(links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        let link = new Link(linkData);
-        link.setRel('event');
+        const link = new Link(linkData);
+        link.setRel("event");
         this.links.push(link);
       });
     }

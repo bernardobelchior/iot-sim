@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /**
  * Message Schema
@@ -14,10 +14,10 @@ const messageSchema = new mongoose.Schema({
     type: Object,
     required: true
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
 /**
  * @typedef Message
  */
-const Message = mongoose.model('Message', messageSchema);
+const Message = mongoose.model("Message", messageSchema);
 export default Message;

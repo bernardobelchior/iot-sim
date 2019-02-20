@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /**
  * Message Schema
@@ -13,10 +13,10 @@ const eventSchema = new mongoose.Schema({
   data: {
     type: Number
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
 /**
  * @typedef Event
  */
-const Event = mongoose.model('Event', eventSchema);
+const Event = mongoose.model("Event", eventSchema);
 export default Event;

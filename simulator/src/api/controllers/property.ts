@@ -1,7 +1,8 @@
-import { Link, ILink } from "./link";
-import EventEmitter from 'events';
-import Ajv from 'ajv';
-let ajv = new Ajv();
+import { ILink, Link } from "./link";
+import EventEmitter from "events";
+import Ajv from "ajv";
+
+const ajv = new Ajv();
 
 export interface IPropertyMetadata {
   type: string;
@@ -69,7 +70,7 @@ export class Property extends EventEmitter {
   addLinks(links: ILink[]): void {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        let link = new Link(linkData);
+        const link = new Link(linkData);
         link.setRel("property");
         this.links.push(link);
       });
@@ -105,9 +106,9 @@ export class Property extends EventEmitter {
   }
 
   /**
- * Defines a new value forwarder
- * @param {Function} g Function that define the method to update the value
- */
+   * Defines a new value forwarder
+   * @param {Function} g Function that define the method to update the value
+   */
   setValueGenerator(g: Function) {
     this.valueGenerator = g;
   }
@@ -115,20 +116,20 @@ export class Property extends EventEmitter {
   /**
    * Notify observers of a value.
    *
-   * @param {*} value value
+   * @param v
    */
   notifyValue(v: any) {
-    if (typeof v !== 'undefined' &&
+    if (typeof v !== "undefined" &&
       v !== null &&
       v !== this.value) {
       this.value = v;
-      super.emit('update', v);
+      super.emit("update", v);
     }
   }
 
   /**
-   * 
-   * @param {Any} newValue Value to be checked against the metadata
+   *
+   * @param {any} newValue Value to be checked against the metadata
    */
   validateValue(newValue: any): Boolean {
     /*     if (this.metadata && this.metadata.hasOwnProperty('readOnly') && this.metadata.readOnly) {
@@ -136,8 +137,9 @@ export class Property extends EventEmitter {
         } */
 
     if (this.metadata) {
-      let valid = ajv.validate(this.metadata, newValue);
-      return valid;
+      /* As long as AJV is not compiled asynchronously, this assertion holds
+       * More info: https://github.com/epoberezkin/ajv#validateobject-schemastring-keystring-ref-data---boolean */
+      return ajv.validate(this.metadata, newValue) as boolean;
     }
     return true;
   }

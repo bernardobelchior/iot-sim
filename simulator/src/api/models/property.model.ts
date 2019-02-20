@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 /**
  * Property Schema
@@ -14,10 +14,10 @@ const propertySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     required: true
   }
-}, { timestamps: true })
+}, { timestamps: true });
 
 /**
  * @typedef Property
  */
-const Property = mongoose.model('Property', propertySchema);
+const Property = mongoose.model("Property", propertySchema);
 export default Property;
