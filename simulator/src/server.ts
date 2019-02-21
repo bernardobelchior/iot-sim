@@ -1,10 +1,19 @@
 import http from "http";
 import mongo from "./config/mongo";
-import manager from "./api/manager";
+// import manager from "./api/manager";
 import { vars } from "./util/vars";
+import { DeviceRegistry } from "./api/DeviceRegistry";
+import { messageQueueBuilder } from "./api/MessageQueue";
+
+async function startRegistry() {
+  const messageQueue = await messageQueueBuilder(vars.AMQP_URI);
+  await messageQueue.init();
+  await new DeviceRegistry(messageQueue).init();
+}
 
 mongo();
-manager();
+// manager();
+startRegistry();
 
 /**
  * Start Node server.

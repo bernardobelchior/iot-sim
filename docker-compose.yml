@@ -17,7 +17,7 @@ services:
     networks:
       - backend
       - middleware
-      
+
   middleware:
     image: iot-sim.middleware
     container_name: iot-sim.middleware
@@ -40,15 +40,15 @@ services:
       retries: 5
     networks:
       - middleware
-        
-  mongo: 
+
+  mongo:
     container_name: iot-sim.mongo
     image: mongo
     restart: always
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: password
-    ports: 
+    ports:
       - 27017:27017
     networks:
       - backend
@@ -56,5 +56,5 @@ services:
 networks:
   middleware:
     driver: bridge
-  backend: 
+  backend:
     driver: bridge

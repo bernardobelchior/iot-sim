@@ -17,7 +17,7 @@ mongoose.set("debug", true);
  */
 export default () => {
   mongoose.connect(vars.MONGODB_URI, {
-    keepAlive: true,
+    keepAlive: true
   });
   return mongoose.connection;
 };

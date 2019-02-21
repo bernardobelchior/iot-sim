@@ -18,9 +18,14 @@ export const publishMessage = async (data: any) => {
     const conn = await amqp.connect(vars.AMQP_URI);
     const ch = await conn.createChannel();
     await ch.checkExchange("source");
-    await ch.publish("source", "topic", Buffer.from(JSON.stringify({ ...data })), {
-      contentType: "application/json",
-    });
+    await ch.publish(
+      "source",
+      "topic",
+      Buffer.from(JSON.stringify({ ...data })),
+      {
+        contentType: "application/json"
+      }
+    );
   } catch (error) {
     throw new Error(error);
   }
