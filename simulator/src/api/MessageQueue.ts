@@ -14,26 +14,12 @@ export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
   return mq;
 }
 
-export abstract class IMessageQueue {
-  abstract publish(
-    exchange: string,
-    routingKey: string,
-    message: Buffer
-  ): boolean;
-
-  abstract async consume(
-    queue: string,
-    onMessage: (msg: ConsumeMessage | null) => any
-  ): Promise<Replies.Consume>;
-}
-
-export class MessageQueue extends IMessageQueue {
+export class MessageQueue {
   url: string;
   channel: Channel | undefined;
   connection: Connection;
 
   constructor(url: string, connection: Connection) {
-    super();
     this.url = url;
     this.connection = connection;
   }

@@ -1,4 +1,5 @@
 import { messageQueueBuilder } from "./api/MessageQueue";
+import { vars } from "./util/vars";
 
 const thing = {
   name: "On/Off Switch",
@@ -14,9 +15,7 @@ const thing = {
 };
 
 async function run() {
-  const messageQueue = await messageQueueBuilder(
-    "amqp://guest:guest@172.23.0.3:5672/vhost"
-  );
+  const messageQueue = await messageQueueBuilder(vars.AMQP_URI);
 
   await messageQueue.init();
   await messageQueue.createExchange("registry", "direct");
