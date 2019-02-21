@@ -28,10 +28,19 @@ export class MessageQueue {
     this.channel = await this.connection.createChannel();
   }
 
-  async bindQueue(queue: string, source: string, routingKey: string) {
+  async assertQueue(queue: string) {
     if (this.channel === undefined) {
       logger.error("MessageQueue: tried to assert queue without channel");
       throw new Error("MessageQueue: tried to assert queue without channel");
+    }
+
+    return this.channel.assertQueue(queue);
+  }
+
+  async bindQueue(queue: string, source: string, routingKey: string) {
+    if (this.channel === undefined) {
+      logger.error("MessageQueue: tried to bind queue without channel");
+      throw new Error("MessageQueue: tried to bind queue without channel");
     }
 
     return this.channel.bindQueue(queue, source, routingKey);

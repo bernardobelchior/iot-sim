@@ -2,9 +2,6 @@ import logger from "./logger";
 import dotenv from "dotenv";
 import fs from "fs";
 
-// Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: ".env.example" });
-
 interface VarsDefinition {
   ENVIRONMENT: string;
   MONGODB_URI: string;
@@ -12,6 +9,7 @@ interface VarsDefinition {
   PORT: number;
 }
 
+// Load environment variables from .env file, where API keys and passwords are configured
 if (fs.existsSync(".env")) {
   logger.debug("Using .env file to supply config environment variables");
   dotenv.config({ path: ".env" });

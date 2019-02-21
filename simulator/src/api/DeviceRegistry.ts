@@ -13,6 +13,8 @@ export class DeviceRegistry {
   }
 
   async init() {
+    await this.mq.createExchange("registry", "direct");
+    await this.mq.assertQueue("register");
     await this.mq.bindQueue("register", "registry", "register");
     await this.mq.consume("register", this.consume.bind(this));
   }
@@ -24,5 +26,7 @@ export class DeviceRegistry {
         parseWebThing(JSON.parse(msg.content.toString()))
       );
     }
+
+    console.log(this.things);
   }
 }

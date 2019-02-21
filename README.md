@@ -17,6 +17,18 @@ To enable the RabbitMQ plugins, run:
 rabbitmq-plugins enable rabbitmq_mqtt rabbitmq_management rabbitmq_web_stomp
 ```
 
+To run mongoDB, in the simulator directory, execute:
+```bash
+mongod --dbpath=./data
+```
+
+After installing its dependencies, the simulator can be run:
+```bash
+npm install
+
+npm start
+```
+
 ### Docker
 
 With Docker and docker-compose installed, run:
