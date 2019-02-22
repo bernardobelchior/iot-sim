@@ -11,7 +11,8 @@ const thing = {
       description: "Whether the lamp is turned on",
       links: [{ href: "/things/lamp/properties/on" }]
     }
-  }
+  },
+  href: "/things/lamp"
 };
 
 async function run() {

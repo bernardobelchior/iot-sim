@@ -1,5 +1,6 @@
-import http from "http";
 import mongo from "./config/mongo";
+import cors from "cors";
+import express, { Router } from "express";
 // import manager from "./api/manager";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
@@ -8,27 +9,36 @@ import { messageQueueBuilder } from "./api/MessageQueue";
 async function startRegistry() {
   const messageQueue = await messageQueueBuilder(vars.AMQP_URI);
   await messageQueue.init();
-  await new DeviceRegistry(messageQueue).init();
+
+  const deviceRegistry = new DeviceRegistry(messageQueue);
+  await deviceRegistry.init();
+  return deviceRegistry;
 }
 
-mongo();
-// manager();
-startRegistry();
-
-/**
- * Start Node server.
- */
-const server = http.createServer();
+const app = express();
 const port = vars.PORT;
 const env = vars.ENVIRONMENT;
+const router = Router();
 
-server.listen(port, (err: any) => {
-  if (err) {
-    return console.log(`Error while starting server: ${err}`);
-  }
+(async () => {
+  mongo();
+  // manager();
+  const registry = await startRegistry();
 
-  console.log("App is running at http://localhost:%d in %s mode", port, env);
-  console.log("Press CTRL-C to stop\n");
-});
+  app.use(cors({ origin: "*" }));
 
-export default server;
+  router.get("/", (req, res) => {
+    res.send(registry.things);
+  });
+
+  app.use("/things", router);
+
+  app.listen(port, (err: any) => {
+    if (err) {
+      return console.log(`Error while starting server: ${err}`);
+    }
+
+    console.log("App is running at http://localhost:%d in %s mode", port, env);
+    console.log("Press CTRL-C to stop\n");
+  });
+})();

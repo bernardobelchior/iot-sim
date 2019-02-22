@@ -1,28 +1,51 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import Things from "./pages/Things";
+import { RootActions } from "./store/actions";
+import { bindActionCreators, Dispatch } from "redux";
+import { fetchThings } from "./store/actions/things";
+import Drawer from "./components/Drawer";
+import { AppBar, Toolbar, Typography } from "@material-ui/core";
 
-class App extends Component {
+interface Props {
+  fetchThings: () => void;
+}
+
+class App extends Component<Props> {
+  componentDidMount() {
+    const { fetchThings } = this.props;
+
+    fetchThings();
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div>
+        <Drawer />
+        <div style={{ marginLeft: "120px" }}>
+            <AppBar position="static">
+                <Toolbar>
+                    <Typography variant="h6" color="inherit">
+                        IoT Simulator
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+          <Things />
+        </div>
       </div>
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = (dispatch: Dispatch<RootActions>) =>
+  bindActionCreators(
+    {
+      fetchThings
+    },
+    dispatch
+  );
+
+export default connect(
+  () => ({}),
+  mapDispatchToProps
+)(App);

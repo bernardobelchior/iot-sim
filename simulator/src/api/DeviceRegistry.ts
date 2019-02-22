@@ -1,11 +1,10 @@
 import { Thing } from "./controllers/thing";
 import { MessageQueue } from "./MessageQueue";
 import { ConsumeMessage } from "amqplib";
-import { v4 as uuid } from "uuid";
 import { parseWebThing } from "./builder";
 
 export class DeviceRegistry {
-  things: Map<string, Thing> = new Map();
+  things: Thing[] = [];
   mq: MessageQueue;
 
   constructor(mq: MessageQueue) {
@@ -21,12 +20,12 @@ export class DeviceRegistry {
 
   consume(msg: ConsumeMessage | null) {
     if (msg !== null) {
-      this.things.set(
-        uuid(),
-        parseWebThing(JSON.parse(msg.content.toString()))
-      );
-    }
+      const obj = JSON.parse(msg.content.toString());
+      console.log(obj);
 
-    console.log(this.things);
+      this.things.push(parseWebThing(obj));
+
+      this.mq.ack(msg);
+    }
   }
 }

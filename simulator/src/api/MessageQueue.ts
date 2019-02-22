@@ -1,4 +1,10 @@
-import amqp, { Channel, Connection, ConsumeMessage, Replies } from "amqplib";
+import amqp, {
+  Channel,
+  Connection,
+  ConsumeMessage,
+  Message,
+  Replies
+} from "amqplib";
 import { toNativePromise } from "../util/promise";
 import logger from "../util/logger";
 
@@ -78,5 +84,14 @@ export class MessageQueue {
     }
 
     return toNativePromise(this.channel.consume(queue, onMessage));
+  }
+
+  ack(message: Message) {
+    if (this.channel === undefined) {
+      logger.error("MessageQueue: tried to ack message without channel");
+      throw new Error("MessageQueue: tried to ack message without channel");
+    }
+
+    return this.channel.ack(message);
   }
 }
