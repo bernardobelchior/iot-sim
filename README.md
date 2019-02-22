@@ -26,6 +26,13 @@ After installing its dependencies, the simulator can be run:
 ```bash
 npm install
 
+npm run watch
+```
+
+After installing its dependencies, the user interface can be run:
+```bash
+npm install
+
 npm start
 ```
 
