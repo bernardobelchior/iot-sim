@@ -17,7 +17,6 @@ export class DeviceRegistry {
   consume(topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
-      console.log(obj);
 
       this.things.push(parseWebThing(obj));
     }

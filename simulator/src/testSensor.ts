@@ -33,8 +33,8 @@ const things = [
 async function run() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
 
-  things.forEach(thing =>
-    messageQueue.publish("register", JSON.stringify(thing))
+  things.forEach(
+    async thing => await messageQueue.publish("register", JSON.stringify(thing))
   );
 }
 

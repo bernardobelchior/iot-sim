@@ -29,7 +29,7 @@ export class MessageQueue {
     this.url = url;
     this.client = client;
 
-    this.client.on("message", this.messageHandler);
+    this.client.on("message", this.messageHandler.bind(this));
   }
 
   private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
