@@ -1,13 +1,13 @@
-import winston, { LoggerInstance, Logger } from "winston";
+import { createLogger, Logger, transports } from "winston";
 
 const ENVIRONMENT = process.env.ENVIRONMENT;
 
-const logger: LoggerInstance = new Logger({
+const logger: Logger = createLogger({
   transports: [
-    new winston.transports.Console({
+    new transports.Console({
       level: ENVIRONMENT === "production" ? "error" : "debug"
     }),
-    new winston.transports.File({ filename: "debug.log", level: "debug" })
+    new transports.File({ filename: "debug.log", level: "debug" })
   ]
 });
 
