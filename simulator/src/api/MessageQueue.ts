@@ -1,97 +1,81 @@
-import amqp, {
-  Channel,
-  Connection,
-  ConsumeMessage,
-  Message,
-  Replies
-} from "amqplib";
-import { toNativePromise } from "../util/promise";
-import logger from "../util/logger";
+import {
+  AsyncMqttClient,
+  connect,
+  OnMessageCallback,
+  Packet
+} from "async-mqtt";
 
-type ExchangeType = "topic" | "direct" | "fanout" | "headers";
-
-export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
-  const connection: Connection = await amqp.connect(url);
-
-  const mq = new MessageQueue(url, connection);
-
-  await mq.init();
-
-  return mq;
+enum QoS {
+  AtMostOnce = 0,
+  AtLeastOnce = 1,
+  ExactlyOnce = 2
 }
 
+export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
+  const client = await connect(url);
+
+  return new MessageQueue(url, client);
+}
+
+/**
+ * Message Queue class that abstracts message queue internals.
+ */
 export class MessageQueue {
   url: string;
-  channel: Channel | undefined;
-  connection: Connection;
+  client: AsyncMqttClient;
+  messageHandlers: { [topic: string]: OnMessageCallback } = {};
 
-  constructor(url: string, connection: Connection) {
+  constructor(url: string, client: AsyncMqttClient) {
     this.url = url;
-    this.connection = connection;
+    this.client = client;
+
+    this.client.on("message", this.messageHandler);
   }
 
-  async init() {
-    this.channel = await this.connection.createChannel();
-  }
+  private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
+    // TODO: Add support for '+' and '#' wildcards
 
-  async assertQueue(queue: string) {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to assert queue without channel");
-      throw new Error("MessageQueue: tried to assert queue without channel");
-    }
-
-    return this.channel.assertQueue(queue);
-  }
-
-  async bindQueue(queue: string, source: string, routingKey: string) {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to bind queue without channel");
-      throw new Error("MessageQueue: tried to bind queue without channel");
-    }
-
-    return this.channel.bindQueue(queue, source, routingKey);
-  }
-
-  async createExchange(exchange: string, type: ExchangeType) {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to create exchange without channel");
-      throw new Error("MessageQueue: tried to create exchange without channel");
-    }
-
-    await this.channel.assertExchange(exchange, type, {
-      durable: true
+    Object.keys(this.messageHandlers).forEach(key => {
+      if (key === topic) {
+        this.messageHandlers[key](topic, payload, packet);
+      }
     });
   }
 
-  publish(exchange: string, routingKey: string, message: Buffer): boolean {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to publish without channel");
-      throw new Error("MessageQueue: tried to publish without channel");
-    }
-
-    return this.channel.publish(exchange, routingKey, message, {
-      contentType: "application/json"
+  /**
+   * Publishes to a topic
+   * @param topic Topic to publish.
+   * @param message Message to send.
+   * @param qos Quality of Service. Default value is at most once.
+   */
+  publish(topic: string, message: Buffer | string, qos: QoS = QoS.AtMostOnce) {
+    return this.client.publish(topic, message, {
+      qos
     });
   }
 
-  consume(
-    queue: string,
-    onMessage: (msg: ConsumeMessage | null) => any
-  ): Promise<Replies.Consume> {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to consume without channel");
-      throw new Error("MessageQueue: tried to consume without channel");
-    }
+  /**
+   * Subscribes to a topic.
+   * @param topic Topic to subscribe.
+   * @param onMessage Function to call whenever a message is received. If this topic was subscribed previously, onMessage will replace the old handler.
+   * @param qos QoS. Exactly once is not supported, since RabbitMQ does not support it. Default value is at most once.
+   */
+  async subscribe(
+    topic: string,
+    onMessage: OnMessageCallback,
+    qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
+  ) {
+    await this.client.subscribe(topic, {
+      qos
+    });
 
-    return toNativePromise(this.channel.consume(queue, onMessage));
+    this.messageHandlers[topic] = onMessage;
   }
 
-  ack(message: Message) {
-    if (this.channel === undefined) {
-      logger.error("MessageQueue: tried to ack message without channel");
-      throw new Error("MessageQueue: tried to ack message without channel");
-    }
-
-    return this.channel.ack(message);
+  /**
+   * Closes the connection gracefully. Promise resolves once all messages have been ACKed.
+   */
+  end() {
+    return this.client.end();
   }
 }

@@ -16,26 +16,27 @@
     "prettier": "prettier src/**/*.ts --fix --write"
   },
   "dependencies": {
-    "ajv": "^6.9.1",
+    "ajv": "^6.9.2",
     "amqplib": "^0.5.3",
+    "async-mqtt": "^2.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^4.0.0",
+    "dotenv": "^6.2.0",
     "express": "^4.16.4",
-    "mongoose": "^5.4.12",
-    "winston": "^2.4.4"
+    "mongoose": "^5.4.15",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.10",
     "@types/cors": "^2.8.4",
-    "@types/dotenv": "^4.0.3",
+    "@types/dotenv": "^6.1.0",
     "@types/express": "^4.16.1",
     "@types/mongodb": "^3.1.19",
-    "@types/mongoose": "^5.3.16",
-    "@types/node": "^11.9.4",
+    "@types/mongoose": "^5.3.19",
+    "@types/node": "^11.9.5",
     "concurrently": "^4.1.0",
     "nodemon": "^1.18.10",
     "prettier": "1.16.4",
-    "tslint": "^5.12.1",
-    "typescript": "^3.3.3"
+    "tslint": "^5.13.0",
+    "typescript": "^3.3.3333"
   }
 }

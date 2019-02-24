@@ -7,8 +7,7 @@ import { DeviceRegistry } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
 
 async function startRegistry() {
-  const messageQueue = await messageQueueBuilder(vars.AMQP_URI);
-  await messageQueue.init();
+  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
 
   const deviceRegistry = new DeviceRegistry(messageQueue);
   await deviceRegistry.init();

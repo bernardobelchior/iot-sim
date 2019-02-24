@@ -12,7 +12,7 @@ mongoose.set("debug", true);
 /**
  * Connect to mongo db
  *
- * @returns {object} Mongoose connection
+ * @returns {object} Mongoose client
  * @public
  */
 export default () => {

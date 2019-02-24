@@ -31,17 +31,10 @@ const things = [
 ];
 
 async function run() {
-  const messageQueue = await messageQueueBuilder(vars.AMQP_URI);
-
-  await messageQueue.init();
-  await messageQueue.createExchange("registry", "direct");
+  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
 
   things.forEach(thing =>
-    messageQueue.publish(
-      "registry",
-      "register",
-      Buffer.from(JSON.stringify(thing))
-    )
+    messageQueue.publish("register", JSON.stringify(thing))
   );
 }
 

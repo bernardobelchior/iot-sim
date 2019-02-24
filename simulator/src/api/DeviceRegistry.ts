@@ -1,6 +1,5 @@
 import { Thing } from "./controllers/thing";
 import { MessageQueue } from "./MessageQueue";
-import { ConsumeMessage } from "amqplib";
 import { parseWebThing } from "./builder";
 
 export class DeviceRegistry {
@@ -12,20 +11,15 @@ export class DeviceRegistry {
   }
 
   async init() {
-    await this.mq.createExchange("registry", "direct");
-    await this.mq.assertQueue("register");
-    await this.mq.bindQueue("register", "registry", "register");
-    await this.mq.consume("register", this.consume.bind(this));
+    await this.mq.subscribe("register", this.consume.bind(this));
   }
 
-  consume(msg: ConsumeMessage | null) {
+  consume(topic: string, msg: Buffer) {
     if (msg !== null) {
-      const obj = JSON.parse(msg.content.toString());
+      const obj = JSON.parse(msg.toString());
       console.log(obj);
 
       this.things.push(parseWebThing(obj));
-
-      this.mq.ack(msg);
     }
   }
 }

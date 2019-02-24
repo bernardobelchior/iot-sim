@@ -1,9 +1,11 @@
-import amqp = require("amqplib");
-import { vars } from "../util/vars";
+import * as amqp from "amqplib";
+
+// FIXME: Temporary fix while this still uses AMQP
+const MQ_URI = "amqp://guest:guest@iot-sim.middleware:5672/vhost";
 
 export const createExchange = async () => {
   try {
-    const conn = await amqp.connect(vars.AMQP_URI);
+    const conn = await amqp.connect(MQ_URI);
     const ch = await conn.createChannel();
     await ch.assertExchange("source", "topic", {
       durable: true
@@ -15,7 +17,7 @@ export const createExchange = async () => {
 
 export const publishMessage = async (data: any) => {
   try {
-    const conn = await amqp.connect(vars.AMQP_URI);
+    const conn = await amqp.connect(MQ_URI);
     const ch = await conn.createChannel();
     await ch.checkExchange("source");
     await ch.publish(
@@ -33,7 +35,7 @@ export const publishMessage = async (data: any) => {
 
 export const consumeMessage = async (queue: string) => {
   try {
-    const conn = await amqp.connect(vars.AMQP_URI);
+    const conn = await amqp.connect(MQ_URI);
     const ch = await conn.createChannel();
     await ch.assertQueue(queue, { exclusive: true });
     await ch.bindQueue(queue, "source", "#");
