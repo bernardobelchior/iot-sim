@@ -1,3 +1,5 @@
+// FIXME: Placeholder types while this is not fixed: https://github.com/mqttjs/async-mqtt/issues/14
+
 declare module "async-mqtt" {
   import {
     MqttClient,
