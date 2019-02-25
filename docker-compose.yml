@@ -49,6 +49,8 @@ services:
       RABBITMQ_DEFAULT_PASS: guest
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_VHOST: vhost
+    volumes:
+      - "./middleware/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:15672"]
       interval: 30s

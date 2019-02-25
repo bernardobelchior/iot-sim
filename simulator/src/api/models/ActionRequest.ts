@@ -96,6 +96,5 @@ export class ActionRequest {
     this.timeCompleted = new Date();
     this.status = ActionRequestStatus.completed;
     this.thing.actionNotify(this.getActionRequest());
-    // remove from queue
   }
 }

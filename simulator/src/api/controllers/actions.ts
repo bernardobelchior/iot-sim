@@ -2,7 +2,7 @@ import { Response, Request } from "express";
 import { DeviceRegistry } from "../DeviceRegistry";
 
 /**
- * Handle a GET request to /<thingId>/actions. Returns an array with all actions executed by the device
+ * Handle a GET request to /<thingId>/actions. Returns an array with all actions available
  *
  * @param {Request} req The request object
  * @param {Response} res The response object

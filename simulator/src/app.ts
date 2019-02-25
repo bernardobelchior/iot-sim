@@ -44,7 +44,7 @@ app.use(expressValidator());
  */
 app.get("/", (req, res) => thingsController.list(req, res));
 app.get("/:thingId", (req, res) => thingsController.get(req, res));
-app.get("/:thingId/properties", (req, res) => propertiesController.get(req, res));
+app.get("/:thingId/properties", (req, res) => propertiesController.list(req, res));
 app.get("/:thingId/properties/:propertyName", (req, res) => propertiesController.get(req, res));
 app.put("/:thingId/properties/:propertyName", (req, res) => propertiesController.put(req, res));
 app.get("/:thingId/actions", (req, res) => actionsController.getActions(req, res));

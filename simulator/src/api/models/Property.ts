@@ -54,13 +54,23 @@ export class Property extends EventEmitter {
     this.valueGenerator = (value: any): any => {
       return value;
     };
+  }
 
+  /**
+   * Get the property description.
+   *
+   * @returns {Object} Description of the property as an object.
+   */
+  asPropertyDescription() {
+    let data: any = {
+      title: this.title,
+      description: this.description
+    };
 
-    setInterval(() => {
-      const newValue = this.valueGenerator(1);
-      this.setValue(newValue);
-    }, 2000);
+    data = {...data, ...this.metadata };
+    data.links = this.links;
 
+    return data;
   }
 
   /**
@@ -99,6 +109,10 @@ export class Property extends EventEmitter {
    * Set the property current value
    */
   setValue(newValue: any): void {
+    if (this.metadata && this.metadata.hasOwnProperty("readOnly") && this.metadata.readOnly) {
+      throw new Error("Property is defined as read-only.");
+    }
+
     const valid = this.validateValue(newValue);
     if (valid) {
       this.notifyValue(newValue);
@@ -132,30 +146,11 @@ export class Property extends EventEmitter {
    * @param {any} newValue Value to be checked against the metadata
    */
   validateValue(newValue: any): Boolean {
-    /*     if (this.metadata && this.metadata.hasOwnProperty('readOnly') && this.metadata.readOnly) {
-          throw new Error('Property is defined as read-only.');
-        } */
-
     if (this.metadata) {
       /* As long as AJV is not compiled asynchronously, this assertion holds
        * More info: https://github.com/epoberezkin/ajv#validateobject-schemastring-keystring-ref-data---boolean */
       return ajv.validate(this.metadata, newValue) as boolean;
     }
     return true;
-  }
-
-  /**
-   * Get the property description.
-   *
-   * @returns {Object} Description of the property as an object.
-   */
-  asPropertyDescription() {
-    const description = JSON.parse(JSON.stringify(this.metadata));
-
-    if (!description.hasOwnProperty("links")) {
-      description.links = [];
-    }
-
-    return description;
   }
 }

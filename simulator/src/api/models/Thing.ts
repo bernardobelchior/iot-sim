@@ -3,7 +3,6 @@ import { Action } from "./Action";
 import { Event } from "./Event";
 import { Link, ILink } from "./Link";
 import { ActionRequest } from "./ActionRequest";
-import * as amqp from "../amqp";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -77,30 +76,22 @@ export class Thing {
     };
 
     this.actions.forEach((value: Action, key: string) => {
-      thing.actions[key] = value.input ? value.input : {};
-      thing.actions[key].title = value.title;
-      thing.actions[key].description = value.description;
-      thing.actions[key].links = [
-        {
-          rel: "action",
-          href: `${this.hrefPrefix}/actions/${key}`,
-        },
-      ];
+      thing.actions[key] = JSON.parse(JSON.stringify(value));
+      delete(thing.actions[key]["id"]);
     });
 
     this.events.forEach((value: Event, key: string) => {
-      thing.events[key] = value.metadata;
-      thing.events[key].links = [
-        {
-          rel: "event",
-          href: `${this.hrefPrefix}/events/${key}`,
-        },
-      ];
+      thing.events[key] = JSON.parse(JSON.stringify(value));
+      delete(thing.events[key]["id"]);
     });
 
     return thing;
   }
 
+  /**
+   *
+   * @param properties
+   */
   addProperties(properties: any): void {
     for (const key in properties) {
       const obj = properties[key];
@@ -122,6 +113,10 @@ export class Thing {
     }
   }
 
+  /**
+   *
+   * @param actions
+   */
   addActions(actions: any): void {
     for (const key in actions) {
       const obj = actions[key];
@@ -133,6 +128,10 @@ export class Thing {
     }
   }
 
+  /**
+   *
+   * @param events
+   */
   addEvents(events: any): void {
     for (const key in events) {
       const obj = events[key];
@@ -155,6 +154,10 @@ export class Thing {
     }
   }
 
+  /**
+   *
+   * @param links
+   */
   addLinks(links: ILink[]): void {
     links.forEach((linkData: ILink) => {
       const link = new Link(linkData);
@@ -255,10 +258,11 @@ export class Thing {
    * @param {String} actionId Id of the action
    */
   cancelAction(actionName: string, actionId: string): boolean {
-    const actionRequest = this.actionsQueue.find(x => x.id === actionId);
+    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
     if (!actionRequest) {
       return false;
     }
+    actionRequest.cancelAction();
     return true;
   }
 
@@ -274,7 +278,8 @@ export class Thing {
         messageType: "propertyStatus",
         [p.id]: p.getValue(),
       };
-      amqp.publishMessage(data);
+      console.log(data);
+      // amqp.publishMessage(data);
     }
   }
 
@@ -288,7 +293,8 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest,
     };
-    amqp.publishMessage(data);
+    console.log(data);
+    // amqp.publishMessage(data);
   }
 
   /**
@@ -308,7 +314,8 @@ export class Thing {
           }
         },
       };
-      amqp.publishMessage(data);
+      console.log(data);
+      // amqp.publishMessage(data);
     }
   }
 
@@ -322,7 +329,7 @@ export class Thing {
   }
 
   /**
-   * Get the thing's events as an array. Events emmited by the device
+   * Get the thing's events as an array. Events emitted by the device
    *
    * @param {String?} eventName Optional event name to get descriptions for
    *
@@ -354,8 +361,20 @@ export class Thing {
    * @returns {Object} Action descriptions.
    */
   getActionDescriptions(actionName?: string) {
-    // TODO use mongo to obtain actions
-    return [];
+    const availableActions: any = {};
+    if (actionName !== undefined) {
+      const action = this.actions.get(actionName);
+      if (action !== undefined) {
+        availableActions[actionName] = JSON.parse(JSON.stringify(action)); 
+        delete(availableActions[actionName]["id"]);
+      }
+    } else {
+      this.actions.forEach((value: Action, key: string) => {
+        availableActions[key] = JSON.parse(JSON.stringify(value));
+        delete(availableActions[key]["id"]);
+      });
+    }
+    return availableActions;
   }
 
   /**
@@ -371,5 +390,12 @@ export class Thing {
     }
 
     return this.actionsQueue.find((x: ActionRequest) => x.id === actionId);
+  }
+
+  /**
+   * Store in a database the properties current values
+   */
+  publishProperties() {
+    const propValues = this.getProperties();
   }
 }
