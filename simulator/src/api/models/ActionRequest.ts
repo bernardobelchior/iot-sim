@@ -1,4 +1,5 @@
-import { Thing } from "./thing";
+import { Thing } from "./Thing";
+import { v4 as uuid } from "uuid";
 
 /**
  *
@@ -15,6 +16,7 @@ enum ActionRequestStatus {
  */
 export class ActionRequest {
   id: string;
+  name: string;
   thing: Thing;
   href: string;
   status: ActionRequestStatus;
@@ -28,10 +30,11 @@ export class ActionRequest {
    * @param actionId
    * @param input
    */
-  constructor(thing: Thing, actionId: string, input?: {}) {
-    this.id = actionId;
+  constructor(thing: Thing, name: string, input?: {}) {
+    this.name = name;
+    this.id = uuid();
     this.thing = thing;
-    this.href = `/actions/${this.thing.name}/${this.id}`;
+    this.href = `/actions/${this.name}/${this.id}`;
     this.status = ActionRequestStatus.created;
     this.timeRequested = new Date();
     this.input = input;

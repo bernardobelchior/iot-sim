@@ -28,9 +28,7 @@ const MONGODB_URI = prod
   : process.env["MONGODB_URI_LOCAL"];
 
 if (MONGODB_URI === undefined) {
-  logger.error(
-    "No mongo client string. Set MONGODB_URI environment variable."
-  );
+  logger.error("No mongo client string. Set MONGODB_URI environment variable.");
   throw new Error(
     "No mongo client string. Set MONGODB_URI environment variable."
   );
@@ -41,7 +39,7 @@ const PORT = parseInt(process.env.PORT || "8080");
 const MQ_URI = prod ? process.env["MQ_URI"] : process.env["AMQP_URI_LOCAL"];
 if (!MQ_URI) {
   logger.error(
-    "Invalid messague config specified. Set MQ_URI environment variable."
+    "Invalid message config specified. Set MQ_URI environment variable."
   );
   throw new Error(
     "Invalid message queue config specified. Set MQ_URI environment variable."

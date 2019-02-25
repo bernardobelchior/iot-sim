@@ -1,4 +1,4 @@
-import { Link, ILink } from "./link";
+import { Link, ILink } from "./Link";
 
 export interface IInputProperty {
   type: string;

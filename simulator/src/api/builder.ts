@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Thing } from "./controllers/thing";
+import { Thing } from "./models/Thing";
 
 export interface IEnvironment {
   // other general configs

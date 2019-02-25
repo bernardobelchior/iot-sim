@@ -1,4 +1,4 @@
-import { ILink, Link } from "./link";
+import { ILink, Link } from "./Link";
 import EventEmitter from "events";
 import Ajv from "ajv";
 
@@ -142,5 +142,20 @@ export class Property extends EventEmitter {
       return ajv.validate(this.metadata, newValue) as boolean;
     }
     return true;
+  }
+
+  /**
+   * Get the property description.
+   *
+   * @returns {Object} Description of the property as an object.
+   */
+  asPropertyDescription() {
+    const description = JSON.parse(JSON.stringify(this.metadata));
+
+    if (!description.hasOwnProperty("links")) {
+      description.links = [];
+    }
+
+    return description;
   }
 }

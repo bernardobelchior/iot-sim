@@ -44,6 +44,7 @@ services:
       - 25672:25672
       - 15671:15671
       - 15672:15672
+      - 1883:1883
     environment:
       RABBITMQ_DEFAULT_PASS: guest
       RABBITMQ_DEFAULT_USER: guest

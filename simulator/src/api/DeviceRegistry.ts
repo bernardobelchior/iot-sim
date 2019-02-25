@@ -1,24 +1,34 @@
-import { Thing } from "./controllers/thing";
+import { Thing } from "./models/Thing";
 import { MessageQueue } from "./MessageQueue";
-import { parseWebThing } from "./builder";
+import { parseWebThing, builder } from "./builder";
 
-export class DeviceRegistry {
-  things: Thing[] = [];
-  mq: MessageQueue;
+export namespace DeviceRegistry {
+  let things: Thing[] = [];
+  let messageQueue: MessageQueue;
 
-  constructor(mq: MessageQueue) {
-    this.mq = mq;
+  export function setMessageQueue(mq: MessageQueue): void {
+    messageQueue = mq;
   }
 
-  async init() {
-    await this.mq.subscribe("register", this.consume.bind(this));
+  export async function init() {
+    things = [...builder().things];
+    // Check if it's working. Changed this to DeviceRegistry namespace. I cannot test because the connection to mqtt fails
+    await messageQueue.subscribe("register", consume.bind(DeviceRegistry));
   }
 
-  consume(topic: string, msg: Buffer) {
+  export const getThings = () => {
+    return things;
+  };
+
+  export const getThing = (thingId: string) => {
+    return things.find((x: Thing) => x.name === thingId);
+  };
+
+  export function consume(topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
 
-      this.things.push(parseWebThing(obj));
+      things.push(parseWebThing(obj));
     }
   }
 }

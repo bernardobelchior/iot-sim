@@ -1,5 +1,5 @@
-import { messageQueueBuilder } from "./api/MessageQueue";
-import { vars } from "./util/vars";
+import { messageQueueBuilder } from "../src/api/MessageQueue";
+import { vars } from "../src/util/vars";
 
 const things = [
   {

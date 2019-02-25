@@ -1,8 +1,8 @@
-import { Property } from "./property";
-import { Action } from "./action";
-import { Event } from "./event";
-import { Link, ILink } from "./link";
-import { ActionRequest } from "./actionRequest";
+import { Property } from "./Property";
+import { Action } from "./Action";
+import { Event } from "./Event";
+import { Link, ILink } from "./Link";
+import { ActionRequest } from "./ActionRequest";
 import * as amqp from "../amqp";
 
 import Ajv from "ajv";
@@ -16,6 +16,7 @@ export class Thing {
   context?: string;
   type?: string[] = [];
   name: string;
+  hrefPrefix: string;
   description: string;
   properties: Map<string, Property> = new Map<string, Property>();
   actions: Map<string, Action> = new Map<string, Action>();
@@ -38,9 +39,66 @@ export class Thing {
     type?: string[]
   ) {
     this.name = name;
+    this.hrefPrefix = "";
     this.description = description;
     this.context = context;
     this.type = type;
+  }
+
+  /**
+   * Return the thing state as a Thing Description.
+   *
+   * @returns {Object} Current thing state
+   */
+  asThingDescription() {
+    const thing: any = {
+      name: this.name,
+      description: this.description,
+      href: this.hrefPrefix ? this.hrefPrefix : "/",
+      "@context": this.context,
+      "@type": this.type,
+      properties: this.getPropertyDescriptions(),
+      actions: {},
+      events: {},
+      links: [
+        {
+          rel: "properties",
+          href: `${this.hrefPrefix}/properties`,
+        },
+        {
+          rel: "actions",
+          href: `${this.hrefPrefix}/actions`,
+        },
+        {
+          rel: "events",
+          href: `${this.hrefPrefix}/events`,
+        },
+      ],
+    };
+
+    this.actions.forEach((value: Action, key: string) => {
+      thing.actions[key] = value.input ? value.input : {};
+      thing.actions[key].title = value.title;
+      thing.actions[key].description = value.description;
+      thing.actions[key].links = [
+        {
+          rel: "action",
+          href: `${this.hrefPrefix}/actions/${key}`,
+        },
+      ];
+    });
+
+    this.events.forEach((value: Event, key: string) => {
+      thing.events[key] = value.metadata;
+      thing.events[key].links = [
+        {
+          rel: "event",
+          href: `${this.hrefPrefix}/events/${key}`,
+        },
+      ];
+    });
+
+    return thing;
   }
 
   addProperties(properties: any): void {
@@ -105,9 +163,11 @@ export class Thing {
   }
 
   /**
+   * Get a mapping of all properties and their values.
    *
+   * Returns an object of propertyName -> value.
    */
-  public getProperties() {
+  getProperties() {
     const propsValues: { [key: string]: number } = {};
     this.properties.forEach((p: Property, key: string) => {
       propsValues[key] = p.getValue();
@@ -116,8 +176,22 @@ export class Thing {
   }
 
   /**
+   * Determine whether or not this thing has a given property.
    *
-   * @param id
+   * @param {String} propertyName The property to look for
+   *
+   * @returns {Boolean} Indication of property presence
+   */
+  hasProperty(propertyName: string) {
+    return this.properties.has(propertyName);
+  }
+
+  /**
+   * Get a property's value
+   *
+   * @param {String} propertyName Name of the property to get the value of
+   *
+   * @returns {*} Current property value if found, else null
    */
   public getPropertyValue(id: string): any {
     const p = this.properties.get(id);
@@ -129,12 +203,13 @@ export class Thing {
   }
 
   /**
+   * Set a property's value.
    *
-   * @param id
-   * @param propertyValue
+   * @param {String} propertyName Name of the property to get the value of
+   * @param {*} propertyValue
    */
-  public setProperty(id: string, propertyValue: any): void {
-    const p = this.properties.get(id);
+  public setProperty(propertyName: string, propertyValue: any): void {
+    const p = this.properties.get(propertyName);
     if (p) {
       p.setValue(propertyValue);
     } else {
@@ -149,8 +224,8 @@ export class Thing {
    * @param {} input Action inputs
    * @returns {ActionRequest} The action that was created.
    */
-  requestAction(actionId: string, input?: any): ActionRequest | undefined  {
-    const action = this.actions.get(actionId);
+  requestAction(actionName: string, input?: any): ActionRequest | undefined {
+    const action = this.actions.get(actionName);
     if (!action) {
       return;
     }
@@ -162,13 +237,13 @@ export class Thing {
         return;
       }
 
-      const actionRequest = new ActionRequest(this, actionId, input);
+      const actionRequest = new ActionRequest(this, actionName, input);
       this.actionsQueue.push(actionRequest);
 
       return actionRequest;
     }
 
-    const actionRequest = new ActionRequest(this, actionId, input);
+    const actionRequest = new ActionRequest(this, actionName, input);
     this.actionsQueue.push(actionRequest);
     return actionRequest;
   }
@@ -177,14 +252,14 @@ export class Thing {
    * Cancel an action currently in the process of being executed.
    *
    * @param {String} actionName Name of the action
+   * @param {String} actionId Id of the action
    */
-  cancelAction(actionId: string): void  {
+  cancelAction(actionName: string, actionId: string): boolean {
     const actionRequest = this.actionsQueue.find(x => x.id === actionId);
     if (!actionRequest) {
-      return;
+      return false;
     }
-
-
+    return true;
   }
 
   /**
@@ -238,16 +313,63 @@ export class Thing {
   }
 
   /**
-   * Get the available events for this thing
+   * Get the thing's events as an array.
+   *
+   * @returns {Map<string, Event>} Thing's available events.
    */
-  getEvents() {
+  getAvailableEvents() {
     return this.events;
   }
 
   /**
-   * Get the available actions for this thing
+   * Get the thing's events as an array. Events emmited by the device
+   *
+   * @param {String?} eventName Optional event name to get descriptions for
+   *
+   * @returns {Object} Event descriptions.
    */
-  getActions() {
-    return this.actions;
+  getEventDescriptions(eventName?: string) {
+    // TODO Use Mongo database to retrieve events.
+  }
+
+  /**
+   * Get the thing's properties as an object.
+   *
+   * @returns {Object} Properties, i.e. name -> description
+   */
+  getPropertyDescriptions() {
+    const descriptions: any = {};
+    this.properties.forEach((value: Property, key: string) => {
+      descriptions[key] = value.asPropertyDescription();
+    });
+
+    return descriptions;
+  }
+
+  /**
+   * Get the thing's actions as an array.
+   *
+   * @param {String?} actionName Optional action name to get descriptions for
+   *
+   * @returns {Object} Action descriptions.
+   */
+  getActionDescriptions(actionName?: string) {
+    // TODO use mongo to obtain actions
+    return [];
+  }
+
+  /**
+   * Get an action.
+   *
+   * @param {String} actionName Name of the action
+   * @param {String} actionId ID of the action
+   * @returns {Object} The requested action if found, else null
+   */
+  getAction(actionName: string, actionId: string) {
+    if (!this.actions.hasOwnProperty(actionName)) {
+      return undefined;
+    }
+
+    return this.actionsQueue.find((x: ActionRequest) => x.id === actionId);
   }
 }
