@@ -13,7 +13,7 @@ const ajv = new Ajv();
  */
 export class Thing {
   context?: string;
-  type?: string[] = [];
+  type: string[] = [];
   name: string;
   hrefPrefix: string;
   description: string;
@@ -41,7 +41,7 @@ export class Thing {
     this.hrefPrefix = "";
     this.description = description;
     this.context = context;
-    this.type = type;
+    this.type = type || [];
   }
 
   /**
@@ -394,5 +394,13 @@ export class Thing {
    */
   publishProperties() {
     // const propValues = this.getProperties();
+  }
+
+  /**
+   * Returns whether or not this Thing is being simulated.
+   * If it is, then the `@type` key will have `Simulated` as a value.
+   */
+  isSimulated() {
+    return this.type.find(t => t === "Simulated");
   }
 }

@@ -28,7 +28,7 @@ export class DeviceRegistry {
     return this.things.find((x: Thing) => x.name === thingId);
   }
 
-  private consume(topic: string, msg: Buffer) {
+  private consume(_topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
 
