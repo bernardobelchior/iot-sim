@@ -67,7 +67,7 @@ export class Property extends EventEmitter {
       description: this.description
     };
 
-    data = {...data, ...this.metadata };
+    data = { ...data, ...this.metadata };
     data.links = this.links;
 
     return data;
@@ -109,7 +109,11 @@ export class Property extends EventEmitter {
    * Set the property current value
    */
   setValue(newValue: any): void {
-    if (this.metadata && this.metadata.hasOwnProperty("readOnly") && this.metadata.readOnly) {
+    if (
+      this.metadata &&
+      this.metadata.hasOwnProperty("readOnly") &&
+      this.metadata.readOnly
+    ) {
       throw new Error("Property is defined as read-only.");
     }
 
@@ -133,9 +137,7 @@ export class Property extends EventEmitter {
    * @param v
    */
   notifyValue(v: any) {
-    if (typeof v !== "undefined" &&
-      v !== null &&
-      v !== this.value) {
+    if (typeof v !== "undefined" && v !== null && v !== this.value) {
       this.value = v;
       super.emit("update", v);
     }

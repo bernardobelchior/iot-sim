@@ -48,9 +48,9 @@ export class ActionRequest {
   getActionRequest(): any {
     const request: any = {
       [this.id]: {
-        "href": this.href,
-        "status": ActionRequestStatus[this.status],
-        "timeRequested": this.timeRequested.toISOString()
+        href: this.href,
+        status: ActionRequestStatus[this.status],
+        timeRequested: this.timeRequested.toISOString()
       }
     };
 

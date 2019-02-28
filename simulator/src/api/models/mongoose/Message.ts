@@ -5,16 +5,19 @@ import mongoose from "mongoose";
  * @private
  */
 
-const messageSchema = new mongoose.Schema({
-  messageType: {
-    type: String,
-    required: true
+const messageSchema = new mongoose.Schema(
+  {
+    messageType: {
+      type: String,
+      required: true
+    },
+    data: {
+      type: Object,
+      required: true
+    }
   },
-  data: {
-    type: Object,
-    required: true
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 /**
  * @typedef Message

@@ -62,27 +62,27 @@ export class Thing {
       links: [
         {
           rel: "properties",
-          href: `${this.hrefPrefix}/properties`,
+          href: `${this.hrefPrefix}/properties`
         },
         {
           rel: "actions",
-          href: `${this.hrefPrefix}/actions`,
+          href: `${this.hrefPrefix}/actions`
         },
         {
           rel: "events",
-          href: `${this.hrefPrefix}/events`,
-        },
-      ],
+          href: `${this.hrefPrefix}/events`
+        }
+      ]
     };
 
     this.actions.forEach((value: Action, key: string) => {
       thing.actions[key] = JSON.parse(JSON.stringify(value));
-      delete(thing.actions[key]["id"]);
+      delete thing.actions[key]["id"];
     });
 
     this.events.forEach((value: Event, key: string) => {
       thing.events[key] = JSON.parse(JSON.stringify(value));
-      delete(thing.events[key]["id"]);
+      delete thing.events[key]["id"];
     });
 
     return thing;
@@ -135,12 +135,7 @@ export class Thing {
   addEvents(events: any): void {
     for (const key in events) {
       const obj = events[key];
-      const e = new Event(
-        key,
-        obj.title,
-        obj.description,
-        obj["@type"]
-      );
+      const e = new Event(key, obj.title, obj.description, obj["@type"]);
       e.defineMetadata({
         type: obj.type,
         unit: obj.unit,
@@ -258,7 +253,9 @@ export class Thing {
    * @param {String} actionId Id of the action
    */
   cancelAction(actionName: string, actionId: string): boolean {
-    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
+    const actionRequest = this.actionsQueue.find(
+      x => x.id === actionId && x.name === actionName
+    );
     if (!actionRequest) {
       return false;
     }
@@ -276,7 +273,7 @@ export class Thing {
     if (p) {
       const data = {
         messageType: "propertyStatus",
-        [p.id]: p.getValue(),
+        [p.id]: p.getValue()
       };
       console.log(data);
       // amqp.publishMessage(data);
@@ -291,7 +288,7 @@ export class Thing {
   actionNotify(actionRequest: any): void {
     const data = {
       messageType: "actionStatus",
-      data: actionRequest,
+      data: actionRequest
     };
     console.log(data);
     // amqp.publishMessage(data);
@@ -310,9 +307,9 @@ export class Thing {
         messageType: "event",
         data: {
           [event.id]: {
-            "timestamp": new Date().toISOString()
+            timestamp: new Date().toISOString()
           }
-        },
+        }
       };
       console.log(data);
       // amqp.publishMessage(data);
@@ -365,13 +362,13 @@ export class Thing {
     if (actionName !== undefined) {
       const action = this.actions.get(actionName);
       if (action !== undefined) {
-        availableActions[actionName] = JSON.parse(JSON.stringify(action)); 
-        delete(availableActions[actionName]["id"]);
+        availableActions[actionName] = JSON.parse(JSON.stringify(action));
+        delete availableActions[actionName]["id"];
       }
     } else {
       this.actions.forEach((value: Action, key: string) => {
         availableActions[key] = JSON.parse(JSON.stringify(value));
-        delete(availableActions[key]["id"]);
+        delete availableActions[key]["id"];
       });
     }
     return availableActions;

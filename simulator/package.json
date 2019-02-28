@@ -13,7 +13,7 @@
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json --fix",
-    "prettier": "prettier src/**/*.ts --fix --write",
+    "prettier": "prettier src/**/*.ts --write",
     "test": "jest --forceExit --coverage --verbose"
   },
   "dependencies": {

@@ -5,15 +5,18 @@ import mongoose from "mongoose";
  * @private
  */
 
-const eventSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true
+const eventSchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      required: true
+    },
+    data: {
+      type: Number
+    }
   },
-  data: {
-    type: Number
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 /**
  * @typedef Event

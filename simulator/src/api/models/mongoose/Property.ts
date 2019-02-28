@@ -5,16 +5,19 @@ import mongoose from "mongoose";
  * @private
  */
 
-const propertySchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true
+const propertySchema = new mongoose.Schema(
+  {
+    id: {
+      type: String,
+      required: true
+    },
+    value: {
+      type: mongoose.Schema.Types.Mixed,
+      required: true
+    }
   },
-  value: {
-    type: mongoose.Schema.Types.Mixed,
-    required: true
-  }
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 /**
  * @typedef Property

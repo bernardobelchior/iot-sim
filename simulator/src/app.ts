@@ -44,16 +44,36 @@ app.use(expressValidator());
  */
 app.get("/", (req, res) => thingsController.list(req, res));
 app.get("/:thingId", (req, res) => thingsController.get(req, res));
-app.get("/:thingId/properties", (req, res) => propertiesController.list(req, res));
-app.get("/:thingId/properties/:propertyName", (req, res) => propertiesController.get(req, res));
-app.put("/:thingId/properties/:propertyName", (req, res) => propertiesController.put(req, res));
-app.get("/:thingId/actions", (req, res) => actionsController.getActions(req, res));
-app.post("/:thingId/actions", (req, res) => actionsController.requestActions(req, res));
-app.get("/:thingId/actions/:actionName", (req, res) => actionsController.getAction(req, res));
-app.post("/:thingId/actions/:actionName", (req, res) => actionsController.requestAction(req, res));
-app.get("/:thingId/actions/:actionName/:actionId", (req, res) => actionsController.getActionRequest(req, res));
-app.delete("/:thingId/actions/:actionName/:actionId", (req, res) => actionsController.cancelActionRequest(req, res));
+app.get("/:thingId/properties", (req, res) =>
+  propertiesController.list(req, res)
+);
+app.get("/:thingId/properties/:propertyName", (req, res) =>
+  propertiesController.get(req, res)
+);
+app.put("/:thingId/properties/:propertyName", (req, res) =>
+  propertiesController.put(req, res)
+);
+app.get("/:thingId/actions", (req, res) =>
+  actionsController.getActions(req, res)
+);
+app.post("/:thingId/actions", (req, res) =>
+  actionsController.requestActions(req, res)
+);
+app.get("/:thingId/actions/:actionName", (req, res) =>
+  actionsController.getAction(req, res)
+);
+app.post("/:thingId/actions/:actionName", (req, res) =>
+  actionsController.requestAction(req, res)
+);
+app.get("/:thingId/actions/:actionName/:actionId", (req, res) =>
+  actionsController.getActionRequest(req, res)
+);
+app.delete("/:thingId/actions/:actionName/:actionId", (req, res) =>
+  actionsController.cancelActionRequest(req, res)
+);
 app.get("/:thingId/events", (req, res) => eventsController.list(req, res));
-app.get("/:thingId/events/:eventName", (req, res) => eventsController.get(req, res));
+app.get("/:thingId/events/:eventName", (req, res) =>
+  eventsController.get(req, res)
+);
 
 export default app;

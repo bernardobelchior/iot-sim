@@ -1,6 +1,5 @@
 import { Link, ILink } from "./Link";
 
-
 interface IEventMetadata {
   type?: string;
   unit?: string;
@@ -30,7 +29,12 @@ export class Event {
    * @param {String} description Human friendly description
    * @param {String} semanticType String identifying a type from the linked context
    */
-  constructor(id: string, title: string, description: string, semanticType: string) {
+  constructor(
+    id: string,
+    title: string,
+    description: string,
+    semanticType: string
+  ) {
     this.id = id;
     this.title = title;
     this.description = description;

@@ -1,4 +1,3 @@
-
 import { Response, Request } from "express";
 import { DeviceRegistry } from "../DeviceRegistry";
 
@@ -35,7 +34,7 @@ export const get = (req: Request, res: Response) => {
 
   const propertyName = req.params.propertyName;
   if (thing.hasProperty(propertyName)) {
-    res.json({[propertyName]: thing.getPropertyValue(propertyName)});
+    res.json({ [propertyName]: thing.getPropertyValue(propertyName) });
   } else {
     res.status(404).end();
   }
@@ -69,7 +68,7 @@ export const put = (req: Request, res: Response) => {
       return;
     }
 
-    res.json({[propertyName]: thing.getPropertyValue(propertyName)});
+    res.json({ [propertyName]: thing.getPropertyValue(propertyName) });
   } else {
     res.status(404).end();
   }

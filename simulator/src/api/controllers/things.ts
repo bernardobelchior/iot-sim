@@ -10,9 +10,7 @@ import { DeviceRegistry } from "../DeviceRegistry";
 export const list = (req: Request, res: Response) => {
   const things = DeviceRegistry.getThings();
 
-  res.json(
-    things.map((thing) => thing.asThingDescription())
-  );
+  res.json(things.map(thing => thing.asThingDescription()));
 };
 
 /**
