@@ -43,3 +43,9 @@ With Docker and docker-compose installed, run:
 ```bash
 docker-compose up --build
 ```
+
+## Automated Tests
+
+The `simulator` directory has automated tests. 
+In order to run them, make sure you have a RabbitMQ server running and have specific the environment variables in `.env`.
+Afterwards, run `npm test` and tests will run and show a coverage report.
