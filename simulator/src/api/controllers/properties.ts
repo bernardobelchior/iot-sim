@@ -1,5 +1,5 @@
-import { Response, Request } from "express";
-import { DeviceRegistry } from "../DeviceRegistry";
+import { Response } from "express";
+import { IRequest } from "../registryMiddleware";
 
 /**
  * Handle a GET request to /<thingId>/properties.
@@ -7,9 +7,9 @@ import { DeviceRegistry } from "../DeviceRegistry";
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const list = (req: Request, res: Response) => {
+export const list = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -24,9 +24,9 @@ export const list = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const get = (req: Request, res: Response) => {
+export const get = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -46,9 +46,9 @@ export const get = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const put = (req: Request, res: Response) => {
+export const put = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;

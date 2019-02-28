@@ -2,37 +2,37 @@ import { Thing } from "./models/Thing";
 import { MessageQueue } from "./MessageQueue";
 import { parseWebThing, builder } from "./builder";
 
-export namespace DeviceRegistry {
-  let things: Thing[] = [];
-  let messageQueue: MessageQueue;
+export class DeviceRegistry {
+  private things: Thing[] = [];
+  private messageQueue: MessageQueue;
 
-  export function setMessageQueue(mq: MessageQueue): void {
-    messageQueue = mq;
+  constructor(messageQueue: MessageQueue) {
+    this.messageQueue = messageQueue;
   }
 
-  export function initFromConfig() {
-    things = [...builder().things];
+  initFromConfig() {
+    this.things = [...builder().things];
 
-    return init();
+    return this.init();
   }
 
-  export function init() {
-    return messageQueue.subscribe("register", consume.bind(DeviceRegistry));
+  init() {
+    return this.messageQueue.subscribe("register", this.consume.bind(this));
   }
 
-  export const getThings = () => {
-    return things;
-  };
+  getThings() {
+    return this.things;
+  }
 
-  export const getThing = (thingId: string) => {
-    return things.find((x: Thing) => x.name === thingId);
-  };
+  getThing(thingId: string) {
+    return this.things.find((x: Thing) => x.name === thingId);
+  }
 
-  function consume(topic: string, msg: Buffer) {
+  private consume(topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
 
-      things.push(parseWebThing(obj));
+      this.things.push(parseWebThing(obj));
     }
   }
 }

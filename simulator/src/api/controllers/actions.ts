@@ -1,5 +1,5 @@
-import { Response, Request } from "express";
-import { DeviceRegistry } from "../DeviceRegistry";
+import { Response } from "express";
+import { IRequest } from "../registryMiddleware";
 
 /**
  * Handle a GET request to /<thingId>/actions. Returns an array with all actions available
@@ -7,9 +7,9 @@ import { DeviceRegistry } from "../DeviceRegistry";
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const getActions = (req: Request, res: Response) => {
+export const getActions = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -24,9 +24,9 @@ export const getActions = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const requestActions = (req: Request, res: Response) => {
+export const requestActions = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -56,9 +56,9 @@ export const requestActions = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const getAction = (req: Request, res: Response) => {
+export const getAction = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -75,9 +75,9 @@ export const getAction = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const requestAction = (req: Request, res: Response) => {
+export const requestAction = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -112,9 +112,9 @@ export const requestAction = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const getActionRequest = (req: Request, res: Response) => {
+export const getActionRequest = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -138,9 +138,9 @@ export const getActionRequest = (req: Request, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const cancelActionRequest = (req: Request, res: Response) => {
+export const cancelActionRequest = (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = DeviceRegistry.getThing(thingId);
+  const thing = req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;

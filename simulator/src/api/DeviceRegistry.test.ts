@@ -35,10 +35,10 @@ const things = [
 describe("DeviceRegistry", () => {
   it("registers devices correctly", async () => {
     const messageQueue = await messageQueueBuilder(vars.MQ_URI);
-    DeviceRegistry.setMessageQueue(messageQueue);
-    await DeviceRegistry.init();
+    const deviceRegistry = new DeviceRegistry(messageQueue);
+    await deviceRegistry.init();
 
-    expect(DeviceRegistry.getThings()).toHaveLength(0);
+    expect(deviceRegistry.getThings()).toHaveLength(0);
 
     things.forEach(
       async thing =>
@@ -46,11 +46,11 @@ describe("DeviceRegistry", () => {
     );
 
     await waitForExpect(() =>
-      expect(DeviceRegistry.getThings()).toHaveLength(2)
+      expect(deviceRegistry.getThings()).toHaveLength(2)
     );
 
     things.forEach(thing =>
-      expect(DeviceRegistry.getThing(thing.name)).toBeTruthy()
+      expect(deviceRegistry.getThing(thing.name)).toBeTruthy()
     );
 
     await messageQueue.end();
