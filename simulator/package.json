@@ -53,6 +53,7 @@
     "supertest": "^3.4.2",
     "ts-jest": "^24.0.0",
     "tslint": "^5.13.0",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "wait-for-expect": "^1.1.0"
   }
 }

@@ -17,7 +17,6 @@ export namespace DeviceRegistry {
   }
 
   export function init() {
-    // Check if it's working. Changed this to DeviceRegistry namespace. I cannot test because the connection to mqtt fails
     return messageQueue.subscribe("register", consume.bind(DeviceRegistry));
   }
 
@@ -29,7 +28,7 @@ export namespace DeviceRegistry {
     return things.find((x: Thing) => x.name === thingId);
   };
 
-  export function consume(topic: string, msg: Buffer) {
+  function consume(topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
 
