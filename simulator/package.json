@@ -55,5 +55,24 @@
     "tslint": "^5.13.0",
     "typescript": "^3.3.3333",
     "wait-for-expect": "^1.1.0"
+  },
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json"
+      }
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "testMatch": [
+      "**/test/**/*.test.ts",
+      "**/src/**/*.test.ts"
+    ],
+    "testEnvironment": "node"
   }
 }
