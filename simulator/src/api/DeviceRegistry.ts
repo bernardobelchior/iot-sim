@@ -10,8 +10,11 @@ export namespace DeviceRegistry {
     messageQueue = mq;
   }
 
-  export async function init() {
+  export function initFromConfig() {
     things = [...builder().things];
+  }
+
+  export async function init() {
     // Check if it's working. Changed this to DeviceRegistry namespace. I cannot test because the connection to mqtt fails
     await messageQueue.subscribe("register", consume.bind(DeviceRegistry));
   }

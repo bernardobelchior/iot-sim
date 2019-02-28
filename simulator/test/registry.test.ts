@@ -1,5 +1,6 @@
 import { messageQueueBuilder } from "../src/api/MessageQueue";
 import { vars } from "../src/util/vars";
+import { DeviceRegistry } from "../src/api/DeviceRegistry";
 
 const things = [
   {
@@ -30,12 +31,24 @@ const things = [
   }
 ];
 
-async function run() {
-  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+describe("DeviceRegistry", () => {
+  it("registers devices correctly", async () => {
+    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    DeviceRegistry.setMessageQueue(messageQueue);
 
-  things.forEach(
-    async thing => await messageQueue.publish("register", JSON.stringify(thing))
-  );
-}
+    expect(DeviceRegistry.getThings()).toHaveLength(0);
 
-run();
+    things.forEach(
+      async thing =>
+        await messageQueue.publish("register", JSON.stringify(thing))
+    );
+
+    expect(DeviceRegistry.getThings()).toHaveLength(2);
+
+    things.forEach(thing =>
+      expect(DeviceRegistry.getThing(thing.name)).toBeTruthy()
+    );
+
+    await messageQueue.end();
+  });
+});

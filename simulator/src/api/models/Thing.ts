@@ -393,6 +393,6 @@ export class Thing {
    * Store in a database the properties current values
    */
   publishProperties() {
-    const propValues = this.getProperties();
+    // const propValues = this.getProperties();
   }
 }
