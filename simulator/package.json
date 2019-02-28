@@ -14,7 +14,8 @@
     "watch-ts": "tsc -w",
     "tslint": "tslint -c tslint.json -p tsconfig.json --fix",
     "prettier": "prettier src/**/*.ts --write",
-    "test": "ENVIRONMENT=test jest --forceExit --coverage --verbose --detectOpenHandles"
+    "test": "ENVIRONMENT=test jest --forceExit --verbose --detectOpenHandles --watch",
+    "coverage": "ENVIRONMENT=test jest --forceExit --verbose --detectOpenHandles --coverage"
   },
   "dependencies": {
     "ajv": "^6.9.2",

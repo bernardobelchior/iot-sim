@@ -32,7 +32,8 @@ export function parseWebThing(obj: any): Thing {
       type = [obj["@type"]];
     }
   }
-  const t = new Thing(obj.name, obj.description, context, type);
+
+  const t = new Thing(obj.name, obj.description, obj.href, context, type);
 
   t.addProperties(obj.properties || []);
   t.addActions(obj.actions || []);

@@ -10,7 +10,8 @@
           "description": "Whether the lamp is turned on",
           "links": [{ "href": "/things/lamp/properties/on" }]
         }
-      }
+      },
+      "href": "/things/switch"
     },
     {
       "@context": "https://iot.mozilla.org/schemas/",
@@ -90,7 +91,8 @@
           "mediaType": "text/html",
           "href": "/things/lamp"
         }
-      ]
+      ],
+      "href": "/things/lamp"
     },
     {
       "name": "WoT Pi",
@@ -151,7 +153,8 @@
           "mediaType": "text/html",
           "href": "/things/pi"
         }
-      ]
+      ],
+      "href": "/things/pi"
     }
   ]
 }

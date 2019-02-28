@@ -14,7 +14,9 @@ const ajv = new Ajv();
 export class Thing {
   context?: string;
   type: string[] = [];
+  id: string;
   name: string;
+  href: string;
   hrefPrefix: string;
   description: string;
   properties: Map<string, Property> = new Map<string, Property>();
@@ -28,20 +30,29 @@ export class Thing {
    *
    * @param {String} name Human friendly string which describes the device.
    * @param {String} description Human friendly string which describes the device and its functions.
+   * @param {String} href Href
    * @param {String} context Optional annotation which can be used to provide a URI for a schema repository which defines standard schemas for common "types" of device capabilities.
    * @param {String} type Optional annotation which can be used to provide the names of schemas for types of capabilities a device supports, from a schema repository referred to in the @context member.
    */
   constructor(
     name: string,
     description: string,
+    href: string,
     context?: string,
     type?: string[]
   ) {
     this.name = name;
     this.hrefPrefix = "";
     this.description = description;
+    this.href = href;
     this.context = context;
     this.type = type || [];
+
+    this.id = Thing.generateIdFromHref(this.href);
+  }
+
+  static generateIdFromHref(href: string) {
+    return href.replace(/\/$/g, "").replace(/[:/]/g, "-");
   }
 
   /**
@@ -49,7 +60,7 @@ export class Thing {
    *
    * @returns {Object} Current thing state
    */
-  asThingDescription() {
+  asThingDescription(): object {
     const thing: any = {
       name: this.name,
       description: this.description,

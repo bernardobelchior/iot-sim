@@ -8,7 +8,7 @@ import { IRequest } from "../registryMiddleware";
  * @param {Response} res The response object
  */
 export const list = (req: IRequest, res: Response) => {
-  const things = req.registry.getThings();
+  const things = Object.values(req.registry.getThings());
 
   res.json(things.map(thing => thing.asThingDescription()));
 };

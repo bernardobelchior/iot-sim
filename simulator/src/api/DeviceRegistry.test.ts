@@ -2,6 +2,7 @@ import waitForExpect from "wait-for-expect";
 import { messageQueueBuilder } from "./MessageQueue";
 import { vars } from "../util/vars";
 import { DeviceRegistry } from "./DeviceRegistry";
+import { Thing } from "./models/Thing";
 
 const things = [
   {
@@ -38,7 +39,7 @@ describe("DeviceRegistry", () => {
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
 
-    expect(deviceRegistry.getThings()).toHaveLength(0);
+    expect(Object.values(deviceRegistry.getThings())).toHaveLength(0);
 
     things.forEach(
       async thing =>
@@ -46,11 +47,13 @@ describe("DeviceRegistry", () => {
     );
 
     await waitForExpect(() =>
-      expect(deviceRegistry.getThings()).toHaveLength(2)
+      expect(Object.values(deviceRegistry.getThings())).toHaveLength(2)
     );
 
     things.forEach(thing =>
-      expect(deviceRegistry.getThing(thing.name)).toBeTruthy()
+      expect(
+        deviceRegistry.getThing(Thing.generateIdFromHref(thing.href))
+      ).toBeTruthy()
     );
 
     await messageQueue.end();
