@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Router } from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
 import mongo from "./config/mongo";
@@ -13,7 +13,7 @@ import { messageQueueBuilder } from "./api/MessageQueue";
   try {
     const messageQueue = await messageQueueBuilder(vars.MQ_URI);
     DeviceRegistry.setMessageQueue(messageQueue);
-    await DeviceRegistry.init();
+    await DeviceRegistry.initFromConfig();
   } catch (error) {
     throw new Error(error);
   }
@@ -39,41 +39,46 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressValidator());
 
+const router = Router();
+
 /**
  * App routes.
  */
-app.get("/", (req, res) => thingsController.list(req, res));
-app.get("/:thingId", (req, res) => thingsController.get(req, res));
-app.get("/:thingId/properties", (req, res) =>
+router.get("/", (req, res) => thingsController.list(req, res));
+router.get("/:thingId", (req, res) => thingsController.get(req, res));
+router.get("/:thingId/properties", (req, res) =>
   propertiesController.list(req, res)
 );
-app.get("/:thingId/properties/:propertyName", (req, res) =>
+router.get("/:thingId/properties/:propertyName", (req, res) =>
   propertiesController.get(req, res)
 );
-app.put("/:thingId/properties/:propertyName", (req, res) =>
+router.put("/:thingId/properties/:propertyName", (req, res) =>
   propertiesController.put(req, res)
 );
-app.get("/:thingId/actions", (req, res) =>
+router.get("/:thingId/actions", (req, res) =>
   actionsController.getActions(req, res)
 );
-app.post("/:thingId/actions", (req, res) =>
+router.post("/:thingId/actions", (req, res) =>
   actionsController.requestActions(req, res)
 );
-app.get("/:thingId/actions/:actionName", (req, res) =>
+router.get("/:thingId/actions/:actionName", (req, res) =>
   actionsController.getAction(req, res)
 );
-app.post("/:thingId/actions/:actionName", (req, res) =>
+router.post("/:thingId/actions/:actionName", (req, res) =>
   actionsController.requestAction(req, res)
 );
-app.get("/:thingId/actions/:actionName/:actionId", (req, res) =>
+router.get("/:thingId/actions/:actionName/:actionId", (req, res) =>
   actionsController.getActionRequest(req, res)
 );
-app.delete("/:thingId/actions/:actionName/:actionId", (req, res) =>
+router.delete("/:thingId/actions/:actionName/:actionId", (req, res) =>
   actionsController.cancelActionRequest(req, res)
 );
-app.get("/:thingId/events", (req, res) => eventsController.list(req, res));
-app.get("/:thingId/events/:eventName", (req, res) =>
+router.get("/:thingId/events", (req, res) => eventsController.list(req, res));
+router.get("/:thingId/events/:eventName", (req, res) =>
   eventsController.get(req, res)
 );
+
+/* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
+app.use("/things", router);
 
 export default app;
