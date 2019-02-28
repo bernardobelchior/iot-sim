@@ -8,7 +8,6 @@ The simulator requires the following software to be previously installed:
 * RabbitMQ with the following plugins:
     * `rabbitmq_mqtt`
     * `rabbitmq_management`
-    * `rabbitmq_web_stomp`
 * MongoDB
 * NodeJS
 
