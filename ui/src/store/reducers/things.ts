@@ -1,8 +1,9 @@
 import actions, { RootActions } from "../actions";
 import { getType } from "typesafe-actions";
+import { Thing } from "../../models/Thing";
 
 export type State = {
-  readonly things: Array<{ [key: string]: any }>;
+  readonly things: Thing[];
 };
 
 export const initialState: State = {

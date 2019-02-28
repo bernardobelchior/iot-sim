@@ -1,46 +1,20 @@
 import React, { FC } from "react";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { connect } from "react-redux";
 import { RootState } from "../store/reducers";
-import {
-  Card,
-  CardContent,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  Typography
-} from "@material-ui/core";
+import ThingsTable from "../components/ThingsTable/ThingsTable";
+import { Thing } from "../models/Thing";
 
-type Props = {
-  things: Array<{ [key: string]: any }>;
-};
+interface IProps {
+  things: Thing[];
+}
 
-const Things: FC<Props> = ({ things }) => (
+const Things: FC<IProps> = ({ things }) => (
   <div style={{ margin: "16px" }}>
-    {things.length > 0 ? (
-      things.map(description => (
-        <ExpansionPanel>
-          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>{description["name"]}</Typography>
-          </ExpansionPanelSummary>
-          <ExpansionPanelDetails>
-            <Typography>{JSON.stringify(description)}</Typography>
-          </ExpansionPanelDetails>
-        </ExpansionPanel>
-      ))
-    ) : (
-      <Card>
-        <CardContent>
-          <Typography variant="title" style={{ textAlign: "center" }}>
-            No Things Available
-          </Typography>
-        </CardContent>
-      </Card>
-    )}
+    <ThingsTable things={things} />
   </div>
 );
 
-const mapStateToProps = ({ things: { things } }: RootState): Props => ({
+const mapStateToProps = ({ things: { things } }: RootState): IProps => ({
   things
 });
 

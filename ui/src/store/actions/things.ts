@@ -1,12 +1,13 @@
 import { createAsyncAction } from "typesafe-actions";
 import api from "../../api";
 import { Dispatch } from "redux";
+import { Thing } from "../../models/Thing";
 
 export const fetchThingsAction = createAsyncAction(
   "FETCH_THINGS_REQUEST",
   "FETCH_THINGS_SUCCESS",
   "FETCH_THINGS_FAILURE"
-)<void, Array<{ [key: string]: any }>, string>();
+)<void, Thing[], string>();
 
 export function fetchThings() {
   return async (dispatch: Dispatch) => {
