@@ -104,10 +104,10 @@ export class Thing {
   addProperties(properties: any): void {
     for (const key in properties) {
       const obj = properties[key];
-      const p = new Property(key, obj.title, obj.description, obj["@type"]);
+      const p = new Property(key, obj.title, obj.description, obj.type);
 
       p.defineMetadata({
-        type: obj.type,
+        semanticType: obj["@type"],
         unit: obj.unit,
         enum: obj.enum,
         readOnly: obj.readOnly,

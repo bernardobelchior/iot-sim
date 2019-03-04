@@ -1,27 +1,33 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
+import { Property } from '../../api/models/Property';
+import assert from 'assert';
+import { PropertyEffect } from './PropertyEffect';
+import { State } from '.';
 
-const assert = require('assert');
-const PropertyEffect = require('./PropertyEffect');
+export interface IPulseEffect {
+  type: string;
+  label: string;
+  property: Property;
+  value: any;
+  oldValue: any;
+  on: boolean;
+}
 
 /**
  * An Effect which temporarily sets the target property to
  * a value before restoring its original value
  */
 export class PulseEffect extends PropertyEffect {
+  value: any;
+  oldValue: any = undefined;
+  on: boolean = false;
+
   /**
-   * @param {EffectDescription} desc
+   * @param {IPulseEffect} desc
    */
-  constructor(desc) {
+  constructor(desc: IPulseEffect) {
     super(desc);
     this.value = desc.value;
-    assert(typeof this.value === this.property.type,
-           'setpoint and property must be same type');
-    this.on = false;
-    this.oldValue = null;
+    assert(typeof this.value === this.property.type, 'setpoint and property must be same type');
   }
 
   /**
@@ -37,15 +43,15 @@ export class PulseEffect extends PropertyEffect {
   /**
    * @param {State} state
    */
-  setState(state) {
+  setState(state: State) {
     if (state.on) {
       // If we're already active, just perform the effect again
       if (this.on) {
-        return this.property.set(this.value);
+        return this.property.setValue(this.value);
       }
       // Activate the effect and save our current state to revert to upon
       // deactivation
-      this.property.get().then((value) => {
+      this.property.getValue().then((value) => {
         if (value !== this.value) {
           this.oldValue = value;
         } else {

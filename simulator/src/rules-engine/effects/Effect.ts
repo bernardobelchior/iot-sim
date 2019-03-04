@@ -1,4 +1,9 @@
-import { EffectDescription, State } from './util';
+import { State } from '.';
+
+export interface IEffect {
+  type: string;
+  label: string;
+}
 
 /**
  * Effect - The outcome of a Rule once triggered
@@ -9,15 +14,15 @@ export class Effect {
 
   /**
    * Create an Effect based on a wire-format description with a property
-   * @param {EffectDescription} desc
+   * @param {IEffect} desc
    */
-  constructor(desc: EffectDescription) {
+  constructor(desc: IEffect) {
     this.type = this.constructor.name;
     this.label = desc.label;
   }
 
   /**
-   * @return {EffectDescription}
+   * @return {IEffect}
    */
   toDescription() {
     return {

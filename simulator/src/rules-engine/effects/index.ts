@@ -1,4 +1,4 @@
-import { Effect } from './Effect';
+import { Effect, IEffect } from './Effect';
 import { ActionEffect } from './ActionEffect';
 import { MultiEffect } from './MultiEffect';
 import { NotificationEffect } from './NotificationEffect';
@@ -13,3 +13,23 @@ export const effects: any = {
   SetEffect,
   PulseEffect
 };
+
+export interface State {
+  on: boolean;
+  off: boolean;
+}
+
+/**
+ * Produce an effect from a serialized effect description. Throws if `desc` is
+ * invalid
+ * @param {EffectDescription} desc
+ * @return {Effect}
+ */
+const fromDescription = (desc: IEffect): Effect => {
+  const EffectClass = effects[desc.type];
+  if (!EffectClass) {
+    throw new Error(`Unsupported or invalid effect type:${desc.type}`);
+  }
+  return new EffectClass(desc);
+}
+export default fromDescription;

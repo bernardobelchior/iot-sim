@@ -1,5 +1,11 @@
 import { Effect } from './Effect';
-import fromDescription, { MultiEffectDescription, State } from './util';
+import fromDescription, { State } from '.';
+
+export interface IMultiEffect {
+  type: string;
+  label: string;
+  effects: Effect[];
+}
 
 /**
  * MultiEffect - The outcome of a Rule involving multiple effects
@@ -9,7 +15,7 @@ export class MultiEffect extends Effect {
   /**
    * @param {MultiEffectDescription} desc
    */
-  constructor(desc: MultiEffectDescription) {
+  constructor(desc: IMultiEffect) {
     super(desc);
 
     this.effects = desc.effects.map(function(effect) {
@@ -18,7 +24,7 @@ export class MultiEffect extends Effect {
   }
 
   /**
-   * @return {EffectDescription}
+   * @return {IMultiEffect}
    */
   toDescription() {
     return Object.assign(super.toDescription(), {

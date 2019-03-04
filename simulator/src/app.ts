@@ -29,6 +29,7 @@ async function app() {
 
   /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
   app.use("/things", thingsRouter(deviceRegistry));
+  app.use("/rules", rulesRouter());
 
   return app;
 }
