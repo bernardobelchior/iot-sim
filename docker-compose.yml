@@ -45,12 +45,9 @@ services:
       - 15671:15671
       - 15672:15672
       - 1883:1883
-    environment:
-      RABBITMQ_DEFAULT_PASS: guest
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_VHOST: vhost
     volumes:
       - "./middleware/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro"
+      - "./middleware/definitions.json:/etc/rabbitmq/definitions.json:ro"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:15672"]
       interval: 30s

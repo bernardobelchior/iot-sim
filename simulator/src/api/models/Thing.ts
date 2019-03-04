@@ -17,7 +17,6 @@ export class Thing {
   id: string;
   name: string;
   href: string;
-  hrefPrefix: string;
   description: string;
   properties: Map<string, Property> = new Map<string, Property>();
   actions: Map<string, Action> = new Map<string, Action>();
@@ -42,7 +41,6 @@ export class Thing {
     type?: string[]
   ) {
     this.name = name;
-    this.hrefPrefix = "";
     this.description = description;
     this.href = href;
     this.context = context;
@@ -64,7 +62,7 @@ export class Thing {
     const thing: any = {
       name: this.name,
       description: this.description,
-      href: this.hrefPrefix ? this.hrefPrefix : "/",
+      href: this.href,
       "@context": this.context,
       "@type": this.type,
       properties: this.getPropertyDescriptions(),
@@ -73,15 +71,15 @@ export class Thing {
       links: [
         {
           rel: "properties",
-          href: `${this.hrefPrefix}/properties`
+          href: `${this.href}/properties`
         },
         {
           rel: "actions",
-          href: `${this.hrefPrefix}/actions`
+          href: `${this.href}/actions`
         },
         {
           rel: "events",
-          href: `${this.hrefPrefix}/events`
+          href: `${this.href}/events`
         }
       ]
     };

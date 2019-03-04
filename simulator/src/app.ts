@@ -13,7 +13,6 @@ async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
   const deviceRegistry = new DeviceRegistry(messageQueue);
   await deviceRegistry.initFromConfig();
-
   mongo();
 
   // Create Express server

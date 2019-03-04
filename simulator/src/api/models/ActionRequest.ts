@@ -71,6 +71,7 @@ export class ActionRequest {
   startAction() {
     this.status = ActionRequestStatus.pending;
     this.thing.actionNotify(this.getActionRequest());
+    this.performAction();
   }
 
   /**

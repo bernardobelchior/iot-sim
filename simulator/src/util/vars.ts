@@ -36,7 +36,7 @@ if (MONGODB_URI === undefined) {
 
 const PORT = parseInt(process.env.PORT || "8080");
 
-const MQ_URI = prod ? process.env["MQ_URI"] : process.env["AMQP_URI_LOCAL"];
+const MQ_URI = prod ? process.env["MQ_URI"] : process.env["MQ_URI_LOCAL"];
 if (!MQ_URI) {
   logger.error(
     "Invalid message config specified. Set MQ_URI environment variable."
