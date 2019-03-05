@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const assert = require('assert');
-const Events = require('../Events');
-const PropertyTrigger = require('./PropertyTrigger');
+const assert = require("assert");
+const Events = require("../Events");
+const PropertyTrigger = require("./PropertyTrigger");
 
 /**
  * A Trigger which activates when a boolean property is
@@ -18,8 +18,8 @@ class BooleanTrigger extends PropertyTrigger {
    */
   constructor(desc) {
     super(desc);
-    assert(this.property.type === 'boolean');
-    assert(typeof desc.onValue === 'boolean');
+    assert(this.property.type === "boolean");
+    assert(typeof desc.onValue === "boolean");
     this.onValue = desc.onValue;
   }
 

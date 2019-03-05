@@ -1,49 +1,53 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
+import assert from "assert";
+import { PropertyEffect } from "./PropertyEffect";
+import { Property } from "../Property";
 
-const assert = require('assert');
-const PropertyEffect = require('./PropertyEffect');
+interface ISetEffect {
+  type: string;
+  label: string;
+  property: Property;
+  value: any;
+  on: boolean;
+}
 
 /**
  * An Effect which permanently sets the target property to
  * a value when triggered
  */
 export class SetEffect extends PropertyEffect {
+  value: any;
+  on: boolean = false;
   /**
    * @param {EffectDescription} desc
    */
-  constructor(desc) {
+  constructor(desc: ISetEffect) {
     super(desc);
     this.value = desc.value;
     assert(typeof this.value === this.property.type,
-           'setpoint and property must be same type');
-    this.on = false;
+      "set point and property must be same type");
   }
 
   /**
-   * @return {EffectDescription}
+   * @return {ISetEffect}
    */
-  toDescription() {
+  toDescription(): ISetEffect {
     return Object.assign(
       super.toDescription(),
-      {value: this.value}
+      { value: this.value, on: this.on }
     );
   }
 
   /**
-   * @return {State}
+   * @param {boolean} state
    */
-  setState(state) {
-    if (!this.on && state.on) {
+  setState(state: boolean) {
+/*     if (!this.on && state) {
       this.on = true;
       return this.property.set(this.value);
     }
-    if (this.on && !state.on) {
+    if (this.on && !state) {
       this.on = false;
       return Promise.resolve();
-    }
+    } */
   }
 }

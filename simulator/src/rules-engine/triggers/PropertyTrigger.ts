@@ -1,12 +1,6 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
-const Events = require('../Events');
-const Trigger = require('./Trigger');
-const Property = require('../Property');
+import { Events } from "../Events";
+import { Trigger } from "./Trigger";
+import { Property } from "../Property";
 
 /**
  * An abstract class for triggers whose input is a single property

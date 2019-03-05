@@ -14,13 +14,13 @@ function migrateProperty(prop) {
   delete base.href;
   return Object.assign(base, {
     id: extractProperty(prop.href),
-    thing: extractThing(prop.href),
+    thing: extractThing(prop.href)
   });
 }
 
 function migrateThing(thing) {
-  console.log('migrateThing', thing);
-  if (typeof thing !== 'object') {
+  console.log("migrateThing", thing);
+  if (typeof thing !== "object") {
     return;
   }
   if (!thing.href) {
@@ -33,7 +33,7 @@ function migratePart(part) {
   let changed = false;
   const newPart = Object.assign({}, part);
   if (part.triggers) {
-    newPart.triggers = part.triggers.map((child) => {
+    newPart.triggers = part.triggers.map(child => {
       const newChild = migratePart(child);
       if (newChild) {
         changed = true;
@@ -43,7 +43,7 @@ function migratePart(part) {
   }
 
   if (part.effects) {
-    newPart.effects = part.effects.map((child) => {
+    newPart.effects = part.effects.map(child => {
       const newChild = migratePart(child);
       if (newChild) {
         changed = true;
@@ -92,5 +92,5 @@ function migrate(oldRule) {
 }
 
 module.exports = {
-  migrate,
+  migrate
 };

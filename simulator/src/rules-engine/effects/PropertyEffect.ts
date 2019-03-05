@@ -1,7 +1,7 @@
-import { Property } from '../../api/models/Property';
-import { Effect } from './Effect';
+import { Property } from "../Property";
+import { Effect } from "./Effect";
 
-export interface IPropertyEffect {
+interface IPropertyEffect {
   type: string;
   label: string;
   property: Property;
@@ -19,17 +19,13 @@ export class PropertyEffect extends Effect {
    */
   constructor(desc: IPropertyEffect) {
     super(desc);
-    let p = desc.property;
-    this.property = new Property(p.id, p.title, p.description, p.type);
-    if(p.metadata !== undefined) {
-      this.property.defineMetadata(p.metadata);
-    }
+    this.property = new Property(desc.property);
   }
 
   /**
    * @return {IPropertyEffect}
    */
-  toDescription() {
+  toDescription(): IPropertyEffect {
     return Object.assign(super.toDescription(), {
       property: this.property.asPropertyDescription(),
     });

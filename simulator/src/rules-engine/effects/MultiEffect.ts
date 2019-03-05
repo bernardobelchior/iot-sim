@@ -1,7 +1,7 @@
-import { Effect } from './Effect';
-import fromDescription, { State } from '.';
+import { Effect } from "./Effect";
+import fromDescription from ".";
 
-export interface IMultiEffect {
+interface IMultiEffect {
   type: string;
   label: string;
   effects: Effect[];
@@ -11,7 +11,7 @@ export interface IMultiEffect {
  * MultiEffect - The outcome of a Rule involving multiple effects
  */
 export class MultiEffect extends Effect {
-  effects: Effect[]
+  effects: Effect[];
   /**
    * @param {MultiEffectDescription} desc
    */
@@ -24,7 +24,7 @@ export class MultiEffect extends Effect {
   }
 
   /**
-   * @return {IMultiEffect}
+   * @return
    */
   toDescription() {
     return Object.assign(super.toDescription(), {
@@ -33,9 +33,9 @@ export class MultiEffect extends Effect {
   }
 
   /**
-   * @param {State} state
+   * @param {boolean} state
    */
-  setState(state: State) {
+  setState(state: boolean) {
     for (const effect of this.effects) {
       effect.setState(state);
     }

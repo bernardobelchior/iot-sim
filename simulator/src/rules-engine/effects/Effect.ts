@@ -1,5 +1,3 @@
-import { State } from '.';
-
 export interface IEffect {
   type: string;
   label: string;
@@ -33,9 +31,9 @@ export class Effect {
 
   /**
    * Set the state of Effect based on a trigger
-   * @param {State} _state
+   * @param {boolean} _state
    */
-  setState(_state: State) {
-    throw new Error('Unimplemented');
+  setState(_state: boolean) {
+    throw new Error("Unimplemented");
   }
 }

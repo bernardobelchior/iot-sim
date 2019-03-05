@@ -4,10 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-'use strict';
+"use strict";
 
-const db = require('../db.js');
-const DatabaseMigrate = require('./DatabaseMigrate');
+const db = require("../db.js");
+const DatabaseMigrate = require("./DatabaseMigrate");
 
 function Database() {
   if (!db.db) {
@@ -34,30 +34,26 @@ Database.prototype.open = function() {
  */
 Database.prototype.getRules = function() {
   return new Promise((resolve, reject) => {
-    db.db.all(
-      'SELECT id, description FROM rules',
-      [],
-      (err, rows) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        const rules = {};
-        const updatePromises = [];
-        for (const row of rows) {
-          let desc = JSON.parse(row.description);
-          const updatedDesc = DatabaseMigrate.migrate(desc);
-          if (updatedDesc) {
-            desc = updatedDesc;
-            updatePromises.push(this.updateRule(row.id, desc));
-          }
-          rules[row.id] = desc;
-        }
-        Promise.all(updatePromises).then(() => {
-          resolve(rules);
-        });
+    db.db.all("SELECT id, description FROM rules", [], (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
       }
-    );
+      const rules = {};
+      const updatePromises = [];
+      for (const row of rows) {
+        let desc = JSON.parse(row.description);
+        const updatedDesc = DatabaseMigrate.migrate(desc);
+        if (updatedDesc) {
+          desc = updatedDesc;
+          updatePromises.push(this.updateRule(row.id, desc));
+        }
+        rules[row.id] = desc;
+      }
+      Promise.all(updatePromises).then(() => {
+        resolve(rules);
+      });
+    });
   });
 };
 
@@ -67,12 +63,11 @@ Database.prototype.getRules = function() {
  * @return {Promise<number>} resolves to rule id
  */
 Database.prototype.createRule = function(desc) {
-  return db.run(
-    'INSERT INTO rules (description) VALUES (?)',
-    [JSON.stringify(desc)]
-  ).then((res) => {
-    return parseInt(res.lastID);
-  });
+  return db
+    .run("INSERT INTO rules (description) VALUES (?)", [JSON.stringify(desc)])
+    .then(res => {
+      return parseInt(res.lastID);
+    });
 };
 
 /**
@@ -82,10 +77,10 @@ Database.prototype.createRule = function(desc) {
  * @return {Promise}
  */
 Database.prototype.updateRule = function(id, desc) {
-  return db.run(
-    'UPDATE rules SET description = ? WHERE id = ?',
-    [JSON.stringify(desc), id]
-  );
+  return db.run("UPDATE rules SET description = ? WHERE id = ?", [
+    JSON.stringify(desc),
+    id
+  ]);
 };
 
 /**
@@ -94,7 +89,7 @@ Database.prototype.updateRule = function(id, desc) {
  * @return {Promise}
  */
 Database.prototype.deleteRule = function(id) {
-  return db.run('DELETE FROM rules WHERE id = ?', [id]);
+  return db.run("DELETE FROM rules WHERE id = ?", [id]);
 };
 
 module.exports = new Database();

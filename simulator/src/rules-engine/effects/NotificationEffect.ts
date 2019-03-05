@@ -1,8 +1,7 @@
-import { Effect } from './Effect';
-import { State } from '.';
-import assert from 'assert';
+import { Effect } from "./Effect";
+import assert from "assert";
 
-export interface INotificationEffect {
+interface INotificationEffect {
   type: string;
   label: string;
   message: string;
@@ -20,7 +19,7 @@ export class NotificationEffect extends Effect {
   constructor(desc: INotificationEffect) {
     super(desc);
 
-    assert(desc.hasOwnProperty('message'));
+    assert(desc.hasOwnProperty("message"));
 
     this.message = desc.message;
   }
@@ -28,7 +27,7 @@ export class NotificationEffect extends Effect {
   /**
    * @return {INotificationEffect}
    */
-  toDescription() {
+  toDescription(): INotificationEffect {
     return Object.assign(
       super.toDescription(),
       {
@@ -38,10 +37,10 @@ export class NotificationEffect extends Effect {
   }
 
   /**
-   * @param {State} state
+   * @param {boolean} state
    */
-  setState(state: State) {
-    if (!state.on) {
+  setState(state: boolean) {
+    if (!state) {
       return;
     }
     // TODO Send notification

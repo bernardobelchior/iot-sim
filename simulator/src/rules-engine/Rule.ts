@@ -1,6 +1,6 @@
-const effects = require('./effects');
-const triggers = require('./triggers');
-const Events = require('./Events');
+const effects = require("./effects");
+const triggers = require("./triggers");
+const Events = require("./Events");
 
 class Rule {
   /**
@@ -23,7 +23,7 @@ class Rule {
     this.trigger.on(Events.STATE_CHANGED, this.onTriggerStateChanged);
     await this.trigger.start();
     if (DEBUG) {
-      console.debug('Rule.start', this.name);
+      console.debug("Rule.start", this.name);
     }
   }
 
@@ -36,7 +36,7 @@ class Rule {
       return;
     }
     if (DEBUG) {
-      console.debug('Rule.onTriggerStateChanged', this.name, state);
+      console.debug("Rule.onTriggerStateChanged", this.name, state);
     }
     this.effect.setState(state);
   }
@@ -48,12 +48,12 @@ class Rule {
     const desc = {
       enabled: this.enabled,
       trigger: this.trigger.toDescription(),
-      effect: this.effect.toDescription(),
+      effect: this.effect.toDescription()
     };
-    if (this.hasOwnProperty('id')) {
+    if (this.hasOwnProperty("id")) {
       desc.id = this.id;
     }
-    if (this.hasOwnProperty('name')) {
+    if (this.hasOwnProperty("name")) {
       desc.name = this.name;
     }
     return desc;
@@ -63,11 +63,13 @@ class Rule {
    * Stop executing the rule
    */
   stop() {
-    this.trigger.removeListener(Events.STATE_CHANGED,
-                                this.onTriggerStateChanged);
+    this.trigger.removeListener(
+      Events.STATE_CHANGED,
+      this.onTriggerStateChanged
+    );
     this.trigger.stop();
     if (DEBUG) {
-      console.debug('Rule.stop', this.name);
+      console.debug("Rule.stop", this.name);
     }
   }
 }
@@ -81,10 +83,10 @@ Rule.fromDescription = function(desc) {
   const trigger = triggers.fromDescription(desc.trigger);
   const effect = effects.fromDescription(desc.effect);
   const rule = new Rule(desc.enabled, trigger, effect);
-  if (desc.hasOwnProperty('id')) {
+  if (desc.hasOwnProperty("id")) {
     rule.id = desc.id;
   }
-  if (desc.hasOwnProperty('name')) {
+  if (desc.hasOwnProperty("name")) {
     rule.name = desc.name;
   }
   return rule;

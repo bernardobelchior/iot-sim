@@ -7,7 +7,7 @@ import cors from "cors";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
-import { thingsRouter } from "./routes/things";
+import * as routes from './routes';
 
 async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
@@ -28,8 +28,8 @@ async function app() {
   app.use(expressValidator());
 
   /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
-  app.use("/things", thingsRouter(deviceRegistry));
-  app.use("/rules", rulesRouter());
+  app.use("/things", routes.thingsRouter(deviceRegistry));
+  app.use("/rules", routes.rulesRouter());
 
   return app;
 }

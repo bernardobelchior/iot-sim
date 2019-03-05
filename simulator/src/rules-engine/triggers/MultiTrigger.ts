@@ -4,15 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const assert = require('assert');
-const Events = require('../Events');
-const Trigger = require('./Trigger');
+const assert = require("assert");
+const Events = require("../Events");
+const Trigger = require("./Trigger");
 
-const DEBUG = false || (process.env.NODE_ENV === 'test');
+const DEBUG = false || (process.env.NODE_ENV === "test");
 
 const ops = {
-  AND: 'AND',
-  OR: 'OR',
+  AND: "AND",
+  OR: "OR",
 };
 
 /**
@@ -26,7 +26,7 @@ class MultiTrigger extends Trigger {
     super(desc);
     assert(desc.op in ops);
     this.op = desc.op;
-    const fromDescription = require('./index').fromDescription;
+    const fromDescription = require("./index").fromDescription;
 
     if (DEBUG) {
       this.id = Math.floor(Math.random() * 1000);

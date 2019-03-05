@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const Database = require('./Database');
-const Rule = require('./Rule');
+const Database = require("./Database");
+const Rule = require("./Rule");
 
 /**
  * An engine for running and managing list of rules
@@ -19,7 +19,7 @@ class Engine {
     let rulesPromise = Promise.resolve(this.rules);
 
     if (!this.rules) {
-      rulesPromise = Database.getRules().then(async (ruleDescs) => {
+      rulesPromise = Database.getRules().then(async ruleDescs => {
         this.rules = {};
         for (const ruleId in ruleDescs) {
           ruleDescs[ruleId].id = parseInt(ruleId);
@@ -30,8 +30,8 @@ class Engine {
       });
     }
 
-    return rulesPromise.then((rules) => {
-      return Object.keys(rules).map((ruleId) => {
+    return rulesPromise.then(rules => {
+      return Object.keys(rules).map(ruleId => {
         return rules[ruleId];
       });
     });
@@ -88,8 +88,7 @@ class Engine {
    */
   deleteRule(ruleId) {
     if (!this.rules[ruleId]) {
-      return Promise.reject(
-        new Error(`Rule ${ruleId} already does not exist`));
+      return Promise.reject(new Error(`Rule ${ruleId} already does not exist`));
     }
     return Database.deleteRule(ruleId).then(() => {
       this.rules[ruleId].stop();

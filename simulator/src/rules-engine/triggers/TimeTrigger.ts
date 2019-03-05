@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const Events = require('../Events');
-const Trigger = require('./Trigger');
+const Events = require("../Events");
+const Trigger = require("./Trigger");
 
 /**
  * An abstract class for triggers whose input is a single property
@@ -33,7 +33,7 @@ class TimeTrigger extends Trigger {
   }
 
   scheduleNext() {
-    const parts = this.time.split(':');
+    const parts = this.time.split(":");
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
 

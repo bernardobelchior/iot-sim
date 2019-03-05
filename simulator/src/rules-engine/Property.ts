@@ -4,17 +4,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const assert = require('assert');
-const AddonManager = require('../addon-manager');
-const Constants = require('../constants');
-const Things = require('../models/things');
-const EventEmitter = require('events').EventEmitter;
-const Events = require('./Events');
+const assert = require("assert");
+const AddonManager = require("../addon-manager");
+const Constants = require("../constants");
+const Things = require("../models/things");
+const EventEmitter = require("events").EventEmitter;
+const Events = require("./Events");
 
 /**
  * Utility to support operations on Thing's properties
  */
-class Property extends EventEmitter {
+export class Property extends EventEmitter {
   /**
    * Create a Property from a descriptor returned by the WoT API
    * @param {PropertyDescription} desc
@@ -48,7 +48,7 @@ class Property extends EventEmitter {
     const desc = {
       type: this.type,
       thing: this.thing,
-      id: this.id,
+      id: this.id
     };
     if (this.unit) {
       desc.unit = this.unit;
@@ -66,7 +66,7 @@ class Property extends EventEmitter {
     try {
       return await Things.getThingProperty(this.thing, this.id);
     } catch (e) {
-      console.warn('Rule get failed', e);
+      console.warn("Rule get failed", e);
     }
   }
 
@@ -75,12 +75,14 @@ class Property extends EventEmitter {
    * @return {Promise} resolves when set is done
    */
   set(value) {
-    return Things.setThingProperty(this.thing, this.id, value).catch((e) => {
-      console.warn('Rule set failed, retrying once', e);
-      return Things.setThingProperty(this.thing, this.id, value);
-    }).catch((e) => {
-      console.warn('Rule set failed completely', e);
-    });
+    return Things.setThingProperty(this.thing, this.id, value)
+      .catch(e => {
+        console.warn("Rule set failed, retrying once", e);
+        return Things.setThingProperty(this.thing, this.id, value);
+      })
+      .catch(e => {
+        console.warn("Rule set failed completely", e);
+      });
   }
 
   async start() {
@@ -95,8 +97,8 @@ class Property extends EventEmitter {
 
   async getInitialValue() {
     const initialValue = await this.get();
-    if (typeof initialValue === 'undefined') {
-      throw new Error('Did not get a real value');
+    if (typeof initialValue === "undefined") {
+      throw new Error("Did not get a real value");
     }
     this.emit(Events.VALUE_CHANGED, initialValue);
   }
@@ -109,8 +111,8 @@ class Property extends EventEmitter {
     if (thing.id !== this.thing) {
       return;
     }
-    this.getInitialValue().catch((e) => {
-      console.warn('Rule property unable to get value', e);
+    this.getInitialValue().catch(e => {
+      console.warn("Rule property unable to get value", e);
     });
   }
 
@@ -125,11 +127,10 @@ class Property extends EventEmitter {
   }
 
   stop() {
-    AddonManager.removeListener(Constants.PROPERTY_CHANGED,
-                                this.onPropertyChanged);
-    AddonManager.removeListener(Constants.THING_ADDED,
-                                this.onThingAdded);
+    AddonManager.removeListener(
+      Constants.PROPERTY_CHANGED,
+      this.onPropertyChanged
+    );
+    AddonManager.removeListener(Constants.THING_ADDED, this.onThingAdded);
   }
 }
-
-module.exports = Property;

@@ -1,14 +1,13 @@
-import { Property } from '../../api/models/Property';
-import assert from 'assert';
-import { PropertyEffect } from './PropertyEffect';
-import { State } from '.';
+import { Property } from "../Property";
+import assert from "assert";
+import { PropertyEffect } from "./PropertyEffect";
 
-export interface IPulseEffect {
+interface IPulseEffect {
   type: string;
   label: string;
   property: Property;
   value: any;
-  oldValue: any;
+  oldValue?: any;
   on: boolean;
 }
 
@@ -27,24 +26,25 @@ export class PulseEffect extends PropertyEffect {
   constructor(desc: IPulseEffect) {
     super(desc);
     this.value = desc.value;
-    assert(typeof this.value === this.property.type, 'setpoint and property must be same type');
+    assert(typeof this.value === this.property.type, "set point and property must be same type");
   }
 
   /**
-   * @return {EffectDescription}
+   * @return {IPulseEffect}
    */
-  toDescription() {
+  toDescription(): IPulseEffect {
     return Object.assign(
       super.toDescription(),
-      {value: this.value}
+      { value: this.value, on: this.on }
     );
   }
 
   /**
-   * @param {State} state
+   * @param {boolean} state
    */
-  setState(state: State) {
-    if (state.on) {
+  setState(state: boolean) {
+/*     if (state) {
+      // TODO
       // If we're already active, just perform the effect again
       if (this.on) {
         return this.property.setValue(this.value);
@@ -66,6 +66,6 @@ export class PulseEffect extends PropertyEffect {
       if (this.oldValue !== null) {
         return this.property.set(this.oldValue);
       }
-    }
+    } */
   }
 }

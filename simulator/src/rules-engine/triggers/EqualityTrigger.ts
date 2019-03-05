@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const Events = require('../Events');
-const PropertyTrigger = require('./PropertyTrigger');
+const Events = require("../Events");
+const PropertyTrigger = require("./PropertyTrigger");
 
 /**
  * A trigger which activates when a property is equal to a given value

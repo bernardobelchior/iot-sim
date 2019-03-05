@@ -1,87 +1,68 @@
-const PromiseRouter = require('express-promise-router');
+import { Response } from "express";
+import { IRequest } from "./rulesMiddleware";
+import APIError from "../util/APIError";
+import Database from "./Database";
+import Engine from "./Engine";
+import Rule from "./Rule";
 
-const APIError = require('./APIError');
-const Database = require('./Database');
-const Engine = require('./Engine');
-const Rule = require('./Rule');
-
-const index = PromiseRouter();
 const engine = new Engine();
 
-/**
- * Express middleware for extracting rules from the bodies of requests
- * @param {express.Request} req
- * @param {express.Response} res
- * @param {Function} next
- */
-function parseRuleFromBody(req, res, next) {
-  if (!req.body.trigger) {
-    res.status(400).send(new APIError('No trigger provided').toString());
-    return;
-  }
-  if (!req.body.effect) {
-    res.status(400).send(new APIError('No effect provided').toString());
-    return;
-  }
-
-  let rule = null;
+export const getAll = async (req: IRequest, res: Response) => {
   try {
-    rule = Rule.fromDescription(req.body);
-  } catch (e) {
-    res.status(400).send(new APIError('Invalid rule', e).toString());
-    return;
+    const rules = await engine.getRules();
+    res.send(
+      rules.map((rule: Rule) => {
+        return rule.toDescription();
+      })
+    );
+  } catch (error) {
+    res
+      .status(404)
+      .send(new APIError("Engine failed to get rules", error).toString());
   }
-  req.rule = rule;
-  next();
-}
-
-index.get('/', async function(req, res) {
-  const rules = await engine.getRules();
-  res.send(rules.map((rule) => {
-    return rule.toDescription();
-  }));
-});
+};
 
 
-index.get('/:id', async function(req, res) {
+index.get("/:id", async function (req, res) {
   try {
     const id = parseInt(req.params.id);
     const rule = await engine.getRule(id);
     res.send(rule.toDescription());
   } catch (e) {
-    res.status(404).send(
-      new APIError('Engine failed to get rule', e).toString());
+    res
+      .status(404)
+      .send(new APIError("Engine failed to get rule", e).toString());
   }
 });
 
-index.post('/', parseRuleFromBody, async function(req, res) {
+index.post("/", parseRuleFromBody, async function (req, res) {
   const ruleId = await engine.addRule(req.rule);
-  res.send({id: ruleId});
+  res.send({ id: ruleId });
 });
 
-index.put('/:id', parseRuleFromBody, async function(req, res) {
+index.put("/:id", parseRuleFromBody, async function (req, res) {
   try {
     await engine.updateRule(parseInt(req.params.id), req.rule);
     res.send({});
   } catch (e) {
-    res.status(404).send(
-      new APIError('Engine failed to update rule', e).toString());
+    res
+      .status(404)
+      .send(new APIError("Engine failed to update rule", e).toString());
   }
 });
 
-index.delete('/:id', async function(req, res) {
+index.delete("/:id", async function (req, res) {
   try {
     await engine.deleteRule(req.params.id);
     res.send({});
   } catch (e) {
-    res.status(404).send(
-      new APIError('Engine failed to delete rule', e).toString());
+    res
+      .status(404)
+      .send(new APIError("Engine failed to delete rule", e).toString());
   }
 });
 
-index.configure = async function() {
+index.configure = async function () {
   await Database.open();
   await engine.getRules();
 };
-
-module.exports = index;

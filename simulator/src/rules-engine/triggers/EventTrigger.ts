@@ -4,10 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const assert = require('assert');
-const Events = require('../Events');
-const Things = require('../../models/things');
-const Trigger = require('./Trigger');
+const assert = require("assert");
+const Events = require("../Events");
+const Things = require("../../models/things");
+const Trigger = require("./Trigger");
 
 /**
  * A trigger activated when an event occurs

@@ -4,14 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
  */
 
-const assert = require('assert');
-const Events = require('../Events');
-const PropertyTrigger = require('./PropertyTrigger');
+const assert = require("assert");
+const Events = require("../Events");
+const PropertyTrigger = require("./PropertyTrigger");
 
 const LevelTriggerTypes = {
-  LESS: 'LESS',
-  EQUAL: 'EQUAL',
-  GREATER: 'GREATER',
+  LESS: "LESS",
+  EQUAL: "EQUAL",
+  GREATER: "GREATER",
 };
 
 /**
@@ -24,11 +24,11 @@ class LevelTrigger extends PropertyTrigger {
    */
   constructor(desc) {
     super(desc);
-    assert(this.property.type === 'number' || this.property.type === 'integer');
-    assert(typeof desc.value === 'number');
+    assert(this.property.type === "number" || this.property.type === "integer");
+    assert(typeof desc.value === "number");
     assert(LevelTriggerTypes[desc.levelType]);
-    if (desc.levelType === 'EQUAL') {
-      assert(this.property.type === 'integer');
+    if (desc.levelType === "EQUAL") {
+      assert(this.property.type === "integer");
     }
 
     this.value = desc.value;
