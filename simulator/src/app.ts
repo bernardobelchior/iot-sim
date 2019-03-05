@@ -8,11 +8,13 @@ import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
 import { thingsRouter } from "./routes/things";
+import { simulateRouter } from "./routes/simulate";
 
 async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
   const deviceRegistry = new DeviceRegistry(messageQueue);
-  await deviceRegistry.initFromConfig();
+  await deviceRegistry.init();
+
   mongo();
 
   // Create Express server
@@ -27,8 +29,8 @@ async function app() {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
   app.use("/things", thingsRouter(deviceRegistry));
+  app.use("/simulate", simulateRouter(deviceRegistry));
 
   return app;
 }

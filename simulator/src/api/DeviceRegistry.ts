@@ -53,9 +53,11 @@ export class DeviceRegistry {
 
   private consume(_topic: string, msg: Buffer) {
     if (msg !== null) {
+      console.log(msg);
       const obj = JSON.parse(msg.toString());
 
       const thing = parseWebThing(obj);
+      console.log(thing);
 
       this.addThing(thing);
     }
