@@ -20,11 +20,10 @@ export const effects: any = {
  * @param {EffectDescription} desc
  * @return {Effect}
  */
-const fromDescription = (desc: IEffect): Effect => {
+export const fromDescription = (desc: IEffect): Effect => {
   const EffectClass = effects[desc.type];
   if (!EffectClass) {
     throw new Error(`Unsupported or invalid effect type:${desc.type}`);
   }
   return new EffectClass(desc);
 };
-export default fromDescription;

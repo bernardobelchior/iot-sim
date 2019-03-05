@@ -1,13 +1,12 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { IRequest } from "./rulesMiddleware";
 import APIError from "../util/APIError";
-import Database from "./Database";
 import Engine from "./Engine";
 import Rule from "./Rule";
 
 const engine = new Engine();
 
-export const getAll = async (req: IRequest, res: Response) => {
+export const getAll = async (req: Request, res: Response) => {
   try {
     const rules = await engine.getRules();
     res.send(
@@ -22,8 +21,7 @@ export const getAll = async (req: IRequest, res: Response) => {
   }
 };
 
-
-index.get("/:id", async function (req, res) {
+export const getRule = async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const rule = await engine.getRule(id);
@@ -33,14 +31,20 @@ index.get("/:id", async function (req, res) {
       .status(404)
       .send(new APIError("Engine failed to get rule", e).toString());
   }
-});
+};
 
-index.post("/", parseRuleFromBody, async function (req, res) {
-  const ruleId = await engine.addRule(req.rule);
-  res.send({ id: ruleId });
-});
+export const addRule = async (req: IRequest, res: Response) => {
+  try {
+    const ruleId = await engine.addRule(req.rule);
+    res.send({ id: ruleId });
+  } catch (e) {
+    res
+      .status(404)
+      .send(new APIError("Engine failed to add rule", e).toString());
+  }
+};
 
-index.put("/:id", parseRuleFromBody, async function (req, res) {
+export const updateRule = async (req: IRequest, res: Response) => {
   try {
     await engine.updateRule(parseInt(req.params.id), req.rule);
     res.send({});
@@ -49,20 +53,15 @@ index.put("/:id", parseRuleFromBody, async function (req, res) {
       .status(404)
       .send(new APIError("Engine failed to update rule", e).toString());
   }
-});
+};
 
-index.delete("/:id", async function (req, res) {
+export const deleteRule = async (req: Request, res: Response) => {
   try {
-    await engine.deleteRule(req.params.id);
+    await engine.deleteRule(parseInt(req.params.id));
     res.send({});
   } catch (e) {
     res
       .status(404)
       .send(new APIError("Engine failed to delete rule", e).toString());
   }
-});
-
-index.configure = async function () {
-  await Database.open();
-  await engine.getRules();
 };

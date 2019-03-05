@@ -7,7 +7,7 @@ import cors from "cors";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
-import * as routes from './routes';
+import * as routes from "./routes";
 
 async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);

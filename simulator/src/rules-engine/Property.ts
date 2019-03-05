@@ -1,13 +1,4 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
 const assert = require("assert");
-const AddonManager = require("../addon-manager");
-const Constants = require("../constants");
-const Things = require("../models/things");
 const EventEmitter = require("events").EventEmitter;
 const Events = require("./Events");
 
@@ -87,7 +78,7 @@ export class Property extends EventEmitter {
 
   async start() {
     AddonManager.on(Constants.PROPERTY_CHANGED, this.onPropertyChanged);
-
+    
     try {
       await this.getInitialValue();
     } catch (_e) {

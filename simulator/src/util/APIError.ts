@@ -1,5 +1,5 @@
 export default class APIError extends Error {
-  constructor(message: string, originalError: any) {
+  constructor(message: string, originalError?: any) {
     super(message);
     if (originalError) {
       this.message += `: ${originalError.message}`;
@@ -8,6 +8,6 @@ export default class APIError extends Error {
   }
 
   toString() {
-    return JSON.stringify({error: true, message: this.message});
+    return JSON.stringify({ error: true, message: this.message });
   }
 }

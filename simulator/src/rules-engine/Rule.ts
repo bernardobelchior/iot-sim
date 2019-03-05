@@ -1,19 +1,46 @@
-const effects = require("./effects");
-const triggers = require("./triggers");
-const Events = require("./Events");
+import { effects } from "./effects";
+import { triggers } from "./triggers";
+import Events from "./Events";
+import { Effect } from "./effects/Effect";
+import { Trigger } from "./triggers/Trigger";
 
-class Rule {
+export default class Rule {
+  effect: Effect;
+  trigger: Trigger;
+  enabled: boolean;
+  id?: string;
+  name?: string;
+
   /**
    * @param {boolean} enabled
    * @param {Trigger} trigger
    * @param {Effect} effect
    */
-  constructor(enabled, trigger, effect) {
+  constructor(enabled: boolean, trigger: Trigger, effect: Effect) {
     this.enabled = enabled;
     this.trigger = trigger;
     this.effect = effect;
 
     this.onTriggerStateChanged = this.onTriggerStateChanged.bind(this);
+  }
+
+
+  /**
+   * Create a rule from a serialized description
+   * @param {any} desc
+   * @return {Rule}
+   */
+  static fromDescription(desc: any): Rule {
+    const trigger = triggers.fromDescription(desc.trigger);
+    const effect = effects.fromDescription(desc.effect);
+    const rule = new this(desc.enabled, trigger, effect);
+    if (desc.hasOwnProperty("id")) {
+      rule.id = desc.id;
+    }
+    if (desc.hasOwnProperty("name")) {
+      rule.name = desc.name;
+    }
+    return rule;
   }
 
   /**
@@ -22,30 +49,24 @@ class Rule {
   async start() {
     this.trigger.on(Events.STATE_CHANGED, this.onTriggerStateChanged);
     await this.trigger.start();
-    if (DEBUG) {
-      console.debug("Rule.start", this.name);
-    }
   }
 
   /**
    * On a state changed event, pass the state forward to the rule's effect
-   * @param {State} state
+   * @param {boolean} state
    */
-  onTriggerStateChanged(state) {
+  onTriggerStateChanged(state: boolean) {
     if (!this.enabled) {
       return;
-    }
-    if (DEBUG) {
-      console.debug("Rule.onTriggerStateChanged", this.name, state);
     }
     this.effect.setState(state);
   }
 
   /**
-   * @return {RuleDescription}
+   * @return {any}
    */
   toDescription() {
-    const desc = {
+    const desc: any = {
       enabled: this.enabled,
       trigger: this.trigger.toDescription(),
       effect: this.effect.toDescription()
@@ -68,28 +89,5 @@ class Rule {
       this.onTriggerStateChanged
     );
     this.trigger.stop();
-    if (DEBUG) {
-      console.debug("Rule.stop", this.name);
-    }
   }
 }
-
-/**
- * Create a rule from a serialized description
- * @param {RuleDescription} desc
- * @return {Rule}
- */
-Rule.fromDescription = function(desc) {
-  const trigger = triggers.fromDescription(desc.trigger);
-  const effect = effects.fromDescription(desc.effect);
-  const rule = new Rule(desc.enabled, trigger, effect);
-  if (desc.hasOwnProperty("id")) {
-    rule.id = desc.id;
-  }
-  if (desc.hasOwnProperty("name")) {
-    rule.name = desc.name;
-  }
-  return rule;
-};
-
-module.exports = Rule;
