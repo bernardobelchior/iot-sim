@@ -1,7 +1,7 @@
-import { EventEmitter } from 'events';
-import { TriggerEmitter } from './Events';
-import Engine from './Engine';
-import { Property as ThingProperty } from '../api/models/Property';
+import { EventEmitter } from "events";
+import { TriggerEmitter } from "./Events";
+import Engine from "./Engine";
+import { Property as ThingProperty } from "../api/models/Property";
 
 /**
  * Utility to support operations on Thing's properties
@@ -12,11 +12,17 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   thing: string;
   unit?: string;
   description?: string;
-  
+
   /**
    * Create a Property from a descriptor returned by the WoT API
    */
-  constructor(type: string, id: string, thing: string, unit?: string, description?: string) {
+  constructor(
+    type: string,
+    id: string,
+    thing: string,
+    unit?: string,
+    description?: string
+  ) {
     super();
 
     this.type = type;
@@ -116,7 +122,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   }
 
   stop() {
-   /*  AddonManager.removeListener(
+    /*  AddonManager.removeListener(
       Constants.PROPERTY_CHANGED,
       this.onPropertyChanged
     );

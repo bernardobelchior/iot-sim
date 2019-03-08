@@ -1,35 +1,27 @@
+import RuleSchema from "../db/Rule";
 import Rule from "./Rule";
 
 /**
  * An engine for running and managing list of rules
  */
 export default class Engine {
-  rules: Rule[] = [];
+  rules: Map<string, Rule> = new Map<string, Rule>();
 
   /**
    * Get a list of all current rules
-   * @return {Promise<Array<Rule>>} rules
    */
-  getRules() {
-    let rulesPromise = Promise.resolve(this.rules);
-
-    if (!this.rules) {
-      rulesPromise = Database.getRules().then(async ruleDescs => {
-        this.rules = {};
-        for (const ruleId in ruleDescs) {
-          ruleDescs[ruleId].id = parseInt(ruleId);
-          this.rules[ruleId] = Rule.fromDescription(ruleDescs[ruleId]);
-          await this.rules[ruleId].start();
-        }
-        return this.rules;
+  async getRules() {
+    try {
+      const rulesDb = await RuleSchema.find({});
+      rulesDb.map(async (rDesc: any) => {
+        const rule = Rule.fromDescription(rDesc);
+        await rule.start();
+        this.rules.set(rDesc.id, rule);
       });
+    } catch (error) {
+      throw new Error("Error obtaining rules");
     }
-
-    return rulesPromise.then(rules => {
-      return Object.keys(rules).map(ruleId => {
-        return rules[ruleId];
-      });
-    });
+    return this.rules;
   }
 
   /**
@@ -37,8 +29,8 @@ export default class Engine {
    * @param {number} id
    * @return {Promise<Rule>}
    */
-  getRule(id: string) {
-    const rule = this.rules[id];
+  async getRule(id: string) {
+    const rule = this.rules.get(id);
     if (!rule) {
       return Promise.reject(new Error(`Rule ${id} does not exist`));
     }
@@ -48,32 +40,35 @@ export default class Engine {
   /**
    * Add a new rule to the engine's list
    * @param {Rule} rule
-   * @return {Promise<number>} rule id
+   * @return {Promise<string>} rule id
    */
-  async addRule(rule) {
-    const id = await Database.createRule(rule.toDescription());
-    rule.id = id;
-    this.rules[id] = rule;
+  async addRule(rule: Rule) {
+    const r = await RuleSchema.create(rule.toDescription());
+    rule.id = r.id;
+    this.rules.set(r.id, rule);
     await rule.start();
-    return id;
+    return rule.id;
   }
 
   /**
    * Update an existing rule
-   * @param {number} rule id
+   * @param {string} rule id
    * @param {Rule} rule
    * @return {Promise}
    */
-  async updateRule(ruleId, rule) {
-    if (!this.rules[ruleId]) {
+  async updateRule(ruleId: string, rule: Rule) {
+    if (!this.rules.has(ruleId)) {
       return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
     }
     rule.id = ruleId;
-    await Database.updateRule(ruleId, rule.toDescription());
+    await RuleSchema.update(ruleId, rule.toDescription());
 
-    this.rules[ruleId].stop();
-    this.rules[ruleId] = rule;
-    await rule.start();
+    const oldRule = this.rules.get(ruleId);
+    if (oldRule) {
+      oldRule.stop();
+    }
+    this.rules.set(ruleId, rule);
+    return await rule.start();
   }
 
   /**
@@ -81,23 +76,15 @@ export default class Engine {
    * @param {number} rule id
    * @return {Promise}
    */
-  deleteRule(ruleId: string): Promise<any> {
-    if (!this.rules[ruleId]) {
-      return Promise.reject(new Error(`Rule ${ruleId} already does not exist`));
+  async deleteRule(ruleId: string) {
+    if (!this.rules.has(ruleId)) {
+      return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
     }
-    return Database.deleteRule(ruleId).then(() => {
-      this.rules[ruleId].stop();
-      delete this.rules[ruleId];
-    });
-  }
-
-  static setThingProperty(thingId: string, id: string, value: any): any {
-    throw new Error('Method not implemented.');
-  }
-  static getThingProperty(thingId: string, id: string): any {
-    throw new Error('Method not implemented.');
-  }
-  static getThing(thingId: string): any {
-    throw new Error("Method not implemented.");
+    await RuleSchema.findByIdAndDelete(ruleId);
+    const delRule = this.rules.get(ruleId);
+    if (delRule) {
+      delRule.stop();
+    }
+    this.rules.delete(ruleId);
   }
 }

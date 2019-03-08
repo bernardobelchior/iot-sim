@@ -1,24 +1,25 @@
-import { effects } from "../../src/rules-engine/effects";
+import { PulseEffect, SetEffect, MultiEffect } from "../../src/rules-engine/effects";
+import { Property } from "../../src/rules-engine/Property";
 
 const pulseEffect = {
   property: {
-    type: 'boolean',
-    thing: 'light1',
-    id: 'on',
+    type: "boolean",
+    thing: "light1",
+    id: "on",
   },
-  type: 'PulseEffect',
+  type: "PulseEffect",
   value: true,
 };
 
 const setEffect = {
   property: {
-    type: 'number',
-    thing: 'thermostat',
-    id: 'temp',
-    unit: 'celsius',
-    description: 'thermostat setpoint',
+    type: "number",
+    thing: "thermostat",
+    id: "temp",
+    unit: "celsius",
+    description: "thermostat setpoint",
   },
-  type: 'SetEffect',
+  type: "SetEffect",
   value: 30,
 };
 
@@ -27,61 +28,31 @@ const bothEffect = {
     pulseEffect,
     setEffect,
   ],
-  type: 'MultiEffect',
+  type: "MultiEffect",
 };
 
-describe('effects', () => {
-  it('should parse a PulseEffect', () => {
-    const effect = effects.fromDescription(pulseEffect);
-    expect(effect).toMatchObject(pulseEffect);
+describe("effects", () => {
+  let p: Property;
+  it("should create a PulseEffect, SetEffect and MultiEffect", () => {
+    p = new Property(pulseEffect.property.type, pulseEffect.property.id, pulseEffect.property.thing);
+    const pEffect = new PulseEffect(pulseEffect.type, p, pulseEffect.value);
+    expect(pEffect).toMatchObject(pulseEffect);
+
+    p = new Property(setEffect.property.type, setEffect.property.id, setEffect.property.thing, setEffect.property.unit, setEffect.property.description);
+    const sEffect = new SetEffect(setEffect.type, p, setEffect.value);
+    expect(sEffect).toMatchObject(setEffect);
+
+    const mEffect = new MultiEffect(bothEffect.type, [pEffect, sEffect]);
+    expect(mEffect).toMatchObject(bothEffect);
   });
 
-  it('should parse a SetEffect', () => {
-    const effect = effects.fromDescription(setEffect);
-    expect(effect).toMatchObject(setEffect);
-  });
-
-  it('should parse a MultiEffect', () => {
-    const effect = effects.fromDescription(bothEffect);
-    expect(effect).toMatchObject(bothEffect);
-  });
-
-  it('should reject an unknown effect type', () => {
-    let err = null;
+  it("should reject a value type disagreeing with property type", () => {
+    let err = undefined;
+    p = new Property(pulseEffect.property.type, pulseEffect.property.id, pulseEffect.property.thing);
     try {
-      effects.fromDescription({type: 'LimaEffect'});
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
-  it('should reject a value type disagreeing with property type', () => {
-    let err = null;
-    try {
-      effects.fromDescription(Object.assign(
-        {},
-        pulseEffect,
-        {value: 12}
-      ));
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
-  it('should reject an effect without a property', () => {
-    let err = null;
-    try {
-      const brokenEffect = Object.assign(
-        {},
-        setEffect
-      );
-      delete brokenEffect.property;
-
-      effects.fromDescription(brokenEffect);
-    } catch (e) {
-      err = e;
+      new PulseEffect(pulseEffect.type, p, 12);
+    } catch (error) {
+      err = error;
     }
     expect(err).toBeTruthy();
   });

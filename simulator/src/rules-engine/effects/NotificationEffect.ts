@@ -7,7 +7,9 @@ export default class NotificationEffect extends Effect {
   message: string;
 
   /**
-   * @param {INotificationEffect} desc
+   *
+   * @param label
+   * @param message
    */
   constructor(label: string, message: string) {
     super(label);
