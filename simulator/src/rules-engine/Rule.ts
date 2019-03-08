@@ -1,10 +1,11 @@
 import { effects } from "./effects";
 import { triggers } from "./triggers";
-import Events from "./Events";
+import { Events, TriggerEmitter } from "./Events";
 import { Effect } from "./effects/Effect";
 import { Trigger } from "./triggers/Trigger";
+import { EventEmitter } from "events";
 
-export default class Rule {
+export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   effect: Effect;
   trigger: Trigger;
   enabled: boolean;
@@ -17,13 +18,13 @@ export default class Rule {
    * @param {Effect} effect
    */
   constructor(enabled: boolean, trigger: Trigger, effect: Effect) {
+    super();
     this.enabled = enabled;
     this.trigger = trigger;
     this.effect = effect;
 
     this.onTriggerStateChanged = this.onTriggerStateChanged.bind(this);
   }
-
 
   /**
    * Create a rule from a serialized description

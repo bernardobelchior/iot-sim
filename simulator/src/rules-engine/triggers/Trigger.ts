@@ -1,34 +1,44 @@
 import { EventEmitter } from "events";
-
-export interface ITrigger {
-  type: string;
-  label: string;
-}
+import { TriggerEmitter } from "../Events";
 
 /**
  * The trigger component of a Rule which monitors some state and passes on
  * whether to be active to the Rule's effect
  */
-export class Trigger extends EventEmitter {
+export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }) {
   type: string;
   label: string;
   /**
    * Create a Trigger based on a wire-format description with a property
-   * @param {ITrigger} desc
+   * @param {string} label
    */
-  constructor(desc: ITrigger) {
+  constructor(label: string) {
     super();
     this.type = this.constructor.name;
-    this.label = desc.label;
+    this.label = label;
   }
 
   /**
-   * @return {ITrigger}
+   * @return {any}
    */
-  toDescription(): ITrigger {
+  toDescription(): any {
     return {
       type: this.type,
-      label: this.label,
+      label: this.label
     };
+  }
+
+  /**
+   *
+   */
+  async start() {
+    throw new Error("Unimplemented");
+  }
+
+  /**
+   *
+   */
+  stop() {
+    throw new Error("Unimplemented");
   }
 }

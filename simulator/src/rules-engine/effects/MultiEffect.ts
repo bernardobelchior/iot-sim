@@ -1,26 +1,16 @@
-import { Effect } from "./Effect";
-import fromDescription from ".";
-
-interface IMultiEffect {
-  type: string;
-  label: string;
-  effects: Effect[];
-}
+import Effect from "./Effect";
 
 /**
  * MultiEffect - The outcome of a Rule involving multiple effects
  */
-export class MultiEffect extends Effect {
+export default class MultiEffect extends Effect {
   effects: Effect[];
   /**
    * @param {MultiEffectDescription} desc
    */
-  constructor(desc: IMultiEffect) {
-    super(desc);
-
-    this.effects = desc.effects.map(function(effect) {
-      return fromDescription(effect);
-    });
+  constructor(label: string, effects: Effect[]) {
+    super(label);
+    this.effects = effects;
   }
 
   /**

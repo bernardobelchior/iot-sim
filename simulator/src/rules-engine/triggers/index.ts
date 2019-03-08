@@ -1,4 +1,11 @@
-import { ITrigger, Trigger } from "./Trigger";
+import BooleanTrigger from "./BooleanTrigger";
+import EqualityTrigger from "./EqualityTrigger";
+import EventTrigger from "./EventTrigger";
+import LevelTrigger from "./LevelTrigger";
+import MultiTrigger from "./MultiTrigger";
+import PropertyTrigger from "./PropertyTrigger";
+import TimeTrigger from "./TimeTrigger";
+import Trigger from "./Trigger";
 
 export const triggers: any = {
   BooleanTrigger,
@@ -10,17 +17,3 @@ export const triggers: any = {
   TimeTrigger,
   Trigger,
 };
-
-/**
- * Produce an trigger from a serialized trigger description. Throws if `desc`
- * is invalid
- * @param {ITrigger} desc
- * @return {Trigger}
- */
-export function fromDescription(desc: ITrigger): Trigger {
-  const TriggerClass = triggers[desc.type];
-  if (!TriggerClass) {
-    throw new Error(`Unsupported or invalid trigger type:${desc.type}`);
-  }
-  return new TriggerClass(desc);
-}

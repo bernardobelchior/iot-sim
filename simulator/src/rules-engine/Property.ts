@@ -78,7 +78,7 @@ export class Property extends EventEmitter {
 
   async start() {
     AddonManager.on(Constants.PROPERTY_CHANGED, this.onPropertyChanged);
-    
+
     try {
       await this.getInitialValue();
     } catch (_e) {

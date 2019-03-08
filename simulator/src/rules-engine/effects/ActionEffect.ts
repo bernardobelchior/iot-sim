@@ -1,44 +1,33 @@
-import assert from "assert";
-import { Effect } from "./Effect";
-
-interface IActionEffect {
-  type: string;
-  label: string;
-  thing: any;
-  action: any;
-  parameters: any;
-}
+import Effect from "./Effect";
+import { Action } from "../../api/models/Action";
 
 /**
  * An Effect which creates an action
  */
-export class ActionEffect extends Effect {
-  thing: any;
+export default class ActionEffect extends Effect {
+  thingId: string;
   action: any;
   parameters: any = {};
 
   /**
    * @param {IActionEffect} desc
    */
-  constructor(desc: IActionEffect) {
-    super(desc);
+  constructor(label: string, thingId: string, action: Action, parameters?: any) {
+    super(label);
 
-    assert(desc.thing);
-    assert(desc.action);
-
-    this.thing = desc.thing;
-    this.action = desc.action;
-    this.parameters = desc.parameters || {};
+    this.thingId = thingId;
+    this.action = action;
+    this.parameters = parameters || {};
   }
 
   /**
-   * @return {EffectDescription}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       {
-        thing: this.thing,
+        thing: this.thingId,
         action: this.action,
         parameters: this.parameters,
       }

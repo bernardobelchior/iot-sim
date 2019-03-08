@@ -1,38 +1,32 @@
 import { Property } from "../Property";
 import assert from "assert";
-import { PropertyEffect } from "./PropertyEffect";
-
-interface IPulseEffect {
-  type: string;
-  label: string;
-  property: Property;
-  value: any;
-  oldValue?: any;
-  on: boolean;
-}
+import PropertyEffect from "./PropertyEffect";
 
 /**
  * An Effect which temporarily sets the target property to
  * a value before restoring its original value
  */
-export class PulseEffect extends PropertyEffect {
+export default class PulseEffect extends PropertyEffect {
   value: any;
   oldValue: any = undefined;
   on: boolean = false;
 
   /**
-   * @param {IPulseEffect} desc
+   *
+   * @param label
+   * @param property
+   * @param value
    */
-  constructor(desc: IPulseEffect) {
-    super(desc);
-    this.value = desc.value;
+  constructor(label: string, property: Property, value: any) {
+    super(label, property);
+    this.value = value;
     assert(typeof this.value === this.property.type, "set point and property must be same type");
   }
 
   /**
-   * @return {IPulseEffect}
+   * @return {any}
    */
-  toDescription(): IPulseEffect {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       { value: this.value, on: this.on }

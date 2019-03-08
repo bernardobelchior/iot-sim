@@ -1,65 +1,58 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
-const assert = require("assert");
-const Events = require("../Events");
-const Things = require("../../models/things");
-const Trigger = require("./Trigger");
+import Trigger from "./Trigger";
+import Engine from "../Engine";
+import { Thing } from "../../api/models/Thing";
 
 /**
  * A trigger activated when an event occurs
  */
-class EventTrigger extends Trigger {
-  constructor(desc) {
-    super(desc);
-    assert(desc.thing);
-    this.thing = desc.thing;
-    this.event = desc.event;
-    this.stopped = true;
+export default class EventTrigger extends Trigger {
+  thingId: string;
+  event: string;
+  stopped: boolean = true;
+
+  constructor(label: string, thingId: string, event: string) {
+    super(label);
+    this.thingId = thingId,
+    this.event = event;
     this.onEvent = this.onEvent.bind(this);
   }
 
   /**
-   * @return {TriggerDescription}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       {
-        thing: this.thing,
+        thingId: this.thingId,
         event: this.event,
+        stopped: this.stopped
       }
     );
   }
 
   async start() {
     this.stopped = false;
-    const thing = await Things.getThing(this.thing);
+    const thing = await Engine.getThing(this.thingId);
     if (this.stopped) {
       return;
     }
     thing.addEventSubscription(this.onEvent);
   }
 
-  onEvent(event) {
-    if (this.event !== event.name) {
+  onEvent(eventName: string) {
+    if (this.event !== eventName) {
       return;
     }
 
-    this.emit(Events.STATE_CHANGED, {on: true, value: Date.now()});
-    this.emit(Events.STATE_CHANGED, {on: false, value: Date.now()});
+    this.emit("stateChanged", {on: true, value: Date.now()});
+    this.emit("stateChanged", {on: false, value: Date.now()});
   }
 
   stop() {
     this.stopped = true;
-    Things.getThing(this.thing).then((thing) => {
+    Engine.getThing(this.thingId).then((thing: Thing) => {
       thing.removeEventSubscription(this.onEvent);
     });
   }
 }
-
-module.exports = EventTrigger;
-

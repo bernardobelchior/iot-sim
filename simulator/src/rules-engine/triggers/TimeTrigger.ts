@@ -1,31 +1,29 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
-const Events = require("../Events");
-const Trigger = require("./Trigger");
+import Trigger from "./Trigger";
 
 /**
  * An abstract class for triggers whose input is a single property
  */
-class TimeTrigger extends Trigger {
-  constructor(desc) {
-    super(desc);
-    this.time = desc.time;
+export default class TimeTrigger extends Trigger {
+  time: Date;
+  timeout?: any;
+
+  /**
+   *
+   * @param {string} label
+   * @param {Date} time
+   */
+  constructor(label: string, time: Date) {
+    super(label);
+    this.time = time;
     this.sendOn = this.sendOn.bind(this);
     this.sendOff = this.sendOff.bind(this);
   }
 
   /**
-   * @return {TriggerDescription}
+   * @return {any}
    */
-  toDescription() {
-    return Object.assign(
-      super.toDescription(),
-      {time: this.time}
-    );
+  toDescription(): any {
+    return Object.assign(super.toDescription(), { time: this.time });
   }
 
   async start() {
@@ -33,7 +31,7 @@ class TimeTrigger extends Trigger {
   }
 
   scheduleNext() {
-    const parts = this.time.split(":");
+    const parts = this.time.toString().split(":");
     const hours = parseInt(parts[0], 10);
     const minutes = parseInt(parts[1], 10);
 
@@ -49,25 +47,21 @@ class TimeTrigger extends Trigger {
     if (this.timeout) {
       clearTimeout(this.timeout);
     }
-    this.timeout = setTimeout(this.sendOn,
-                              nextTime.getTime() - Date.now());
+    this.timeout = setTimeout(this.sendOn, nextTime.getTime() - Date.now());
   }
 
   sendOn() {
-    this.emit(Events.STATE_CHANGED, {on: true, value: Date.now()});
+    this.emit("stateChanged", { on: true, value: Date.now() });
     this.timeout = setTimeout(this.sendOff, 60 * 1000);
   }
 
   sendOff() {
-    this.emit(Events.STATE_CHANGED, {on: false, value: Date.now()});
+    this.emit("stateChanged", { on: false, value: Date.now() });
     this.scheduleNext();
   }
 
   stop() {
     clearTimeout(this.timeout);
-    this.timeout = null;
+    this.timeout = undefined;
   }
 }
-
-module.exports = TimeTrigger;
-

@@ -1,29 +1,28 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
-const Events = require("../Events");
-const PropertyTrigger = require("./PropertyTrigger");
+import PropertyTrigger from "./PropertyTrigger";
+import { Property } from "../Property";
 
 /**
  * A trigger which activates when a property is equal to a given value
  */
-class EqualityTrigger extends PropertyTrigger {
-  /**
-   * @param {TriggerDescription} desc
-   */
-  constructor(desc) {
-    super(desc);
+export default class EqualityTrigger extends PropertyTrigger {
+  value: number;
 
-    this.value = desc.value;
+  /**
+   *
+   * @param label
+   * @param property
+   * @param value
+   */
+  constructor(label: string, property: Property, value: number) {
+    super(label, property);
+
+    this.value = value;
   }
 
   /**
-   * @return {TriggerDescription}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       {
@@ -34,13 +33,9 @@ class EqualityTrigger extends PropertyTrigger {
 
   /**
    * @param {number} propValue
-   * @return {State}
    */
-  onValueChanged(propValue) {
+  onValueChanged(propValue: number) {
     const on = propValue === this.value;
-
-    this.emit(Events.STATE_CHANGED, {on: on, value: propValue});
+    this.emit("stateChanged", {on: on, value: propValue});
   }
 }
-
-module.exports = EqualityTrigger;

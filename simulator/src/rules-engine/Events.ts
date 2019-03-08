@@ -1,6 +1,9 @@
-export default {
-  // Sent by a trigger to a rule to notify effects
-  STATE_CHANGED: "state-changed",
-  // Sent by a property to a trigger to potentially change state
-  VALUE_CHANGED: "value-changed"
-};
+import StrictEventEmitter from "strict-event-emitter-types";
+import { EventEmitter } from "events";
+
+export interface Events {
+  stateChanged: (payload: { on: boolean; value?: any }) => void;
+  valueChanged: () => void;
+}
+
+export type TriggerEmitter = StrictEventEmitter<EventEmitter, Events>;

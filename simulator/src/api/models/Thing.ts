@@ -12,6 +12,9 @@ const ajv = new Ajv();
  * in a machine readable format with a default JSON encoding.
  */
 export class Thing {
+  removeEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
+  }
   context?: string;
   type: string[] = [];
   id: string;

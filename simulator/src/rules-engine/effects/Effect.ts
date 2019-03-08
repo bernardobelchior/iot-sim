@@ -1,12 +1,7 @@
-export interface IEffect {
-  type: string;
-  label: string;
-}
-
 /**
  * Effect - The outcome of a Rule once triggered
  */
-export class Effect {
+export default class Effect {
   type: string;
   label: string;
 
@@ -14,15 +9,15 @@ export class Effect {
    * Create an Effect based on a wire-format description with a property
    * @param {IEffect} desc
    */
-  constructor(desc: IEffect) {
+  constructor(label: string) {
     this.type = this.constructor.name;
-    this.label = desc.label;
+    this.label = label;
   }
 
   /**
-   * @return {IEffect}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return {
       type: this.type,
       label: this.label,

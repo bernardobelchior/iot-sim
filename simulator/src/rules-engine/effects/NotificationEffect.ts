@@ -1,33 +1,23 @@
-import { Effect } from "./Effect";
-import assert from "assert";
-
-interface INotificationEffect {
-  type: string;
-  label: string;
-  message: string;
-}
+import Effect from "./Effect";
 
 /**
  * An Effect which creates a notification
  */
-export class NotificationEffect extends Effect {
+export default class NotificationEffect extends Effect {
   message: string;
 
   /**
    * @param {INotificationEffect} desc
    */
-  constructor(desc: INotificationEffect) {
-    super(desc);
-
-    assert(desc.hasOwnProperty("message"));
-
-    this.message = desc.message;
+  constructor(label: string, message: string) {
+    super(label);
+    this.message = message;
   }
 
   /**
-   * @return {INotificationEffect}
+   * @return {any}
    */
-  toDescription(): INotificationEffect {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       {

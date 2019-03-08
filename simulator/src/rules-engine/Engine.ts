@@ -11,6 +11,9 @@ const Rule = require("./Rule");
  * An engine for running and managing list of rules
  */
 export default class Engine {
+  static getThing(thingId: string): any {
+    throw new Error("Method not implemented.");
+  }
   /**
    * Get a list of all current rules
    * @return {Promise<Array<Rule>>} rules

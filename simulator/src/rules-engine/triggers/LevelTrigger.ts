@@ -1,44 +1,44 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
+import assert from "assert";
+import PropertyTrigger from "./PropertyTrigger";
+import { Property } from "../Property";
 
-const assert = require("assert");
-const Events = require("../Events");
-const PropertyTrigger = require("./PropertyTrigger");
-
-const LevelTriggerTypes = {
-  LESS: "LESS",
-  EQUAL: "EQUAL",
-  GREATER: "GREATER",
-};
+enum LevelTriggerTypes {
+  LESS =  "LESS",
+  EQUAL = "EQUAL",
+  GREATER = "GREATER",
+}
 
 /**
  * A trigger which activates when a numerical property is less or greater than
  * a given level
  */
-class LevelTrigger extends PropertyTrigger {
+export default class LevelTrigger extends PropertyTrigger {
+  value: number;
+  levelType: LevelTriggerTypes;
+
   /**
-   * @param {TriggerDescription} desc
+   *
+   * @param label
+   * @param property
+   * @param value
+   * @param levelType
    */
-  constructor(desc) {
-    super(desc);
+  constructor(label: string, property: Property, value: number, levelType: LevelTriggerTypes) {
+    super(label, property);
     assert(this.property.type === "number" || this.property.type === "integer");
-    assert(typeof desc.value === "number");
-    assert(LevelTriggerTypes[desc.levelType]);
-    if (desc.levelType === "EQUAL") {
+    assert(LevelTriggerTypes[levelType]);
+    if (levelType === LevelTriggerTypes.EQUAL) {
       assert(this.property.type === "integer");
     }
 
-    this.value = desc.value;
-    this.levelType = desc.levelType;
+    this.value = value;
+    this.levelType = levelType;
   }
 
   /**
-   * @return {TriggerDescription}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       {
@@ -50,9 +50,8 @@ class LevelTrigger extends PropertyTrigger {
 
   /**
    * @param {number} propValue
-   * @return {State}
    */
-  onValueChanged(propValue) {
+  onValueChanged(propValue: number) {
     let on = false;
 
     switch (this.levelType) {
@@ -73,10 +72,6 @@ class LevelTrigger extends PropertyTrigger {
         break;
     }
 
-    this.emit(Events.STATE_CHANGED, {on: on, value: propValue});
+    this.emit("stateChanged", {on: on, value: propValue});
   }
 }
-
-LevelTrigger.types = LevelTriggerTypes;
-
-module.exports = LevelTrigger;

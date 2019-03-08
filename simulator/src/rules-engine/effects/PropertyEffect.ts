@@ -1,31 +1,26 @@
 import { Property } from "../Property";
-import { Effect } from "./Effect";
-
-interface IPropertyEffect {
-  type: string;
-  label: string;
-  property: Property;
-}
+import Effect from "./Effect";
 
 /**
  * PropertyEffect - The outcome of a Rule involving a property
  */
-export class PropertyEffect extends Effect {
+export default class PropertyEffect extends Effect {
   property: Property;
 
   /**
-   * Create an Effect based on a wire-format description with a property
-   * @param {IPropertyEffect} desc
+   *
+   * @param label
+   * @param property
    */
-  constructor(desc: IPropertyEffect) {
-    super(desc);
-    this.property = new Property(desc.property);
+  constructor(label: string, property: Property) {
+    super(label);
+    this.property = property;
   }
 
   /**
-   * @return {IPropertyEffect}
+   * @return {any}
    */
-  toDescription(): IPropertyEffect {
+  toDescription(): any {
     return Object.assign(super.toDescription(), {
       property: this.property.asPropertyDescription(),
     });

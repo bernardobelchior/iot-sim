@@ -1,36 +1,26 @@
 import assert from "assert";
-import { PropertyEffect } from "./PropertyEffect";
+import PropertyEffect from "./PropertyEffect";
 import { Property } from "../Property";
-
-interface ISetEffect {
-  type: string;
-  label: string;
-  property: Property;
-  value: any;
-  on: boolean;
-}
 
 /**
  * An Effect which permanently sets the target property to
  * a value when triggered
  */
-export class SetEffect extends PropertyEffect {
+export default class SetEffect extends PropertyEffect {
   value: any;
   on: boolean = false;
-  /**
-   * @param {EffectDescription} desc
-   */
-  constructor(desc: ISetEffect) {
-    super(desc);
-    this.value = desc.value;
+
+  constructor(label: string, property: Property, value: any) {
+    super(label, property);
+    this.value = value;
     assert(typeof this.value === this.property.type,
       "set point and property must be same type");
   }
 
   /**
-   * @return {ISetEffect}
+   * @return {any}
    */
-  toDescription(): ISetEffect {
+  toDescription(): any {
     return Object.assign(
       super.toDescription(),
       { value: this.value, on: this.on }

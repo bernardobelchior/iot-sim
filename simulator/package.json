@@ -30,6 +30,7 @@
     "express-validator": "^5.3.1",
     "mongoose": "^5.4.16",
     "request": "^2.88.0",
+    "strict-event-emitter-types": "^2.0.0",
     "uuid": "^3.3.2",
     "winston": "^3.2.1"
   },
