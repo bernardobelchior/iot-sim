@@ -1,8 +1,8 @@
 import { effects } from "./effects";
 import { triggers } from "./triggers";
-import { Events, TriggerEmitter } from "./Events";
-import { Effect } from "./effects/Effect";
-import { Trigger } from "./triggers/Trigger";
+import { TriggerEmitter } from "./Events";
+import Effect from "./effects/Effect";
+import Trigger from "./triggers/Trigger";
 import { EventEmitter } from "events";
 
 export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
@@ -48,7 +48,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    * Begin executing the rule
    */
   async start() {
-    this.trigger.on(Events.STATE_CHANGED, this.onTriggerStateChanged);
+    this.trigger.on("initRule", this.onTriggerStateChanged);
     await this.trigger.start();
   }
 
@@ -85,10 +85,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    * Stop executing the rule
    */
   stop() {
-    this.trigger.removeListener(
-      Events.STATE_CHANGED,
-      this.onTriggerStateChanged
-    );
+    this.trigger.removeListener("initRule", this.onTriggerStateChanged);
     this.trigger.stop();
   }
 }

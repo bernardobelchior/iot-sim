@@ -1,31 +1,33 @@
-const assert = require("assert");
-const EventEmitter = require("events").EventEmitter;
-const Events = require("./Events");
+import { EventEmitter } from 'events';
+import { TriggerEmitter } from './Events';
+import Engine from './Engine';
+import { Property as ThingProperty } from '../api/models/Property';
 
 /**
  * Utility to support operations on Thing's properties
  */
-export class Property extends EventEmitter {
+export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
+  id: string;
+  type: string;
+  thing: string;
+  unit?: string;
+  description?: string;
+  
   /**
    * Create a Property from a descriptor returned by the WoT API
-   * @param {PropertyDescription} desc
    */
-  constructor(desc) {
+  constructor(type: string, id: string, thing: string, unit?: string, description?: string) {
     super();
 
-    assert(desc.type);
-    assert(desc.thing);
-    assert(desc.id);
+    this.type = type;
+    this.thing = thing;
+    this.id = id;
 
-    this.type = desc.type;
-    this.thing = desc.thing;
-    this.id = desc.id;
-
-    if (desc.unit) {
-      this.unit = desc.unit;
+    if (unit) {
+      this.unit = unit;
     }
-    if (desc.description) {
-      this.description = desc.description;
+    if (description) {
+      this.description = description;
     }
 
     this.onPropertyChanged = this.onPropertyChanged.bind(this);
@@ -33,10 +35,10 @@ export class Property extends EventEmitter {
   }
 
   /**
-   * @return {PropertyDescription}
+   * @return {any}
    */
-  toDescription() {
-    const desc = {
+  toDescription(): any {
+    const desc: any = {
       type: this.type,
       thing: this.thing,
       id: this.id
@@ -53,9 +55,9 @@ export class Property extends EventEmitter {
   /**
    * @return {Promise} resolves to property's value or undefined if not found
    */
-  async get() {
+  async get(): Promise<any> {
     try {
-      return await Things.getThingProperty(this.thing, this.id);
+      return await Engine.getThingProperty(this.thing, this.id);
     } catch (e) {
       console.warn("Rule get failed", e);
     }
@@ -65,24 +67,21 @@ export class Property extends EventEmitter {
    * @param {any} value
    * @return {Promise} resolves when set is done
    */
-  set(value) {
-    return Things.setThingProperty(this.thing, this.id, value)
-      .catch(e => {
-        console.warn("Rule set failed, retrying once", e);
-        return Things.setThingProperty(this.thing, this.id, value);
-      })
-      .catch(e => {
-        console.warn("Rule set failed completely", e);
-      });
+  async set(value: any) {
+    try {
+      return Engine.setThingProperty(this.thing, this.id, value);
+    } catch (e) {
+      console.warn("Rule set failed", e);
+    }
   }
 
   async start() {
-    AddonManager.on(Constants.PROPERTY_CHANGED, this.onPropertyChanged);
+    // AddonManager.on(Constants.PROPERTY_CHANGED, this.onPropertyChanged);
 
     try {
       await this.getInitialValue();
     } catch (_e) {
-      AddonManager.on(Constants.THING_ADDED, this.onThingAdded);
+      // AddonManager.on(Constants.THING_ADDED, this.onThingAdded);
     }
   }
 
@@ -91,15 +90,14 @@ export class Property extends EventEmitter {
     if (typeof initialValue === "undefined") {
       throw new Error("Did not get a real value");
     }
-    this.emit(Events.VALUE_CHANGED, initialValue);
+    this.emit("valueChanged", initialValue);
   }
 
   /**
-   * Listener for AddonManager's THING_ADDED event
    * @param {String} thing - thing id
    */
-  onThingAdded(thing) {
-    if (thing.id !== this.thing) {
+  onThingAdded(thing: string) {
+    if (thing !== this.thing) {
       return;
     }
     this.getInitialValue().catch(e => {
@@ -107,21 +105,21 @@ export class Property extends EventEmitter {
     });
   }
 
-  onPropertyChanged(property) {
-    if (property.device.id !== this.thing) {
+  onPropertyChanged(propertyDevice: string, property: ThingProperty) {
+    if (propertyDevice !== this.thing) {
       return;
     }
-    if (property.name !== this.id) {
+    if (property.title !== this.id) {
       return;
     }
-    this.emit(Events.VALUE_CHANGED, property.value);
+    this.emit("valueChanged", property.value);
   }
 
   stop() {
-    AddonManager.removeListener(
+   /*  AddonManager.removeListener(
       Constants.PROPERTY_CHANGED,
       this.onPropertyChanged
     );
-    AddonManager.removeListener(Constants.THING_ADDED, this.onThingAdded);
+    AddonManager.removeListener(Constants.THING_ADDED, this.onThingAdded); */
   }
 }

@@ -1,19 +1,11 @@
-/**
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.*
- */
-
-const Database = require("./Database");
-const Rule = require("./Rule");
+import Rule from "./Rule";
 
 /**
  * An engine for running and managing list of rules
  */
 export default class Engine {
-  static getThing(thingId: string): any {
-    throw new Error("Method not implemented.");
-  }
+  rules: Rule[] = [];
+
   /**
    * Get a list of all current rules
    * @return {Promise<Array<Rule>>} rules
@@ -45,7 +37,7 @@ export default class Engine {
    * @param {number} id
    * @return {Promise<Rule>}
    */
-  getRule(id) {
+  getRule(id: string) {
     const rule = this.rules[id];
     if (!rule) {
       return Promise.reject(new Error(`Rule ${id} does not exist`));
@@ -89,7 +81,7 @@ export default class Engine {
    * @param {number} rule id
    * @return {Promise}
    */
-  deleteRule(ruleId) {
+  deleteRule(ruleId: string): Promise<any> {
     if (!this.rules[ruleId]) {
       return Promise.reject(new Error(`Rule ${ruleId} already does not exist`));
     }
@@ -97,5 +89,15 @@ export default class Engine {
       this.rules[ruleId].stop();
       delete this.rules[ruleId];
     });
+  }
+
+  static setThingProperty(thingId: string, id: string, value: any): any {
+    throw new Error('Method not implemented.');
+  }
+  static getThingProperty(thingId: string, id: string): any {
+    throw new Error('Method not implemented.');
+  }
+  static getThing(thingId: string): any {
+    throw new Error("Method not implemented.");
   }
 }
