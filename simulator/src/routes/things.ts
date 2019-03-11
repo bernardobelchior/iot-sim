@@ -10,9 +10,6 @@ export function thingsRouter(registry: DeviceRegistry) {
   const router = Router();
   router.use(registryMiddleware(registry));
 
-  /**
-   * App routes.
-   */
   router.get("/", (req, res) => thingsController.list(req as IRequest, res));
   router.get("/:thingId", (req, res) =>
     thingsController.get(req as IRequest, res)

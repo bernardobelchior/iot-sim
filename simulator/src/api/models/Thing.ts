@@ -12,6 +12,9 @@ const ajv = new Ajv();
  * in a machine readable format with a default JSON encoding.
  */
 export class Thing {
+  removeEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
+  }
   context?: string;
   type: string[] = [];
   id: string;
@@ -104,10 +107,10 @@ export class Thing {
   addProperties(properties: any): void {
     for (const key in properties) {
       const obj = properties[key];
-      const p = new Property(key, obj.title, obj.description, obj["@type"]);
+      const p = new Property(key, obj.title, obj.description, obj.type);
 
       p.defineMetadata({
-        type: obj.type,
+        semanticType: obj["@type"],
         unit: obj.unit,
         enum: obj.enum,
         readOnly: obj.readOnly,

@@ -5,7 +5,7 @@ import Ajv from "ajv";
 const ajv = new Ajv();
 
 export interface IPropertyMetadata {
-  type: string;
+  semanticType?: string;
   unit?: string;
   enum?: number[];
   readOnly?: boolean;
@@ -23,7 +23,7 @@ export class Property extends EventEmitter {
   id: string;
   title: string;
   description: string;
-  semanticType: string;
+  type: string;
 
   metadata?: IPropertyMetadata;
   value: any;
@@ -36,19 +36,19 @@ export class Property extends EventEmitter {
    * @param {String} id Property identifier
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
-   * @param {String} semanticType String identifying a type from the linked context
+   * @param {String} type A primitive type
    */
   constructor(
     id: string,
     title: string,
     description: string,
-    semanticType: string
+    type: string
   ) {
     super();
     this.id = id;
     this.title = title;
     this.description = description;
-    this.semanticType = semanticType;
+    this.type = type;
 
     this.value = 0;
     this.valueGenerator = (value: any): any => {

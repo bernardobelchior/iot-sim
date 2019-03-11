@@ -5,6 +5,15 @@ import { parseWebThing, builder } from "./builder";
 type ThingMap = { [id: string]: Thing };
 
 export class DeviceRegistry {
+  static getThing(thingId: string): any {
+    throw new Error("Method not implemented.");
+  }
+  static setThingProperty(thing: string, id: string, value: any): any {
+    throw new Error("Method not implemented.");
+  }
+  static getThingProperty(thing: string, id: string): any {
+    throw new Error("Method not implemented.");
+  }
   private simulatedThings: ThingMap = {};
   private things: ThingMap = {};
   private messageQueue: MessageQueue;

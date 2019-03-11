@@ -1,14 +1,13 @@
 import express from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
-import mongo from "./config/mongo";
+import mongo from "./db/config";
 import expressValidator from "express-validator";
 import cors from "cors";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
-import { thingsRouter } from "./routes/things";
-import { simulateRouter } from "./routes/simulate";
+import * as routes from "./routes";
 
 async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
@@ -29,8 +28,9 @@ async function app() {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  app.use("/things", thingsRouter(deviceRegistry));
-  app.use("/simulate", simulateRouter(deviceRegistry));
+  /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
+  app.use("/things", routes.thingsRouter(deviceRegistry));
+  app.use("/rules", routes.rulesRouter());
 
   return app;
 }
