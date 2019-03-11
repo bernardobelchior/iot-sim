@@ -1,8 +1,8 @@
 import waitForExpect from "wait-for-expect";
-import { messageQueueBuilder } from "./MessageQueue";
-import { vars } from "../util/vars";
-import { DeviceRegistry } from "./DeviceRegistry";
-import { Thing } from "./models/Thing";
+import { messageQueueBuilder } from "../src/api/MessageQueue";
+import { vars } from "../src/util/vars";
+import { DeviceRegistry } from "../src/api/DeviceRegistry";
+import { Thing } from "../src/api/models/Thing";
 
 const things = [
   {

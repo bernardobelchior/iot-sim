@@ -52,6 +52,28 @@ export class Thing {
     this.id = Thing.generateIdFromHref(this.href);
   }
 
+  static fromDescription(desc: any): Thing {
+    const context: string | undefined = desc["@context"];
+    let type: string[] = [];
+
+    if ("@type" in desc) {
+      if (Array.isArray(desc["@type"])) {
+        type = desc["@type"];
+      } else {
+        type = [desc["@type"]];
+      }
+    }
+
+    const t = new this(desc.name, desc.description, desc.href, context, type);
+
+    t.addProperties(desc.properties || []);
+    t.addActions(desc.actions || []);
+    t.addEvents(desc.events || []);
+    t.addLinks(desc.links || []);
+
+    return t;
+  }
+
   static generateIdFromHref(href: string) {
     return href.replace(/\/$/g, "").replace(/[:/]/g, "-");
   }

@@ -7,9 +7,9 @@ import { IRequest } from "../registryMiddleware";
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const list = (req: IRequest, res: Response) => {
+export const list = async (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = req.registry.getThing(thingId);
+  const thing = await req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -24,9 +24,9 @@ export const list = (req: IRequest, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const get = (req: IRequest, res: Response) => {
+export const get = async (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = req.registry.getThing(thingId);
+  const thing = await req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;
@@ -46,9 +46,9 @@ export const get = (req: IRequest, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const put = (req: IRequest, res: Response) => {
+export const put = async (req: IRequest, res: Response) => {
   const thingId = req.params.thingId;
-  const thing = req.registry.getThing(thingId);
+  const thing = await req.registry.getThing(thingId);
   if (thing === null || thing === undefined) {
     res.status(404).end();
     return;

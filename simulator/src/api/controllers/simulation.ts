@@ -3,8 +3,8 @@ import { IRequest } from "../registryMiddleware";
 import { Thing } from "../models/Thing";
 import { SimulatedThing } from "../models/SimulatedThing";
 
-export const post = (req: IRequest, res: Response) => {
-  const thing: Thing | undefined = req.registry.getThing(req.params.id);
+export const post = async (req: IRequest, res: Response) => {
+  const thing: Thing | undefined = await req.registry.getThing(req.params.id);
 
   if (thing) {
     req.registry.addThing(new SimulatedThing(thing));

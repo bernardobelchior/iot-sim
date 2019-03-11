@@ -40,7 +40,7 @@ export default class Engine {
 
   /**
    * Get a rule by id
-   * @param {number} id
+   * @param {string} id
    * @return {Promise<Rule>}
    */
   async getRule(id: string): Promise<Rule> {

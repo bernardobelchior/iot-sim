@@ -1,4 +1,4 @@
-import { Thing } from "./Thing";
+import { Thing } from "../../src/api/models/Thing";
 
 describe("Thing.isSimulated()", () => {
   it("should return true if thing has 'Simulated' in '@type'", function() {

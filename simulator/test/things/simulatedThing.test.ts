@@ -1,5 +1,4 @@
-import { parseWebThing } from "../builder";
-import { SimulatedThing } from "./SimulatedThing";
+import { SimulatedThing } from "../../src/api/models/SimulatedThing";
 
 const thing = {
   name: "Lamp",
@@ -17,7 +16,7 @@ const thing = {
 
 describe("SimulatedThing", () => {
   it("should return true when isSimulated is called", async () => {
-    const simulatedThing = new SimulatedThing(parseWebThing(thing));
+    const simulatedThing = SimulatedThing.fromDescription(thing);
 
     expect(simulatedThing.isSimulated()).toBeTruthy();
   });
