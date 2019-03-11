@@ -5,7 +5,7 @@ import { Property } from "../Property";
  * A trigger which activates when a property is equal to a given value
  */
 export default class EqualityTrigger extends PropertyTrigger {
-  value: number;
+  value: string;
 
   /**
    *
@@ -13,7 +13,7 @@ export default class EqualityTrigger extends PropertyTrigger {
    * @param property
    * @param value
    */
-  constructor(label: string, property: Property, value: number) {
+  constructor(label: string, property: Property, value: string) {
     super(label, property);
 
     this.value = value;
@@ -34,7 +34,7 @@ export default class EqualityTrigger extends PropertyTrigger {
   /**
    * @param {number} propValue
    */
-  onValueChanged(propValue: number) {
+  onValueChanged(propValue: string) {
     const on = propValue === this.value;
     this.emit("stateChanged", {on: on, value: propValue});
   }

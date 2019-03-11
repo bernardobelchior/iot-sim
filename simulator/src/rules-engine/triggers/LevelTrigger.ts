@@ -23,16 +23,19 @@ export default class LevelTrigger extends PropertyTrigger {
    * @param value
    * @param levelType
    */
-  constructor(label: string, property: Property, value: number, levelType: LevelTriggerTypes) {
+  constructor(label: string, property: Property, value: number, levelType: string) {
     super(label, property);
     assert(this.property.type === "number" || this.property.type === "integer");
-    assert(LevelTriggerTypes[levelType]);
-    if (levelType === LevelTriggerTypes.EQUAL) {
+    if (!Object.values(LevelTriggerTypes).includes(levelType)) {
+      throw Error('Level type missing');
+    }
+    const levelIdx = levelType as keyof typeof LevelTriggerTypes;
+    if (levelIdx === LevelTriggerTypes.EQUAL) {
       assert(this.property.type === "integer");
     }
 
     this.value = value;
-    this.levelType = levelType;
+    this.levelType = LevelTriggerTypes[levelIdx];
   }
 
   /**

@@ -2,18 +2,13 @@ import { Request, Response } from "express";
 import { IRequest } from "./rulesMiddleware";
 import APIError from "../util/APIError";
 import Engine from "./Engine";
-import Rule from "./Rule";
 
 const engine = new Engine();
 
 export const getAll = async (req: Request, res: Response) => {
   try {
     const rules = await engine.getRules();
-    res.send(
-      rules.map((rule: Rule) => {
-        return rule.toDescription();
-      })
-    );
+    res.send(rules);
   } catch (error) {
     res
       .status(404)
@@ -23,7 +18,7 @@ export const getAll = async (req: Request, res: Response) => {
 
 export const getRule = async (req: Request, res: Response) => {
   try {
-    const id = parseInt(req.params.id);
+    const id = req.params.id;
     const rule = await engine.getRule(id);
     res.send(rule.toDescription());
   } catch (e) {
@@ -46,7 +41,7 @@ export const addRule = async (req: IRequest, res: Response) => {
 
 export const updateRule = async (req: IRequest, res: Response) => {
   try {
-    await engine.updateRule(parseInt(req.params.id), req.rule);
+    await engine.updateRule(req.params.id, req.rule);
     res.send({});
   } catch (e) {
     res
@@ -57,7 +52,7 @@ export const updateRule = async (req: IRequest, res: Response) => {
 
 export const deleteRule = async (req: Request, res: Response) => {
   try {
-    await engine.deleteRule(parseInt(req.params.id));
+    await engine.deleteRule(req.params.id);
     res.send({});
   } catch (e) {
     res

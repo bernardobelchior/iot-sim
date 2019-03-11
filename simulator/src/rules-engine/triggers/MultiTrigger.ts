@@ -1,4 +1,3 @@
-import assert from "assert";
 import Trigger from "./Trigger";
 
 enum OperationTypes {
@@ -15,10 +14,13 @@ export default class MultiTrigger extends Trigger {
   states: boolean[];
   state: boolean = false;
 
-  constructor(label: string, op: OperationTypes, triggers: Trigger[]) {
+  constructor(label: string, op: string, triggers: Trigger[]) {
     super(label);
-    assert(op in OperationTypes);
-    this.op = op;
+    if (!Object.values(OperationTypes).includes(op)) {
+      throw Error('Operation type missing');
+    }
+    const operationIdx = op as keyof typeof OperationTypes;
+    this.op = OperationTypes[operationIdx];
     this.triggers = triggers;
 
     this.states = new Array(this.triggers.length);

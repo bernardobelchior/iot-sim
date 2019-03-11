@@ -1,5 +1,5 @@
-import { effects } from "./effects";
-import { triggers } from "./triggers";
+import { fromDescription as eFromDescription } from "./effects";
+import { fromDescription as tFromDescription } from "./triggers";
 import { TriggerEmitter } from "./Events";
 import Effect from "./effects/Effect";
 import Trigger from "./triggers/Trigger";
@@ -32,8 +32,8 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    * @return {Rule}
    */
   static fromDescription(desc: any): Rule {
-    const trigger = triggers.fromDescription(desc.trigger);
-    const effect = effects.fromDescription(desc.effect);
+    const trigger = tFromDescription(desc.trigger);
+    const effect = eFromDescription(desc.effect);
     const rule = new this(desc.enabled, trigger, effect);
     if (desc.hasOwnProperty("id")) {
       rule.id = desc.id;

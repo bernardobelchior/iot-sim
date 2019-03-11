@@ -1,4 +1,5 @@
-import { triggers } from "../../src/rules-engine/triggers";
+import { BooleanTrigger, LevelTrigger, EqualityTrigger, MultiTrigger } from "../../src/rules-engine/triggers";
+import { Property } from "../../src/rules-engine/Property";
 
 const booleanTrigger = {
   property: {
@@ -43,88 +44,36 @@ const andTrigger = {
 
 describe("triggers", () => {
   it("should parse a BooleanTrigger", () => {
-    const trigger = triggers.fromDescription(booleanTrigger);
+    const p = new Property("boolean", "on", "light1");
+    const trigger = new BooleanTrigger(booleanTrigger.type, p, booleanTrigger.onValue);
     expect(trigger).toMatchObject(booleanTrigger);
   });
 
   it("should parse a LevelTrigger", () => {
-    const trigger = triggers.fromDescription(levelTrigger);
+    const p = new Property("number", "hue", "light2");
+    const trigger = new LevelTrigger(levelTrigger.type, p, levelTrigger.value, levelTrigger.levelType);
     expect(trigger).toMatchObject(levelTrigger);
   });
 
   it("should parse an EqualityTrigger", () => {
-    const trigger = triggers.fromDescription(equalityTrigger);
+    const p = new Property("string", "color", "light2");
+    const trigger = new EqualityTrigger(equalityTrigger.type, p, equalityTrigger.value);
     expect(trigger).toMatchObject(equalityTrigger);
   });
 
   it("should parse a MultiTrigger", () => {
-    const trigger = triggers.fromDescription(andTrigger);
+    const p1 = new Property("boolean", "on", "light1");
+    const p2 = new Property("number", "hue", "light2");
+    const triggers = [new BooleanTrigger(booleanTrigger.type, p1, booleanTrigger.onValue), new LevelTrigger(levelTrigger.type, p2, levelTrigger.value, levelTrigger.levelType)]
+    const trigger = new MultiTrigger(andTrigger.type, andTrigger.op, triggers);
     expect(trigger).toMatchObject(andTrigger);
   });
 
-  it("should reject an unknown trigger type", () => {
-    let err = null;
-    try {
-      triggers.fromDescription({type: "LimaTrigger"});
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
-  it("should reject a number type onValue", () => {
-    let err = null;
-    try {
-      triggers.fromDescription(Object.assign(
-        {},
-        booleanTrigger,
-        {onValue: 12}
-      ));
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
-  it("should reject a boolean type level", () => {
-    let err = null;
-    try {
-      triggers.fromDescription(Object.assign(
-        {},
-        levelTrigger,
-        {value: true}
-      ));
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
   it("should reject an unknown levelType", () => {
-    let err = null;
+    let err = undefined;
     try {
-      triggers.fromDescription(Object.assign(
-        {},
-        levelTrigger,
-        {levelType: "GARBANZO"}
-      ));
-    } catch (e) {
-      err = e;
-    }
-    expect(err).toBeTruthy();
-  });
-
-
-  it("should reject an trigger without a property", () => {
-    let err = null;
-    try {
-      const brokenTrigger = Object.assign(
-        {},
-        levelTrigger
-      );
-      delete brokenTrigger.property;
-
-      triggers.fromDescription(brokenTrigger);
+      const p = new Property("number", "hue", "light2");
+      new LevelTrigger(levelTrigger.type, p, levelTrigger.value, "INVALID_LEVEL");
     } catch (e) {
       err = e;
     }

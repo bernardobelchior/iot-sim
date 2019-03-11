@@ -1,27 +1,41 @@
 import RuleSchema from "../db/Rule";
 import Rule from "./Rule";
 
+type RuleMap = { [id: string]: Rule };
+
 /**
  * An engine for running and managing list of rules
  */
 export default class Engine {
-  rules: Map<string, Rule> = new Map<string, Rule>();
+  rules: RuleMap = {};
+  rulesPromise: any = undefined;
 
   /**
    * Get a list of all current rules
    */
-  async getRules() {
-    try {
-      const rulesDb = await RuleSchema.find({});
-      rulesDb.map(async (rDesc: any) => {
-        const rule = Rule.fromDescription(rDesc);
-        await rule.start();
-        this.rules.set(rDesc.id, rule);
-      });
-    } catch (error) {
-      throw new Error("Error obtaining rules");
+  async getRules(): Promise<RuleMap> {
+    if (Object.keys(this.rules).length > 0) {
+      return Promise.resolve(this.rules);
     }
-    return this.rules;
+
+    if (this.rulesPromise) {
+      return this.rulesPromise.then((rules: RuleMap) => {
+        return rules;
+      });
+    }
+
+    this.rulesPromise = RuleSchema.find({}).then(async rulesDb => {
+      this.rulesPromise = undefined;
+
+      this.rules = {};
+      for (const rule of rulesDb) {
+        this.rules[rule.id] = Rule.fromDescription(rule);
+        await this.rules[rule.id].start();
+      }
+      return this.rules;
+    });
+
+    return this.rulesPromise;
   }
 
   /**
@@ -29,12 +43,15 @@ export default class Engine {
    * @param {number} id
    * @return {Promise<Rule>}
    */
-  async getRule(id: string) {
-    const rule = this.rules.get(id);
-    if (!rule) {
+  async getRule(id: string): Promise<Rule> {
+    try {
+      const rule = (await this.getRules())[id];
+      if (!rule) {
+        return Promise.reject(new Error(`Rule ${id} does not exist`));
+      } else return Promise.resolve(rule);
+    } catch (error) {
       return Promise.reject(new Error(`Rule ${id} does not exist`));
     }
-    return Promise.resolve(rule);
   }
 
   /**
@@ -42,49 +59,61 @@ export default class Engine {
    * @param {Rule} rule
    * @return {Promise<string>} rule id
    */
-  async addRule(rule: Rule) {
-    const r = await RuleSchema.create(rule.toDescription());
-    rule.id = r.id;
-    this.rules.set(r.id, rule);
-    await rule.start();
-    return rule.id;
+  async addRule(rule: Rule): Promise<string> {
+    try {
+      const r = await RuleSchema.create(rule.toDescription());
+      rule.id = r.id;
+      this.rules[r.id] = rule;
+      await this.rules[r.id].start();
+      return r.id;
+    } catch (error) {
+      return Promise.reject(new Error(`Error creating rule.`));
+    }
   }
 
   /**
    * Update an existing rule
    * @param {string} rule id
    * @param {Rule} rule
-   * @return {Promise}
+   * @return {Promise<string>}
    */
-  async updateRule(ruleId: string, rule: Rule) {
-    if (!this.rules.has(ruleId)) {
+  async updateRule(ruleId: string, rule: Rule): Promise<string> {
+    try {
+      const rule = (await this.getRules())[ruleId];
+      if (!rule) {
+        return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
+      }
+      const uRule = await RuleSchema.update(ruleId, rule.toDescription(), {
+        new: true
+      });
+      const oldRule = this.rules[ruleId];
+      oldRule.stop();
+      this.rules[ruleId] = uRule.fromDescription();
+      await this.rules[ruleId].start();
+      return ruleId;
+    } catch (error) {
       return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
     }
-    rule.id = ruleId;
-    await RuleSchema.update(ruleId, rule.toDescription());
-
-    const oldRule = this.rules.get(ruleId);
-    if (oldRule) {
-      oldRule.stop();
-    }
-    this.rules.set(ruleId, rule);
-    return await rule.start();
   }
 
   /**
    * Delete an existing rule
    * @param {number} rule id
-   * @return {Promise}
+   * @return {Promise<string>}
    */
-  async deleteRule(ruleId: string) {
-    if (!this.rules.has(ruleId)) {
+  async deleteRule(ruleId: string): Promise<string> {
+    try {
+      const rule = (await this.getRules())[ruleId];
+      if (!rule) {
+        return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
+      }
+      await RuleSchema.findByIdAndDelete(ruleId);
+      const delRule = this.rules[ruleId];
+      await delRule.stop();
+      delete this.rules[ruleId];
+      return ruleId;
+    } catch (error) {
       return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
     }
-    await RuleSchema.findByIdAndDelete(ruleId);
-    const delRule = this.rules.get(ruleId);
-    if (delRule) {
-      delRule.stop();
-    }
-    this.rules.delete(ruleId);
   }
 }
