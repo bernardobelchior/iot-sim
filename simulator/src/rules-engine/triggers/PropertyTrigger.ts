@@ -19,21 +19,21 @@ export default class PropertyTrigger extends Trigger {
   }
 
   /**
-   * @return {IPropertyTrigger}
+   * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     return Object.assign(super.toDescription(), { property: this.property.toDescription() });
   }
 
   async start() {
-    // this.property.on(Events.VALUE_CHANGED, this.onValueChanged);
+    this.property.on("valueChanged", this.onValueChanged);
     await this.property.start();
   }
 
   onValueChanged(_value: any) {}
 
   stop() {
-    // this.property.removeListener(Events.VALUE_CHANGED, this.onValueChanged);
+    this.property.removeListener("valueChanged", this.onValueChanged);
     this.property.stop();
   }
 }

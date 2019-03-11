@@ -48,19 +48,19 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    * Begin executing the rule
    */
   async start() {
-    this.trigger.on("initRule", this.onTriggerStateChanged);
+    this.trigger.on("stateChanged", this.onTriggerStateChanged);
     await this.trigger.start();
   }
 
   /**
    * On a state changed event, pass the state forward to the rule's effect
-   * @param {boolean} state
+   * @param {any} state
    */
-  onTriggerStateChanged(state: boolean) {
+  onTriggerStateChanged(state: { on: boolean; value?: any }) {
     if (!this.enabled) {
       return;
     }
-    this.effect.setState(state);
+    this.effect.setState(state.on);
   }
 
   /**
@@ -85,7 +85,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    * Stop executing the rule
    */
   stop() {
-    this.trigger.removeListener("initRule", this.onTriggerStateChanged);
+    this.trigger.removeListener("stateChanged", this.onTriggerStateChanged);
     this.trigger.stop();
   }
 }

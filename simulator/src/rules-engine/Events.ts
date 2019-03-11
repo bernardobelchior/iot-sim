@@ -3,7 +3,6 @@ import { EventEmitter } from "events";
 
 export interface Events {
   stateChanged: (payload: { on: boolean; value?: any }) => void;
-  initRule: (state: boolean) => void;
   valueChanged: (value: any) => void;
 }
 

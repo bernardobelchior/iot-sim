@@ -31,13 +31,13 @@ export default class SetEffect extends PropertyEffect {
    * @param {boolean} state
    */
   setState(state: boolean) {
-/*     if (!this.on && state) {
+     if (!this.on && state) {
       this.on = true;
       return this.property.set(this.value);
     }
     if (this.on && !state) {
       this.on = false;
-      return Promise.resolve();
-    } */
+    }
+    return Promise.resolve();
   }
 }

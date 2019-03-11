@@ -17,7 +17,7 @@ export default class MultiTrigger extends Trigger {
   constructor(label: string, op: string, triggers: Trigger[]) {
     super(label);
     if (!Object.values(OperationTypes).includes(op)) {
-      throw Error('Operation type missing');
+      throw Error("Operation type missing");
     }
     const operationIdx = op as keyof typeof OperationTypes;
     this.op = OperationTypes[operationIdx];
@@ -41,7 +41,7 @@ export default class MultiTrigger extends Trigger {
 
   async start() {
     const starts = this.triggers.map((trigger, triggerIndex) => {
-      // trigger.on("stateChanged", this.onStateChanged.bind(this, triggerIndex));
+      trigger.on("stateChanged", this.onStateChanged.bind(this, triggerIndex));
       return trigger.start();
     });
     await Promise.all(starts);
@@ -54,8 +54,8 @@ export default class MultiTrigger extends Trigger {
     });
   }
 
-  onStateChanged(triggerIndex: number, state: boolean) {
-    this.states[triggerIndex] = state;
+  onStateChanged(triggerIndex: number, state: { on: boolean, value?: any }) {
+    this.states[triggerIndex] = state.on;
 
     let value = this.states[0];
     for (let i = 1; i < this.states.length; i++) {

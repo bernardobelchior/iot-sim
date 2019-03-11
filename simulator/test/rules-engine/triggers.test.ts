@@ -64,7 +64,7 @@ describe("triggers", () => {
   it("should parse a MultiTrigger", () => {
     const p1 = new Property("boolean", "on", "light1");
     const p2 = new Property("number", "hue", "light2");
-    const triggers = [new BooleanTrigger(booleanTrigger.type, p1, booleanTrigger.onValue), new LevelTrigger(levelTrigger.type, p2, levelTrigger.value, levelTrigger.levelType)]
+    const triggers = [new BooleanTrigger(booleanTrigger.type, p1, booleanTrigger.onValue), new LevelTrigger(levelTrigger.type, p2, levelTrigger.value, levelTrigger.levelType)];
     const trigger = new MultiTrigger(andTrigger.type, andTrigger.op, triggers);
     expect(trigger).toMatchObject(andTrigger);
   });

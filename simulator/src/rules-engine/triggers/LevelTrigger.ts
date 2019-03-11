@@ -27,7 +27,7 @@ export default class LevelTrigger extends PropertyTrigger {
     super(label, property);
     assert(this.property.type === "number" || this.property.type === "integer");
     if (!Object.values(LevelTriggerTypes).includes(levelType)) {
-      throw Error('Level type missing');
+      throw Error("Level type missing");
     }
     const levelIdx = levelType as keyof typeof LevelTriggerTypes;
     if (levelIdx === LevelTriggerTypes.EQUAL) {

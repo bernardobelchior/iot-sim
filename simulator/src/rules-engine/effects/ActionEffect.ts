@@ -1,4 +1,5 @@
 import Effect from "./Effect";
+import { DeviceRegistry } from "../../api/DeviceRegistry";
 import { Action } from "../../api/models/Action";
 
 /**
@@ -24,14 +25,11 @@ export default class ActionEffect extends Effect {
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(
-      super.toDescription(),
-      {
-        thing: this.thingId,
-        action: this.action,
-        parameters: this.parameters,
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      thing: this.thingId,
+      action: this.action,
+      parameters: this.parameters
+    });
   }
 
   /**
@@ -47,12 +45,10 @@ export default class ActionEffect extends Effect {
 
   async createAction() {
     try {
-/*       const thing = await Things.getThing(this.thing);
+      const thing = await DeviceRegistry.getThing(this.thingId);
 
       const action = new Action(this.action, this.parameters, thing);
-      await Actions.add(action);
-      await AddonManager.requestAction(this.thing, action.id, this.action,
-                                       this.parameters); */
+      thing.requestAction(action);
     } catch (e) {
       console.warn("Unable to dispatch action", e);
     }

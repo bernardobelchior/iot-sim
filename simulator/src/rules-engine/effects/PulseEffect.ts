@@ -37,19 +37,18 @@ export default class PulseEffect extends PropertyEffect {
    * @param {boolean} state
    */
   setState(state: boolean) {
-/*     if (state) {
-      // TODO
+     if (state) {
       // If we're already active, just perform the effect again
       if (this.on) {
-        return this.property.setValue(this.value);
+        return this.property.set(this.value);
       }
       // Activate the effect and save our current state to revert to upon
       // deactivation
-      this.property.getValue().then((value) => {
+      this.property.get().then((value) => {
         if (value !== this.value) {
           this.oldValue = value;
         } else {
-          this.oldValue = null;
+          this.oldValue = undefined;
         }
         this.on = true;
         return this.property.set(this.value);
@@ -60,6 +59,7 @@ export default class PulseEffect extends PropertyEffect {
       if (this.oldValue !== null) {
         return this.property.set(this.oldValue);
       }
-    } */
+    }
+    return Promise.resolve();
   }
 }
