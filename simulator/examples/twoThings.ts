@@ -1,6 +1,5 @@
-import { messageQueueBuilder } from "../src/api/MessageQueue";
-import { vars } from "../src/util/vars";
 import { start } from "../src/server";
+import { MessageQueue } from "../src/api/MessageQueue";
 
 const things = [
   {
@@ -31,12 +30,10 @@ const things = [
   }
 ];
 
-start().then(async server => {
-  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+start().then(async ({ app }) => {
+  const messageQueue: MessageQueue = app.get("messageQueue");
 
-  things.forEach(async thing =>
-    console.log(await messageQueue.publish("register", JSON.stringify(thing)))
+  await Promise.all(
+    things.map(thing => messageQueue.publish("register", JSON.stringify(thing)))
   );
-
-  await messageQueue.end();
 });

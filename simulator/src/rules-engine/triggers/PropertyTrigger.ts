@@ -22,7 +22,9 @@ export default class PropertyTrigger extends Trigger {
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(super.toDescription(), { property: this.property.toDescription() });
+    return Object.assign(super.toDescription(), {
+      property: this.property.toDescription()
+    });
   }
 
   async start() {

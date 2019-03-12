@@ -22,7 +22,7 @@ export default class PropertyEffect extends Effect {
    */
   toDescription(): any {
     return Object.assign(super.toDescription(), {
-      property: this.property.toDescription(),
+      property: this.property.toDescription()
     });
   }
 }

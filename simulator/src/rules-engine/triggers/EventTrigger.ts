@@ -12,8 +12,7 @@ export default class EventTrigger extends Trigger {
 
   constructor(label: string, thingId: string, event: string) {
     super(label);
-    this.thingId = thingId,
-    this.event = event;
+    (this.thingId = thingId), (this.event = event);
     this.onEvent = this.onEvent.bind(this);
   }
 
@@ -21,14 +20,11 @@ export default class EventTrigger extends Trigger {
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(
-      super.toDescription(),
-      {
-        thingId: this.thingId,
-        event: this.event,
-        stopped: this.stopped
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      thingId: this.thingId,
+      event: this.event,
+      stopped: this.stopped
+    });
   }
 
   async start() {
@@ -45,8 +41,8 @@ export default class EventTrigger extends Trigger {
       return;
     }
 
-    this.emit("stateChanged", {on: true, value: Date.now()});
-    this.emit("stateChanged", {on: false, value: Date.now()});
+    this.emit("stateChanged", { on: true, value: Date.now() });
+    this.emit("stateChanged", { on: false, value: Date.now() });
   }
 
   stop() {

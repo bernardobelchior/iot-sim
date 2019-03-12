@@ -20,7 +20,7 @@ export default class Effect {
   toDescription(): any {
     return {
       type: this.type,
-      label: this.label,
+      label: this.label
     };
   }
 

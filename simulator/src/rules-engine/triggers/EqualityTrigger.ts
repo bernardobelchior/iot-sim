@@ -23,12 +23,9 @@ export default class EqualityTrigger extends PropertyTrigger {
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(
-      super.toDescription(),
-      {
-        value: this.value,
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value
+    });
   }
 
   /**
@@ -36,6 +33,6 @@ export default class EqualityTrigger extends PropertyTrigger {
    */
   onValueChanged(propValue: string) {
     const on = propValue === this.value;
-    this.emit("stateChanged", {on: on, value: propValue});
+    this.emit("stateChanged", { on: on, value: propValue });
   }
 }

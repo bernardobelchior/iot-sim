@@ -13,7 +13,12 @@ export default class ActionEffect extends Effect {
   /**
    * @param {IActionEffect} desc
    */
-  constructor(label: string, thingId: string, action: Action, parameters?: any) {
+  constructor(
+    label: string,
+    thingId: string,
+    action: Action,
+    parameters?: any
+  ) {
     super(label);
 
     this.thingId = thingId;

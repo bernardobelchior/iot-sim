@@ -20,31 +20,34 @@ export default class PulseEffect extends PropertyEffect {
   constructor(label: string, property: Property, value: any) {
     super(label, property);
     this.value = value;
-    assert(typeof this.value === this.property.type, "set point and property must be same type");
+    assert(
+      typeof this.value === this.property.type,
+      "set point and property must be same type"
+    );
   }
 
   /**
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(
-      super.toDescription(),
-      { value: this.value, on: this.on }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value,
+      on: this.on
+    });
   }
 
   /**
    * @param {boolean} state
    */
   setState(state: boolean) {
-     if (state) {
+    if (state) {
       // If we're already active, just perform the effect again
       if (this.on) {
         return this.property.set(this.value);
       }
       // Activate the effect and save our current state to revert to upon
       // deactivation
-      this.property.get().then((value) => {
+      this.property.get().then(value => {
         if (value !== this.value) {
           this.oldValue = value;
         } else {

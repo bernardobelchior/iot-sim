@@ -38,12 +38,7 @@ export class Property extends EventEmitter {
    * @param {String} description Human friendly description
    * @param {String} type A primitive type
    */
-  constructor(
-    id: string,
-    title: string,
-    description: string,
-    type: string
-  ) {
+  constructor(id: string, title: string, description: string, type: string) {
     super();
     this.id = id;
     this.title = title;
