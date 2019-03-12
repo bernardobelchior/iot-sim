@@ -5,6 +5,7 @@
   "author": "#####",
   "license": "MIT",
   "scripts": {
+    "example": "node examples/run.js",
     "start": "npm run serve",
     "build": "npm run build-ts && npm run tslint",
     "serve": "node dist/src/index.js",

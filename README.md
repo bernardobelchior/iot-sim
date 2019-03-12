@@ -48,3 +48,13 @@ docker-compose up --build
 The `simulator` directory has automated tests. 
 In order to run them, make sure you have a RabbitMQ server running and have specific the environment variables in `.env`.
 Afterwards, run `npm test` and tests will run and show a coverage report.
+
+## Examples
+
+The `simulator` directory has example scenarios that can be used to quickly setup an environment. 
+
+Before running, make sure you have a RabbitMQ instance running. Running multiple scenarios at the same time may create inconsistencies.
+
+In order to run them, run `npm run example -- <example-name>`. When trying to run the example named `twoThings.ts`, the following commmand would have to be executed `npm run example -- twoThings`.
+
+Note: in some cases, TypeScript compilation may be slower than running the example. If this happens, you should try again.
