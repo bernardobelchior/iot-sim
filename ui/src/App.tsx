@@ -3,9 +3,9 @@ import { connect } from "react-redux";
 import Things from "./pages/Things";
 import { RootActions } from "./store/actions";
 import { bindActionCreators, Dispatch } from "redux";
-import { fetchThings } from "./store/actions/things";
 import Drawer from "./components/Drawer";
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import { fetchThings } from "./store/actions/things";
 
 interface Props {
   fetchThings: () => void;

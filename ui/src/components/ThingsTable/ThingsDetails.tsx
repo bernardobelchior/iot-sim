@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import { Thing, ThingProperty } from "../../models/Thing";
+import React, { Component} from "react";
+import { Thing} from "../../models/Thing";
 import MUIDataTable, {
   MUIDataTableColumnDef,
   MUIDataTableOptions
@@ -7,10 +7,14 @@ import MUIDataTable, {
 import { Properties } from "../../store/reducers/properties";
 import { RootState } from "../../store/reducers";
 import { connect } from "react-redux";
+import { fetchThingProperties } from "../../store/actions/properties";
+import { bindActionCreators, Dispatch } from "redux";
+import { RootActions } from "../../store/actions";
 
 interface IProps {
   thing: Thing;
   properties: { [id: string]: Properties };
+  fetchThingProperties: (thingId: string) => void;
 }
 
 const options: MUIDataTableOptions = {
@@ -71,35 +75,55 @@ const columns: MUIDataTableColumnDef[] = [
  * @param thing
  * @param numCols Number of columns to span
  */
-const ThingsDetails: FC<IProps> = ({ thing, properties }) => (
-  <div style={{ padding: "16px", backgroundColor: "#f8f8f8" }}>
-    <MUIDataTable
-      title="Properties"
-      columns={propertyColumns}
-      options={options}
-      data={Object.entries(thing.properties).map(([id, prop]) => ({
-       title: prop.title,
-        description: prop.description,
-        value: properties[thing.id] && properties[thing.id].properties[prop.id]
-      }))}
-    />
-    <MUIDataTable
-      title="Actions"
-      columns={columns}
-      options={options}
-      data={Object.values(thing.actions)}
-    />
-    <MUIDataTable
-      title="Events"
-      columns={columns}
-      options={options}
-      data={Object.values(thing.events)}
-    />
-  </div>
-);
+class ThingsDetails extends Component<IProps> {
+  componentDidMount() {
+    const { thing, fetchThingProperties } = this.props;
+
+    fetchThingProperties(thing.id);
+  }
+
+  render() {
+    const { thing, properties } = this.props;
+
+    return (
+      <div style={{ padding: "16px", backgroundColor: "#f8f8f8" }}>
+        <MUIDataTable
+          title="Properties"
+          columns={propertyColumns}
+          options={options}
+          data={Object.entries(thing.properties).map(([id, prop]) => ({
+            title: prop.title,
+            description: prop.description,
+            value: properties[thing.id] && properties[thing.id].properties && properties[thing.id].properties[id]
+          }))}
+        />
+        <MUIDataTable
+          title="Actions"
+          columns={columns}
+          options={options}
+          data={Object.values(thing.actions)}
+        />
+        <MUIDataTable
+          title="Events"
+          columns={columns}
+          options={options}
+          data={Object.values(thing.events)}
+        />
+      </div>
+    );
+  }
+}
 
 const mapStateToProps = ({properties: { properties}}: RootState) => ({
   properties
 });
 
-export default connect(mapStateToProps)(ThingsDetails);
+const mapDispatchToProps = (dispatch: Dispatch<RootActions>) =>
+  bindActionCreators(
+    {
+      fetchThingProperties
+    },
+    dispatch
+  );
+
+export default connect(mapStateToProps, mapDispatchToProps)(ThingsDetails);

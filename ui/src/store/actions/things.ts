@@ -1,7 +1,6 @@
 import { createAsyncAction } from "typesafe-actions";
 import api from "../../api";
 import { Dispatch } from "redux";
-import { Thing } from "../../models/Thing";
 import { ThingMap } from "../reducers/things";
 
 export const fetchThingsAction = createAsyncAction(
