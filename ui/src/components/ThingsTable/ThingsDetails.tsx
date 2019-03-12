@@ -11,9 +11,12 @@ import { fetchThingProperties } from "../../store/actions/properties";
 import { bindActionCreators, Dispatch } from "redux";
 import { RootActions } from "../../store/actions";
 
-interface IProps {
+interface IOwnProps {
   thing: Thing;
-  properties: { [id: string]: Properties };
+}
+
+interface IProps extends IOwnProps{
+  properties: Properties;
   fetchThingProperties: (thingId: string) => void;
 }
 
@@ -48,7 +51,7 @@ const propertyColumns: MUIDataTableColumnDef[] = [
     name: "value",
     label: "Value",
     options: {
-      customBodyRender: value => value || "No value found"
+      customBodyRender: value => value === undefined ? "No value found" : JSON.stringify(value)
     }
   },
 ];
@@ -94,7 +97,7 @@ class ThingsDetails extends Component<IProps> {
           data={Object.entries(thing.properties).map(([id, prop]) => ({
             title: prop.title,
             description: prop.description,
-            value: properties[thing.id] && properties[thing.id].properties && properties[thing.id].properties[id]
+            value: properties[id]
           }))}
         />
         <MUIDataTable
@@ -114,8 +117,8 @@ class ThingsDetails extends Component<IProps> {
   }
 }
 
-const mapStateToProps = ({properties: { properties}}: RootState) => ({
-  properties
+const mapStateToProps = ({properties: { properties}}: RootState, { thing }: IOwnProps) => ({
+  properties: properties[thing.id] || {}
 });
 
 const mapDispatchToProps = (dispatch: Dispatch<RootActions>) =>

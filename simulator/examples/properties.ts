@@ -1,6 +1,7 @@
 import { start } from "../src/server";
 import { MessageQueue } from "../src/api/MessageQueue";
-import { REGISTER_TOPIC } from "../src/api/DeviceRegistry";
+import { DeviceRegistry } from "../src/api/DeviceRegistry";
+import { parseWebThing } from "../src/api/builder";
 
 const things = [
   {
@@ -9,8 +10,9 @@ const things = [
     properties: {
       on: {
         title: "On/Off",
-        type: "boolean",
-        description: "Whether the lamp is turned on",
+        type: "integer",
+        unit: "percent",
+        description: "Percentage of light sent from the lamp",
         links: [{ href: "/things/lamp/properties/on" }]
       }
     },
@@ -33,10 +35,18 @@ const things = [
 
 start().then(async ({ app }) => {
   const messageQueue: MessageQueue = app.get("messageQueue");
+  const registry: DeviceRegistry = app.get("registry");
 
-  await Promise.all(
-    things.map(thing =>
-      messageQueue.publish(REGISTER_TOPIC, JSON.stringify(thing))
-    )
+  await registry.addThing(parseWebThing(things[0]));
+  await registry.addThing(parseWebThing(things[1]));
+
+  await messageQueue.publish(
+    things[0].href,
+    JSON.stringify({ messageType: "setProperty", data: { on: 87 } })
+  );
+
+  await messageQueue.publish(
+    things[1].href,
+    JSON.stringify({ messageType: "setProperty", data: { open: true } })
   );
 });

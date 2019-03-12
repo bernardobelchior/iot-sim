@@ -4,6 +4,8 @@ import { parseWebThing, builder } from "./builder";
 
 type ThingMap = { [id: string]: Thing };
 
+export const REGISTER_TOPIC = "__register";
+
 export class DeviceRegistry {
   static getThing(thingId: string): any {
     throw new Error("Method not implemented.");
@@ -33,7 +35,7 @@ export class DeviceRegistry {
    * published to the message queue will not be consumed.
    */
   init() {
-    return this.messageQueue.subscribe("register", this.consume.bind(this));
+    return this.messageQueue.subscribe(REGISTER_TOPIC, this.consume.bind(this));
   }
 
   getSimulatedThings(): ThingMap {
@@ -58,15 +60,45 @@ export class DeviceRegistry {
     } else {
       this.things[thing.id] = thing;
     }
+
+    return this.messageQueue.subscribe(thing.href, this.consume.bind(this));
   }
 
-  private consume(_topic: string, msg: Buffer) {
-    if (msg !== null) {
-      const obj = JSON.parse(msg.toString());
+  private consume(topic: string, msg: Buffer) {
+    switch (topic) {
+      case REGISTER_TOPIC:
+        this.handleRegistry(topic, msg);
+        break;
+      default:
+        this.handleWebSocketMessage(topic, msg);
+        break;
+    }
+  }
 
-      const thing = parseWebThing(obj);
+  private handleRegistry(_topic: string, msg: Buffer) {
+    const obj = JSON.parse(msg.toString());
 
-      this.addThing(thing);
+    const thing = parseWebThing(obj);
+
+    this.addThing(thing);
+  }
+
+  private handleWebSocketMessage(topic: string, msg: Buffer) {
+    const id = Thing.generateIdFromHref(topic);
+
+    const obj: any = JSON.parse(msg.toString());
+
+    switch (obj.messageType) {
+      case "setProperty":
+        const thing = this.getThing(id);
+
+        if (thing !== undefined) {
+          thing.setProperties(obj.data);
+        }
+
+        break;
+      default:
+        break;
     }
   }
 }

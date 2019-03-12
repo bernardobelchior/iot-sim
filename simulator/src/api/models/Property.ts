@@ -45,7 +45,7 @@ export class Property extends EventEmitter {
     this.description = description;
     this.type = type;
 
-    this.value = 0;
+    this.value = undefined;
     this.valueGenerator = (value: any): any => {
       return value;
     };

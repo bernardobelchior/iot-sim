@@ -213,6 +213,16 @@ export class Thing {
   }
 
   /**
+   * Sets multiple properties at once
+   * @param properties
+   */
+  public setProperties(properties: { [name: string]: any }): void {
+    Object.entries(properties).forEach(([name, value]) =>
+      this.setProperty(name, value)
+    );
+  }
+
+  /**
    * Set a property's value.
    *
    * @param {String} propertyName Name of the property to get the value of
@@ -283,11 +293,11 @@ export class Thing {
   propertyNotify(propertyId: string): void {
     const p = this.properties.get(propertyId);
     if (p) {
+      // @ts-ignore
       const data = {
         messageType: "propertyStatus",
         [p.id]: p.getValue()
       };
-      console.log(data);
       // amqp.publishMessage(data);
     }
   }
@@ -298,11 +308,11 @@ export class Thing {
    * @param {Object} action
    */
   actionNotify(actionRequest: any): void {
+    // @ts-ignore
     const data = {
       messageType: "actionStatus",
       data: actionRequest
     };
-    console.log(data);
     // amqp.publishMessage(data);
   }
 
@@ -315,6 +325,7 @@ export class Thing {
     const event = this.events.get(eventId);
 
     if (event) {
+      // @ts-ignore
       const data = {
         messageType: "event",
         data: {
@@ -323,7 +334,6 @@ export class Thing {
           }
         }
       };
-      console.log(data);
       // amqp.publishMessage(data);
     }
   }

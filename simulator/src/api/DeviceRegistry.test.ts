@@ -1,8 +1,9 @@
 import waitForExpect from "wait-for-expect";
 import { messageQueueBuilder } from "./MessageQueue";
 import { vars } from "../util/vars";
-import { DeviceRegistry } from "./DeviceRegistry";
+import { DeviceRegistry, REGISTER_TOPIC } from "./DeviceRegistry";
 import { Thing } from "./models/Thing";
+import { parseWebThing } from "./builder";
 
 const things = [
   {
@@ -43,7 +44,7 @@ describe("DeviceRegistry", () => {
 
     things.forEach(
       async thing =>
-        await messageQueue.publish("register", JSON.stringify(thing))
+        await messageQueue.publish(REGISTER_TOPIC, JSON.stringify(thing))
     );
 
     await waitForExpect(() =>
@@ -54,6 +55,32 @@ describe("DeviceRegistry", () => {
       expect(
         deviceRegistry.getThing(Thing.generateIdFromHref(thing.href))
       ).toBeTruthy()
+    );
+
+    await messageQueue.end();
+  });
+
+  it("sets device property correctly", async () => {
+    const thing = parseWebThing(things[0]);
+    const message = {
+      messageType: "setProperty",
+      data: {
+        on: true
+      }
+    };
+
+    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    const deviceRegistry = new DeviceRegistry(messageQueue);
+    await deviceRegistry.init();
+
+    await deviceRegistry.addThing(thing);
+
+    expect(thing.getPropertyValue("on")).toBeUndefined();
+
+    await messageQueue.publish(thing.href, JSON.stringify(message));
+
+    await waitForExpect(() =>
+      expect(thing.getPropertyValue("on")).toBe(message.data.on)
     );
 
     await messageQueue.end();
