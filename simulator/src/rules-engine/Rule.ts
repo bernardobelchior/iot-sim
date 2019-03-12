@@ -66,7 +66,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   /**
    * @return {any}
    */
-  toDescription() {
+  toDescription(): any {
     const desc: any = {
       enabled: this.enabled,
       trigger: this.trigger.toDescription(),

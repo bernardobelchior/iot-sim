@@ -13,6 +13,10 @@ export default class MultiEffect extends Effect {
     this.effects = effects;
   }
 
+  static fromDescription() {
+
+  }
+
   /**
    * @return
    */

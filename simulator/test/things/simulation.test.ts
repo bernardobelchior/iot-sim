@@ -1,10 +1,9 @@
-import * as controller from "./simulation";
-import { DeviceRegistry } from "../DeviceRegistry";
+import * as controller from "../../src/api/controllers/simulation";
+import { DeviceRegistry } from "../../src/api/DeviceRegistry";
 import { MockMessageQueue } from "../MockMessageQueue";
-import { IRequest } from "../registryMiddleware";
+import { IRequest } from "../../src/api/registryMiddleware";
 import express = require("express");
-import { Thing } from "../models/Thing";
-import { parseWebThing } from "../builder";
+import { Thing } from "../../src/api/models/Thing";
 
 const thing = {
   name: "Lamp",
@@ -25,7 +24,7 @@ describe("controllers/simulation", () => {
     const deviceRegistry = new DeviceRegistry(new MockMessageQueue());
     const sendStatus = jest.fn();
 
-    deviceRegistry.addThing(parseWebThing(thing));
+    deviceRegistry.addThing(Thing.fromDescription(thing));
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(0);
 

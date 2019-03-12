@@ -8,11 +8,11 @@ type ThingMap = { [id: string]: Thing };
 export class DeviceRegistry {
   private simulatedThings: ThingMap = {};
   private things: ThingMap = {};
-  private messageQueue: MessageQueue;
+  private messageQueue?: MessageQueue;
 
   private getThingsPromise: any = undefined;
 
-  constructor(messageQueue: MessageQueue) {
+  constructor(messageQueue?: MessageQueue) {
     this.messageQueue = messageQueue;
   }
 
@@ -32,7 +32,9 @@ export class DeviceRegistry {
    * published to the message queue will not be consumed.
    */
   init() {
-    return this.messageQueue.subscribe("register", this.consume.bind(this));
+    if (this.messageQueue)
+      return this.messageQueue.subscribe("register", this.consume.bind(this));
+    return;
   }
 
   /**
@@ -51,7 +53,7 @@ export class DeviceRegistry {
     return this.things;
   }
 
-  getThings(): Promise<ThingMap> {
+  async getThings(): Promise<ThingMap> {
     if (
       Object.keys(this.things).length > 0 ||
       Object.keys(this.simulatedThings).length > 0
@@ -242,3 +244,5 @@ export class DeviceRegistry {
     }
   }
 }
+
+export const DeviceRegistrySingleton = new DeviceRegistry();

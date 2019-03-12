@@ -5,14 +5,13 @@ import mongo from "./db/config";
 import expressValidator from "express-validator";
 import cors from "cors";
 import { vars } from "./util/vars";
-import { DeviceRegistry } from "./api/DeviceRegistry";
+import { DeviceRegistrySingleton } from "./api/DeviceRegistry";
 import { messageQueueBuilder } from "./api/MessageQueue";
 import * as routes from "./routes";
 
 async function app() {
   const messageQueue = await messageQueueBuilder(vars.MQ_URI);
-  const deviceRegistry = new DeviceRegistry(messageQueue);
-  await deviceRegistry.init();
+  await DeviceRegistrySingleton.init();
 
   mongo();
 
@@ -29,7 +28,7 @@ async function app() {
   app.use(expressValidator());
 
   /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
-  app.use("/things", routes.thingsRouter(deviceRegistry));
+  app.use("/things", routes.thingsRouter(DeviceRegistrySingleton));
   app.use("/rules", routes.rulesRouter());
 
   return app;

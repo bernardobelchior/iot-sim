@@ -1,5 +1,5 @@
 import Effect from "./Effect";
-import { DeviceRegistry } from "../../api/DeviceRegistry";
+import { DeviceRegistrySingleton } from "../../api/DeviceRegistry";
 import { Action } from "../../api/models/Action";
 
 /**
@@ -45,10 +45,9 @@ export default class ActionEffect extends Effect {
 
   async createAction() {
     try {
-      const thing = await DeviceRegistry.getThing(this.thingId);
+      const thing = await DeviceRegistrySingleton.getThing(this.thingId);
 
-      const action = new Action(this.action, this.parameters, thing);
-      thing.requestAction(action);
+      thing.requestAction(this.action);
     } catch (e) {
       console.warn("Unable to dispatch action", e);
     }

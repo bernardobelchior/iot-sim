@@ -1,6 +1,6 @@
 import Trigger from "./Trigger";
 import { Thing } from "../../api/models/Thing";
-import { DeviceRegistry } from "../../api/DeviceRegistry";
+import { DeviceRegistrySingleton } from "../../api/DeviceRegistry";
 
 /**
  * A trigger activated when an event occurs
@@ -33,7 +33,7 @@ export default class EventTrigger extends Trigger {
 
   async start() {
     this.stopped = false;
-    const thing = await DeviceRegistry.getThing(this.thingId);
+    const thing = await DeviceRegistrySingleton.getThing(this.thingId);
     if (this.stopped) {
       return;
     }
@@ -51,7 +51,7 @@ export default class EventTrigger extends Trigger {
 
   stop() {
     this.stopped = true;
-    DeviceRegistry.getThing(this.thingId).then((thing: Thing) => {
+    DeviceRegistrySingleton.getThing(this.thingId).then((thing: Thing) => {
       thing.removeEventSubscription(this.onEvent);
     });
   }

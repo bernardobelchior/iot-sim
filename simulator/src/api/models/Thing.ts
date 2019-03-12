@@ -12,7 +12,10 @@ const ajv = new Ajv();
  * in a machine readable format with a default JSON encoding.
  */
 export class Thing {
-  removeEventSubscription(onEvent: (eventName: string) => void): any {
+  getEventDescriptions(eventName?: string): any {
+    throw new Error("Method not implemented.");
+  }
+  addEventSubscription(onEvent: (eventName: string) => void): any {
     throw new Error("Method not implemented.");
   }
   context?: string;
@@ -360,17 +363,6 @@ export class Thing {
   }
 
   /**
-   * Get the thing's events as an array. Events emitted by the device
-   *
-   * @param {String?} eventName Optional event name to get descriptions for
-   *
-   * @returns {Object} Event descriptions.
-   */
-  getEventDescriptions(eventName?: string) {
-    // TODO Use Mongo database to retrieve events.
-  }
-
-  /**
    * Get the thing's properties as an object.
    *
    * @returns {Object} Properties, i.e. name -> description
@@ -436,5 +428,9 @@ export class Thing {
    */
   isSimulated() {
     return this.type.find(t => t === "Simulated");
+  }
+
+  removeEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
   }
 }

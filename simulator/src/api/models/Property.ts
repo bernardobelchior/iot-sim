@@ -1,5 +1,11 @@
 import { ILink, Link } from "./Link";
-import EventEmitter from "events";
+import StrictEventEmitter from "strict-event-emitter-types";
+import { EventEmitter } from "events";
+
+export interface Events {
+  update: (value: any) => void;
+}
+
 import Ajv from "ajv";
 
 const ajv = new Ajv();
@@ -16,10 +22,12 @@ export interface IPropertyMetadata {
   [key: string]: any;
 }
 
+type PropertyEmitter = StrictEventEmitter<EventEmitter, Events>;
+
 /**
  * A property object describes an attribute of a Thing and is indexed by a property id.
  */
-export class Property extends EventEmitter {
+export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
   id: string;
   title: string;
   description: string;
@@ -54,6 +62,7 @@ export class Property extends EventEmitter {
     this.valueGenerator = (value: any): any => {
       return value;
     };
+
   }
 
   /**
@@ -139,7 +148,7 @@ export class Property extends EventEmitter {
   notifyValue(v: any) {
     if (typeof v !== "undefined" && v !== null && v !== this.value) {
       this.value = v;
-      super.emit("update", v);
+      this.emit("update", v);
     }
   }
 

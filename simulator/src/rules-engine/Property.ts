@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { TriggerEmitter } from "./Events";
-import { DeviceRegistry } from "../api/DeviceRegistry";
+import { DeviceRegistrySingleton } from "../api/DeviceRegistry";
 import { Property as ThingProperty } from "../api/models/Property";
 
 /**
@@ -63,7 +63,10 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
    */
   async get(): Promise<any> {
     try {
-      return await DeviceRegistry.getThingProperty(this.thing, this.id);
+      return await DeviceRegistrySingleton.getThingProperty(
+        this.thing,
+        this.id
+      );
     } catch (e) {
       console.warn("Rule get failed", e);
     }
@@ -75,7 +78,11 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
    */
   async set(value: any) {
     try {
-      return await DeviceRegistry.setThingProperty(this.thing, this.id, value);
+      return await DeviceRegistrySingleton.setThingProperty(
+        this.thing,
+        this.id,
+        value
+      );
     } catch (e) {
       console.warn("Rule set failed", e);
     }

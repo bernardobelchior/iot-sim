@@ -19,6 +19,14 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
   }
 
   /**
+   * Creates a trigger from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+
+  }
+
+  /**
    * @return {any}
    */
   toDescription(): any {
