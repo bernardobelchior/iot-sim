@@ -107,7 +107,7 @@ export class DeviceRegistry {
    * @param Object description Thing description.
    */
   async createThing(id: string, description: any): Promise<Thing> {
-    const thing = Thing.fromDescription(description);
+    const thing = Thing.fromDescription({ ...description, id });
     try {
       await ThingSchema.create(thing.id, thing.asThingDescription());
       this.addThing(thing);

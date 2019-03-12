@@ -12,12 +12,6 @@ const ajv = new Ajv();
  * in a machine readable format with a default JSON encoding.
  */
 export class Thing {
-  getEventDescriptions(eventName?: string): any {
-    throw new Error("Method not implemented.");
-  }
-  addEventSubscription(onEvent: (eventName: string) => void): any {
-    throw new Error("Method not implemented.");
-  }
   context?: string;
   type: string[] = [];
   id: string;
@@ -35,24 +29,23 @@ export class Thing {
    *
    * @param {String} name Human friendly string which describes the device.
    * @param {String} description Human friendly string which describes the device and its functions.
-   * @param {String} href Href
+   * @param {String} id Thing identifier
    * @param {String} context Optional annotation which can be used to provide a URI for a schema repository which defines standard schemas for common "types" of device capabilities.
    * @param {String} type Optional annotation which can be used to provide the names of schemas for types of capabilities a device supports, from a schema repository referred to in the @context member.
    */
   constructor(
     name: string,
     description: string,
-    href: string,
+    id: string,
     context?: string,
     type?: string[]
   ) {
     this.name = name;
+    this.id = id;
     this.description = description;
-    this.href = href;
     this.context = context;
     this.type = type || [];
-
-    this.id = Thing.generateIdFromHref(this.href);
+    this.href = this.href = `things/${this.id}`;
   }
 
   static fromDescription(desc: any): Thing {
@@ -68,6 +61,9 @@ export class Thing {
     }
 
     const t = new this(desc.name, desc.description, desc.href, context, type);
+    if (desc.hasOwnProperty("id")) {
+      t.id = desc.id;
+    }
 
     t.addProperties(desc.properties || []);
     t.addActions(desc.actions || []);
@@ -75,10 +71,6 @@ export class Thing {
     t.addLinks(desc.links || []);
 
     return t;
-  }
-
-  static generateIdFromHref(href: string) {
-    return href.replace(/\/$/g, "").replace(/[:/]/g, "-");
   }
 
   /**
@@ -431,6 +423,14 @@ export class Thing {
   }
 
   removeEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
+  }
+
+  getEventDescriptions(eventName?: string): any {
+    throw new Error("Method not implemented.");
+  }
+
+  addEventSubscription(onEvent: (eventName: string) => void): any {
     throw new Error("Method not implemented.");
   }
 }
