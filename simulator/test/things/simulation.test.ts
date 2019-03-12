@@ -16,7 +16,7 @@ const thing = {
       links: [{ href: "/things/lamp/properties/on" }]
     }
   },
-  href: "/things/lamp"
+  id: "lamp"
 };
 
 describe("controllers/simulation", () => {
@@ -32,7 +32,7 @@ describe("controllers/simulation", () => {
       {
         registry: deviceRegistry,
         params: {
-          id: Thing.generateIdFromHref(thing.href)
+          id: thing.id
         }
       } as IRequest,
       {

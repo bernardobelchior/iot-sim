@@ -1,7 +1,6 @@
 import express from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
-import mongo from "./db/config";
 import expressValidator from "express-validator";
 import cors from "cors";
 import { vars } from "./util/vars";
@@ -12,8 +11,6 @@ import * as routes from "./routes";
 async function app() {
   // const messageQueue = await messageQueueBuilder(vars.MQ_URI);
   await DeviceRegistrySingleton.init();
-
-  mongo();
 
   // Create Express server
   const app = express();

@@ -80,7 +80,7 @@ describe("rules engine", () => {
     await addDevice(thingLight3);
   });
 
-  it('gets a list of 0 rules', async () => {
+  it("gets a list of 0 rules", async () => {
     const res = await request(appInstance)
       .delete(`/rules`)
       .set("Accept", "application/json")

@@ -4,12 +4,13 @@ import { TriggerEmitter } from "./Events";
 import Effect from "./effects/Effect";
 import Trigger from "./triggers/Trigger";
 import { EventEmitter } from "events";
+import { v4 as uuid } from "uuid";
 
 export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   effect: Effect;
   trigger: Trigger;
   enabled: boolean;
-  id?: string;
+  id: string;
   name?: string;
 
   /**
@@ -19,6 +20,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
    */
   constructor(enabled: boolean, trigger: Trigger, effect: Effect) {
     super();
+    this.id = uuid();
     this.enabled = enabled;
     this.trigger = trigger;
     this.effect = effect;

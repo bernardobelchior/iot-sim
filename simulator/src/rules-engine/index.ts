@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
 import { IRequest } from "./rulesMiddleware";
 import APIError from "../util/APIError";
-import Engine from "./Engine";
-
-const engine = new Engine();
+import { EngineSingleton } from "./Engine";
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const rules = await engine.getRules();
+    const rules = EngineSingleton.getRules();
     res.send(rules);
   } catch (error) {
     res
@@ -19,7 +17,7 @@ export const getAll = async (req: Request, res: Response) => {
 export const getRule = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    const rule = await engine.getRule(id);
+    const rule = EngineSingleton.getRule(id);
     res.send(rule.toDescription());
   } catch (e) {
     res
@@ -30,7 +28,7 @@ export const getRule = async (req: Request, res: Response) => {
 
 export const addRule = async (req: IRequest, res: Response) => {
   try {
-    const ruleId = await engine.addRule(req.rule);
+    const ruleId = EngineSingleton.addRule(req.rule);
     res.send({ id: ruleId });
   } catch (e) {
     res
@@ -41,7 +39,7 @@ export const addRule = async (req: IRequest, res: Response) => {
 
 export const updateRule = async (req: IRequest, res: Response) => {
   try {
-    await engine.updateRule(req.params.id, req.rule);
+    await EngineSingleton.updateRule(req.params.id, req.rule);
     res.send({});
   } catch (e) {
     res
@@ -52,7 +50,7 @@ export const updateRule = async (req: IRequest, res: Response) => {
 
 export const deleteRule = async (req: Request, res: Response) => {
   try {
-    await engine.deleteRule(req.params.id);
+    EngineSingleton.deleteRule(req.params.id);
     res.send({});
   } catch (e) {
     res
