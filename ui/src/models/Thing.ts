@@ -3,6 +3,7 @@ export interface ThingLink {
 }
 
 export interface ThingProperty {
+  id: string;
   type: string;
   "@type"?: string;
   title: string;
@@ -30,10 +31,12 @@ export interface ThingEvent {
 }
 
 export interface Thing {
+  id: string;
   "@context"?: string;
   "@type"?: string | string[];
   name: string;
   description: string;
+  href: string;
   properties: ThingProperty[];
   actions: ThingAction[];
   events: ThingEvent[];

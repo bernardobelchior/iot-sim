@@ -15,7 +15,7 @@ const Things: FC<IProps> = ({ things }) => (
 );
 
 const mapStateToProps = ({ things: { things } }: RootState): IProps => ({
-  things
+  things: Object.values(things),
 });
 
 export default connect(mapStateToProps)(Things);
