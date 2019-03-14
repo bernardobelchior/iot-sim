@@ -1,7 +1,9 @@
 import React, { FC } from "react";
+import UpdateIcon from "@material-ui/icons/Update";
 import MUIDataTable, { MUIDataTableOptions } from "mui-datatables";
 import ThingsDetails from "./ThingsDetails";
 import { Thing } from "../../models/Thing";
+import { IconButton } from "@material-ui/core";
 
 const columns = [
   {
@@ -32,14 +34,16 @@ const columns = [
 
 interface IProps {
   things: Thing[];
+  fetchThings: () => void;
 }
 
-const ThingsTable: FC<IProps> = ({ things }) => {
+const ThingsTable: FC<IProps> = ({ things, fetchThings }) => {
   const options: MUIDataTableOptions = {
     filterType: "checkbox",
     selectableRows: false,
     expandableRows: true,
     viewColumns: false,
+    customToolbar: () => (<IconButton onClick={fetchThings}><UpdateIcon/></IconButton>),
 
     renderExpandableRow: (rowData, rowMeta) => (
       <tr>
