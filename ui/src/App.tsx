@@ -20,19 +20,19 @@ class App extends Component<Props> {
 
   render() {
     return (
-      <div>
+      <>
         <Drawer />
-        <div style={{ marginLeft: "120px" }}>
-            <AppBar position="static">
+            <AppBar position="relative" style={{ zIndex: 2000}}>
                 <Toolbar>
                     <Typography variant="h6" color="inherit">
                         IoT Simulator
                     </Typography>
                 </Toolbar>
             </AppBar>
+          <div style={{ marginLeft: 120}}>
           <Things />
         </div>
-      </div>
+        </>
     );
   }
 }
