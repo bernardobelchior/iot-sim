@@ -159,7 +159,9 @@ describe("DeviceRegistry", () => {
     );
 
     await waitForExpect(() =>
-      expect(simulatedThing.getPropertyValue("on")).toBe(true)
+      expect(deviceRegistry.getThing(thing.id)!.getPropertyValue("on")).toBe(
+        true
+      )
     );
 
     await messageQueue.end();
