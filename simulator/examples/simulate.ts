@@ -48,6 +48,12 @@ const things = [
   }
 ];
 
+/**
+ * This example creates two things: a Lamp and a Window, and sets their properties.
+ * After 10 seconds, a simulated Lamp is created and its property changed.
+ * This example shows how simulated things override physical things.
+ */
+
 start().then(async ({ app }) => {
   const messageQueue: MessageQueue = app.get("messageQueue");
   const registry: DeviceRegistry = app.get("registry");
@@ -64,4 +70,13 @@ start().then(async ({ app }) => {
     things[2].href,
     JSON.stringify({ messageType: "setProperty", data: { open: true } })
   );
+
+  setTimeout(async () => {
+    await registry.addThing(parseWebThing(things[1]));
+
+    await messageQueue.publish(
+      things[1].href,
+      JSON.stringify({ messageType: "setProperty", data: { on: 32 } })
+    );
+  }, 10000);
 });
