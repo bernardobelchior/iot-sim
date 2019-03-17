@@ -40,6 +40,24 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     this.onThingAdded = this.onThingAdded.bind(this);
   }
 
+
+  /**
+   * Creates a property from an object
+   * @param desc
+   */
+  static fromDescription(desc: any): Property {
+    if (!desc.hasOwnProperty("type")) {
+      throw new Error("Type property missing from object.");
+    }
+    if (!desc.hasOwnProperty("id")) {
+      throw new Error("Id property missing from object.");
+    }
+    if (!desc.hasOwnProperty("thing")) {
+      throw new Error("Thing property missing from object.");
+    }
+    return new this(desc.type, desc.id, desc.thing, desc.unit, desc.description);
+  }
+
   /**
    * @return {any}
    */

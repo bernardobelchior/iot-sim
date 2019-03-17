@@ -23,7 +23,10 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
    * @param {any} desc
    */
   static fromDescription(desc: any) {
-
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    return new this(desc.label);
   }
 
   /**

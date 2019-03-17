@@ -20,6 +20,17 @@ export default class TimeTrigger extends Trigger {
   }
 
   /**
+   * Creates a trigger from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("time")) {
+      throw new Error("Time property missing from object.");
+    }
+    return new this(desc.label, new Date(desc.time));
+  }
+
+  /**
    * @return {any}
    */
   toDescription(): any {

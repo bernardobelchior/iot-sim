@@ -21,6 +21,21 @@ export default class ActionEffect extends Effect {
     this.parameters = parameters || {};
   }
 
+ /**
+   * Creates an effect from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    if (!desc.hasOwnProperty("action")) {
+      throw new Error("Action property missing from object.");
+    }
+    const action = new Action(desc.action.id, desc.action.title, desc.action.description);
+    return new this(desc.label, desc.thingId, action);
+  }
+
   /**
    * @return {any}
    */

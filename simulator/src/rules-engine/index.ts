@@ -5,7 +5,7 @@ import { EngineSingleton } from "./Engine";
 
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const rules = EngineSingleton.getRules();
+    const rules = Object.values(EngineSingleton.getRules());
     res.send(rules);
   } catch (error) {
     res
@@ -28,7 +28,7 @@ export const getRule = async (req: Request, res: Response) => {
 
 export const addRule = async (req: IRequest, res: Response) => {
   try {
-    const ruleId = EngineSingleton.addRule(req.rule);
+    const ruleId = await EngineSingleton.addRule(req.rule);
     res.send({ id: ruleId });
   } catch (e) {
     res

@@ -15,6 +15,17 @@ export default class Effect {
   }
 
   /**
+   * Creates an effect from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    return new this(desc.label);
+  }
+
+  /**
    * @return {any}
    */
   toDescription(): any {

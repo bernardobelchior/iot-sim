@@ -21,7 +21,7 @@ export function rulesRouter() {
     await rulesController.updateRule(req as IRequest, res);
   });
 
-  router.delete("/:id", rulesMiddleware, async (req, res) => {
+  router.delete("/:id", async (req, res) => {
     await rulesController.deleteRule(req as IRequest, res);
   });
 

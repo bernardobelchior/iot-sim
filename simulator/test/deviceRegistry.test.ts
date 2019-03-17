@@ -1,8 +1,7 @@
-/* import waitForExpect from "wait-for-expect";
+import waitForExpect from "wait-for-expect";
 import { messageQueueBuilder } from "../src/api/MessageQueue";
 import { vars } from "../src/util/vars";
 import { DeviceRegistry } from "../src/api/DeviceRegistry";
-import { Thing } from "../src/api/models/Thing";
 
 const things = [
   {
@@ -16,7 +15,7 @@ const things = [
         links: [{ href: "/things/lamp/properties/on" }]
       }
     },
-    href: "/things/lamp"
+    id: "lamp"
   },
   {
     name: "Window",
@@ -29,7 +28,7 @@ const things = [
         links: [{ href: "/things/window/properties/open" }]
       }
     },
-    href: "/things/window"
+    id: "window"
   }
 ];
 
@@ -52,11 +51,10 @@ describe("DeviceRegistry", () => {
 
     things.forEach(thing =>
       expect(
-        deviceRegistry.getThing(Thing.generateIdFromHref(thing.href))
+        deviceRegistry.getThing(thing.id)
       ).toBeTruthy()
     );
 
     await messageQueue.end();
   });
 });
- */

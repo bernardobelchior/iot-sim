@@ -1,5 +1,4 @@
 import Trigger from "./Trigger";
-import { Thing } from "../../api/models/Thing";
 import { DeviceRegistrySingleton } from "../../api/DeviceRegistry";
 
 /**
@@ -12,28 +11,38 @@ export default class EventTrigger extends Trigger {
 
   constructor(label: string, thingId: string, event: string) {
     super(label);
-    this.thingId = thingId,
-    this.event = event;
+    (this.thingId = thingId), (this.event = event);
     this.onEvent = this.onEvent.bind(this);
+  }
+
+  /**
+   * Creates a trigger from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("thingId")) {
+      throw new Error("ThingId property missing from object.");
+    }
+    if (!desc.hasOwnProperty("event")) {
+      throw new Error("Event property missing from object.");
+    }
+    return new this(desc.label, desc.thingId, desc.event);
   }
 
   /**
    * @return {any}
    */
   toDescription(): any {
-    return Object.assign(
-      super.toDescription(),
-      {
-        thingId: this.thingId,
-        event: this.event,
-        stopped: this.stopped
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      thingId: this.thingId,
+      event: this.event,
+      stopped: this.stopped
+    });
   }
 
   async start() {
     this.stopped = false;
-    const thing = await DeviceRegistrySingleton.getThing(this.thingId);
+    const thing = DeviceRegistrySingleton.getThing(this.thingId);
     if (this.stopped) {
       return;
     }
@@ -45,14 +54,13 @@ export default class EventTrigger extends Trigger {
       return;
     }
 
-    this.emit("stateChanged", {on: true, value: Date.now()});
-    this.emit("stateChanged", {on: false, value: Date.now()});
+    this.emit("stateChanged", { on: true, value: Date.now() });
+    this.emit("stateChanged", { on: false, value: Date.now() });
   }
 
   stop() {
     this.stopped = true;
-    DeviceRegistrySingleton.getThing(this.thingId).then((thing: Thing) => {
-      thing.removeEventSubscription(this.onEvent);
-    });
+    const thing = DeviceRegistrySingleton.getThing(this.thingId);
+    thing.removeEventSubscription(this.onEvent);
   }
 }

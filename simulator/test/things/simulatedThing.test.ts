@@ -11,7 +11,7 @@ const thing = {
       links: [{ href: "/things/lamp/properties/on" }]
     }
   },
-  href: "/things/lamp"
+  id: "lamp"
 };
 
 describe("SimulatedThing", () => {

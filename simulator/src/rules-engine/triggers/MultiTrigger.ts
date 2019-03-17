@@ -30,6 +30,21 @@ export default class MultiTrigger extends Trigger {
   }
 
   /**
+   * Creates a trigger from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("op")) {
+      throw new Error("Operation property missing from object.");
+    }
+    if (!desc.hasOwnProperty("triggers")) {
+      throw new Error("Triggers property missing from object.");
+    }
+    const triggers: Trigger[] = desc.triggers.map((t: any) => Trigger.fromDescription(t));
+    return new this(desc.label, desc.op, triggers);
+  }
+
+  /**
    * @return {any}
    */
   toDescription(): any {

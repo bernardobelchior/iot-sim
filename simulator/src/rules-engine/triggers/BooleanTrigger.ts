@@ -23,6 +23,20 @@ export default class BooleanTrigger extends PropertyTrigger {
   }
 
   /**
+   * Creates a trigger from a given object
+   * @param {any} desc
+   */
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("onValue")) {
+      throw new Error("OnValue property missing from object.");
+    }
+    if (!desc.hasOwnProperty("property")) {
+      throw new Error("Property description missing from object.");
+    }
+    return new this(desc.label, Property.fromDescription(desc.property), desc.onValue);
+  }
+
+  /**
    * @return {any}
    */
   toDescription(): any {
