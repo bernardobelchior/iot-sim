@@ -1,6 +1,7 @@
 import fs from "fs";
 import { Thing } from "./models/Thing";
-import { MessageQueue } from "./MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "./MessageQueue";
+import { vars } from "../util/vars";
 
 type ThingMap = { [id: string]: Thing };
 
@@ -32,6 +33,10 @@ export class DeviceRegistry {
     if (this.messageQueue)
       return this.messageQueue.subscribe("register", this.consume.bind(this));
     return;
+  }
+
+  setMessageQueue(messageQueue: MessageQueue): any {
+    this.messageQueue = messageQueue;
   }
 
   /**
@@ -91,7 +96,9 @@ export class DeviceRegistry {
    *
    * @param Thing thing definition.
    */
-  addThing(thing: Thing) {
+  async addThing(thing: Thing) {
+    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    thing.configureNotifications(messageQueue);
     if (thing.isSimulated()) {
       this.simulatedThings[thing.id] = thing;
     } else {

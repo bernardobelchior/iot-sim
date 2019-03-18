@@ -5,7 +5,7 @@ type RuleMap = { [id: string]: Rule };
 /**
  * An engine for running and managing list of rules
  */
-export default class Engine {
+export class Engine {
   rules: RuleMap = {};
 
   /**

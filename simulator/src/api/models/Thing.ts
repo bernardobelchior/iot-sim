@@ -3,6 +3,7 @@ import { Action } from "./Action";
 import { Event } from "./Event";
 import { Link, ILink } from "./Link";
 import { ActionRequest } from "./ActionRequest";
+import { MessageQueue } from "../MessageQueue";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
@@ -25,6 +26,8 @@ export class Thing {
 
   actionsQueue: ActionRequest[] = [];
 
+  messageQueue?: MessageQueue;
+
   /**
    *
    * @param {String} name Human friendly string which describes the device.
@@ -33,13 +36,7 @@ export class Thing {
    * @param {String} context Optional annotation which can be used to provide a URI for a schema repository which defines standard schemas for common "types" of device capabilities.
    * @param {String} type Optional annotation which can be used to provide the names of schemas for types of capabilities a device supports, from a schema repository referred to in the @context member.
    */
-  constructor(
-    name: string,
-    description: string,
-    id: string,
-    context?: string,
-    type?: string[]
-  ) {
+  constructor(name: string, description: string, id: string, context?: string, type?: string[]) {
     this.name = name;
     this.id = id;
     this.description = description;
@@ -283,9 +280,7 @@ export class Thing {
    * @param {String} actionId Id of the action
    */
   cancelAction(actionName: string, actionId: string): boolean {
-    const actionRequest = this.actionsQueue.find(
-      x => x.id === actionId && x.name === actionName
-    );
+    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
     if (!actionRequest) {
       return false;
     }
@@ -305,8 +300,7 @@ export class Thing {
         messageType: "propertyStatus",
         [p.id]: p.getValue()
       };
-      console.log(data);
-      // amqp.publishMessage(data);
+      this.sendMessage(`${this.href}/properties`, JSON.stringify(data));
     }
   }
 
@@ -320,8 +314,7 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest
     };
-    console.log(data);
-    // amqp.publishMessage(data);
+    this.sendMessage(`${this.href}/actions`, JSON.stringify(data));
   }
 
   /**
@@ -341,8 +334,7 @@ export class Thing {
           }
         }
       };
-      console.log(data);
-      // amqp.publishMessage(data);
+      this.sendMessage(`${this.href}/events`, JSON.stringify(data));
     }
   }
 
@@ -434,4 +426,23 @@ export class Thing {
   addEventSubscription(onEvent: (eventName: string) => void): any {
     throw new Error("Method not implemented.");
   }
+
+  sendMessage(topic: string, data: string) {
+    if (this.messageQueue) {
+      this.messageQueue.publish(topic, data);
+    }
+  }
+
+  consumeMessage(_topic: string, msg: Buffer) {
+
+  }
+
+  configureNotifications(messageQueue: MessageQueue): any {
+    if (!this.messageQueue) {
+      this.messageQueue = messageQueue;
+    }
+
+    this.messageQueue.subscribe(this.href, this.consumeMessage.bind(this));
+  }
+
 }

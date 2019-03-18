@@ -19,22 +19,14 @@ const thingLight = {
     blink: {
       links: [],
       description: "Blink the switch on and off",
-    },
-    rejectRequest: {
-      links: [],
-      description: "Reject when call requestAction",
-    },
-    rejectRemove: {
-      links: [],
-      description: "Reject when call removeAction",
-    },
+    }
   },
 };
 
 describe("actions/", () => {
   let appInstance: any = undefined;
 
-  async function addDevice(desc: any) {
+  async function addDevice(desc: any = thingLight) {
     const res = await request(appInstance)
       .post(`/things`)
       .set("Accept", "application/json")
@@ -44,5 +36,6 @@ describe("actions/", () => {
 
   beforeEach(async () => {
     appInstance = await app();
+    addDevice();
   });
 });

@@ -6,11 +6,12 @@ import cors from "cors";
 import mongo from "./db/config";
 import { vars } from "./util/vars";
 import { DeviceRegistrySingleton } from "./api/DeviceRegistry";
-// import { messageQueueBuilder } from "./api/MessageQueue";
+import { messageQueueBuilder } from "./api/MessageQueue";
 import * as routes from "./routes";
 
 async function app() {
-  // const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+  DeviceRegistrySingleton.setMessageQueue(messageQueue);
   await DeviceRegistrySingleton.init();
 
   mongo();
