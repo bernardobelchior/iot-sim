@@ -21,7 +21,7 @@ export default class ActionEffect extends Effect {
     this.parameters = parameters || {};
   }
 
- /**
+  /**
    * Creates an effect from a given object
    * @param {any} desc
    */

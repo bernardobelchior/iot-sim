@@ -15,7 +15,8 @@ export default class NotificationEffect extends Effect {
     super(label);
     this.message = message;
   }
- /**
+
+  /**
    * Creates an effect from a given object
    * @param {any} desc
    */

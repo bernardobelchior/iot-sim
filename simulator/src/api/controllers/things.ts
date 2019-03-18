@@ -1,5 +1,7 @@
 import { Response } from "express";
 import { IRequest } from "../registryMiddleware";
+import { DeviceRegistrySingleton } from "../DeviceRegistry";
+import APIError from "../../util/APIError";
 
 /**
  * Handle a GET request to /.
@@ -7,9 +9,8 @@ import { IRequest } from "../registryMiddleware";
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const list = async (req: IRequest, res: Response) => {
-  const things = Object.values(await req.registry.getThings());
-
+export const list = (req: IRequest, res: Response) => {
+  const things = Object.values(req.registry.getThings());
   res.json(things.map(thing => thing.asThingDescription()));
 };
 
@@ -19,12 +20,31 @@ export const list = async (req: IRequest, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const get = async (req: IRequest, res: Response) => {
-  const thingId = req.params.thingId;
-  const thing = await req.registry.getThing(thingId);
-  if (thing === null || thing === undefined) {
-    res.status(404).end();
-    return;
+export const get = (req: IRequest, res: Response) => {
+  try {
+    const thingId = req.params.thingId;
+    const thing = req.registry.getThing(thingId);
+    res.json(thing.asThingDescription());
+  } catch (e) {
+    res.status(404).send(new APIError("Failed to get thing", e).toString());
   }
-  res.json(thing.asThingDescription());
+};
+
+/**
+ * Handle a POST request to /.
+ *
+ * @param {Request} req The request object
+ * @param {Response} res The response object
+ */
+export const create = (req: IRequest, res: Response) => {
+  try {
+    if (!req.body.hasOwnProperty("id")) {
+      res.status(400).send(new APIError("Failed to add thing", "ID missing").toString());
+      return;
+    }
+    const thing = DeviceRegistrySingleton.createThing(req.body.id, req.body);
+    res.send({ id: thing.id });
+  } catch (e) {
+    res.status(404).send(new APIError("Failed to add thing", e).toString());
+  }
 };

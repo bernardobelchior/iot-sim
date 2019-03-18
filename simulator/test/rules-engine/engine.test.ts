@@ -110,9 +110,9 @@ describe("rules engine", () => {
   let ruleId: string;
   let appInstance: any = undefined;
 
-  async function addDevice(desc: any) {
+  function addDevice(desc: any) {
     const { id } = desc;
-    await DeviceRegistrySingleton.createThing(id, desc);
+    DeviceRegistrySingleton.createThing(id, desc);
   }
 
   async function deleteRule(id: string) {
@@ -125,9 +125,10 @@ describe("rules engine", () => {
 
   beforeEach(async () => {
     appInstance = await app();
-    await addDevice(thingLight1);
-    await addDevice(thingLight2);
-    await addDevice(thingLight3);
+    DeviceRegistrySingleton.clearState();
+    addDevice(thingLight1);
+    addDevice(thingLight2);
+    addDevice(thingLight3);
   });
 
   it("gets a list of 0 rules", async () => {

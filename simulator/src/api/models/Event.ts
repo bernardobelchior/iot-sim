@@ -56,12 +56,12 @@ export class Event {
    * Add relationships between events and remaining entities
    * @param {ILink[]} links
    */
-  addLinks(links: ILink[]): any {
+  addLinks(href: string, links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        const link = new Link(linkData);
-        link.setRel("event");
-        this.links.push(link);
+        linkData.href = `${href}${linkData.href}`;
+        this.links.push(new Link(linkData));
+        this.links.push(new Link({ ...linkData, rel: "event" }));
       });
     }
   }

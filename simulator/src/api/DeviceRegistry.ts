@@ -77,6 +77,10 @@ export class DeviceRegistry {
    * @param Object description Thing description.
    */
   createThing(id: string, description: any): Thing {
+    const t = this.things[id];
+    if (t) {
+      throw new Error(`Thing ${id} already exists.`);
+    }
     const thing = Thing.fromDescription({ ...description, id });
     this.addThing(thing);
     return thing;
@@ -163,13 +167,16 @@ export class DeviceRegistry {
     }
   }
 
+  clearState() {
+    this.things = {};
+    this.simulatedThings = {};
+  }
+
   private consume(_topic: string, msg: Buffer) {
     if (msg !== null) {
-      console.log(msg);
       const obj = JSON.parse(msg.toString());
 
       const thing = Thing.fromDescription(obj);
-      console.log(thing);
 
       this.addThing(thing);
     }

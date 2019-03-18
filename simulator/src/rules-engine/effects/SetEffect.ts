@@ -17,7 +17,7 @@ export default class SetEffect extends PropertyEffect {
       "set point and property must be same type");
   }
 
- /**
+  /**
    * Creates an effect from a given object
    * @param {any} desc
    */

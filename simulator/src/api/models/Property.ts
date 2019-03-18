@@ -13,7 +13,7 @@ const ajv = new Ajv();
 export interface IPropertyMetadata {
   semanticType?: string;
   unit?: string;
-  enum?: number[];
+  enum?: any[];
   readOnly?: boolean;
   minimum?: number;
   maximum?: number;
@@ -35,7 +35,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
 
   metadata?: IPropertyMetadata;
   value: any;
-  valueGenerator: Function;
 
   links: Link[] = [];
 
@@ -59,10 +58,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
     this.type = type;
 
     this.value = 0;
-    this.valueGenerator = (value: any): any => {
-      return value;
-    };
-
   }
 
   /**
@@ -73,10 +68,16 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
   asPropertyDescription() {
     let data: any = {
       title: this.title,
-      description: this.description
+      description: this.description,
+      type: this.type,
     };
 
     data = { ...data, ...this.metadata };
+
+    if (data.hasOwnProperty("semanticType")) {
+      data["@type"] = data.semanticType;
+      delete(data.semanticType);
+    }
     data.links = this.links;
 
     return data;
@@ -86,14 +87,18 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
    * Add a set of relationships to the property
    * @param {ILink} links Array of objects containing links
    */
-  addLinks(links: ILink[]): void {
+  addLinks(href: string, links: ILink[]): void {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        const link = new Link(linkData);
-        link.setRel("property");
-        this.links.push(link);
+        linkData.href = `${href}${linkData.href}`;
+        this.links.push(new Link(linkData));
+        this.links.push(new Link({ ...linkData, rel: "property" }));
       });
     }
+  }
+
+  initValue(value: any): any {
+    this.value = value;
   }
 
   /**
@@ -123,12 +128,14 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
       this.metadata.hasOwnProperty("readOnly") &&
       this.metadata.readOnly
     ) {
-      throw new Error("Property is defined as read-only.");
+      throw new Error(`Property ${this.id} is defined as read-only.`);
     }
 
     const valid = this.validateValue(newValue);
     if (valid) {
       this.notifyValue(newValue);
+    } else {
+      throw new Error(ajv.errorsText());
     }
   }
 
@@ -137,7 +144,7 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
    * @param {Function} g Function that define the method to update the value
    */
   setValueGenerator(g: Function) {
-    this.valueGenerator = g;
+    // this.valueGenerator = g;
   }
 
   /**

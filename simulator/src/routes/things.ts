@@ -14,6 +14,10 @@ export function thingsRouter(registry: DeviceRegistry) {
     "/",
     async (req, res) => await thingsController.list(req as IRequest, res)
   );
+  router.post(
+    "/",
+    async (req, res) => await thingsController.create(req as IRequest, res)
+  );
   router.get(
     "/:thingId",
     async (req, res) => await thingsController.get(req as IRequest, res)

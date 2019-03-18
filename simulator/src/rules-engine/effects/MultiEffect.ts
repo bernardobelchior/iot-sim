@@ -12,7 +12,7 @@ export default class MultiEffect extends Effect {
     super(label);
     this.effects = effects;
   }
- /**
+  /**
    * Creates an effect from a given object
    * @param {any} desc
    */

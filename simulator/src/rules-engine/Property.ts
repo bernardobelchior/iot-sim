@@ -40,7 +40,6 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     this.onThingAdded = this.onThingAdded.bind(this);
   }
 
-
   /**
    * Creates a property from an object
    * @param desc
@@ -55,7 +54,13 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     if (!desc.hasOwnProperty("thing")) {
       throw new Error("Thing property missing from object.");
     }
-    return new this(desc.type, desc.id, desc.thing, desc.unit, desc.description);
+    return new this(
+      desc.type,
+      desc.id,
+      desc.thing,
+      desc.unit,
+      desc.description
+    );
   }
 
   /**

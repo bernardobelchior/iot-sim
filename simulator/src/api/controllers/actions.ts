@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { IRequest } from "../registryMiddleware";
+import APIError from "../../util/APIError";
 
 /**
  * Handle a GET request to /<thingId>/actions. Returns an array with all actions available
@@ -8,14 +9,13 @@ import { IRequest } from "../registryMiddleware";
  * @param {Response} res The response object
  */
 export const getActions = async (req: IRequest, res: Response) => {
-  const thingId = req.params.thingId;
-  const thing = await req.registry.getThing(thingId);
-  if (thing === null || thing === undefined) {
-    res.status(404).end();
-    return;
+  try {
+    const thingId = req.params.thingId;
+    const thing = req.registry.getThing(thingId);
+    res.json(thing.getActionDescriptions());
+  } catch (e) {
+    res.status(404).send(new APIError(`Failed to get thing actions`, e).toString());
   }
-
-  res.json(thing.getActionDescriptions());
 };
 
 /**
@@ -57,16 +57,15 @@ export const requestActions = async (req: IRequest, res: Response) => {
  * @param {Response} res The response object
  */
 export const getAction = async (req: IRequest, res: Response) => {
-  const thingId = req.params.thingId;
-  const thing = await req.registry.getThing(thingId);
-  if (thing === null || thing === undefined) {
-    res.status(404).end();
-    return;
+  try {
+    const thingId = req.params.thingId;
+    const thing = req.registry.getThing(thingId);
+    const actionName = req.params.actionName;
+
+    res.json(thing.getActionDescriptions(actionName));
+  } catch (e) {
+    res.status(404).send(new APIError(`Failed to get thing action`, e).toString());
   }
-
-  const actionName = req.params.actionName;
-
-  res.json(thing.getActionDescriptions(actionName));
 };
 
 /**

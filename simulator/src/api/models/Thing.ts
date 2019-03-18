@@ -60,10 +60,7 @@ export class Thing {
       }
     }
 
-    const t = new this(desc.name, desc.description, desc.href, context, type);
-    if (desc.hasOwnProperty("id")) {
-      t.id = desc.id;
-    }
+    const t = new this(desc.name, desc.description, desc.id, context, type);
 
     t.addProperties(desc.properties || []);
     t.addActions(desc.actions || []);
@@ -126,6 +123,10 @@ export class Thing {
       const obj = properties[key];
       const p = new Property(key, obj.title, obj.description, obj.type);
 
+      if (obj.hasOwnProperty("value")) {
+        p.initValue(obj.value);
+      }
+
       p.defineMetadata({
         semanticType: obj["@type"],
         unit: obj.unit,
@@ -135,7 +136,7 @@ export class Thing {
         maximum: obj.maximum,
         multipleOf: obj.multipleOf
       });
-      p.addLinks(obj.links);
+      p.addLinks(this.href, obj.links);
       p.on("update", () => this.propertyNotify(p.id));
 
       this.properties.set(key, p);
@@ -151,7 +152,7 @@ export class Thing {
       const obj = actions[key];
       const a = new Action(key, obj.title, obj.description);
       a.defineInput(obj.input);
-      a.addLinks(obj.links);
+      a.addLinks(this.href, obj.links);
 
       this.actions.set(key, a);
     }
@@ -172,7 +173,7 @@ export class Thing {
         maximum: obj.maximum,
         multipleOf: obj.multipleOf
       });
-      e.addLinks(obj.links);
+      e.addLinks(this.href, obj.links);
 
       this.events.set(key, e);
     }
@@ -226,7 +227,7 @@ export class Thing {
       return p.getValue();
     }
 
-    throw new Error("Property specified doesn't exists");
+    throw new Error(`Property ${id} doesn't exists`);
   }
 
   /**
@@ -240,7 +241,7 @@ export class Thing {
     if (p) {
       p.setValue(propertyValue);
     } else {
-      throw new Error("Property specified doesn't exists");
+      throw new Error(`Property ${propertyName} doesn't exists`);
     }
   }
 

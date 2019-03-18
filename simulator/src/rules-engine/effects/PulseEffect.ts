@@ -23,7 +23,7 @@ export default class PulseEffect extends PropertyEffect {
     assert(typeof this.value === this.property.type, "set point and property must be same type");
   }
 
- /**
+  /**
    * Creates an effect from a given object
    * @param {any} desc
    */
