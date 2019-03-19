@@ -31,14 +31,20 @@ export default class TimeTrigger extends Trigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a time trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), { time: this.time });
   }
 
   async start() {
     this.scheduleNext();
+  }
+
+  stop() {
+    clearTimeout(this.timeout);
+    this.timeout = undefined;
   }
 
   scheduleNext() {
@@ -69,10 +75,5 @@ export default class TimeTrigger extends Trigger {
   sendOff() {
     this.emit("stateChanged", { on: false, value: Date.now() });
     this.scheduleNext();
-  }
-
-  stop() {
-    clearTimeout(this.timeout);
-    this.timeout = undefined;
   }
 }

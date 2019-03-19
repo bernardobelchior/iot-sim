@@ -14,6 +14,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   name?: string;
 
   /**
+   * Constructor for the rule object
    * @param {boolean} enabled
    * @param {Trigger} trigger
    * @param {Effect} effect
@@ -31,7 +32,7 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   /**
    * Create a rule from a serialized description
    * @param {any} desc
-   * @return {Rule}
+   * @returns {Rule}
    */
   static fromDescription(desc: any): Rule {
     const trigger = tFromDescription(desc.trigger);
@@ -47,26 +48,8 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   }
 
   /**
-   * Begin executing the rule
-   */
-  async start() {
-    this.trigger.on("stateChanged", this.onTriggerStateChanged);
-    await this.trigger.start();
-  }
-
-  /**
-   * On a state changed event, pass the state forward to the rule's effect
-   * @param {any} state
-   */
-  onTriggerStateChanged(state: { on: boolean; value?: any }) {
-    if (!this.enabled) {
-      return;
-    }
-    this.effect.setState(state.on);
-  }
-
-  /**
-   * @return {any}
+   * Creates a JSON object from the respective Rule instance
+   * @returns {any}
    */
   toDescription(): any {
     const desc: any = {
@@ -84,10 +67,29 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   }
 
   /**
+   * Begin executing the rule
+   */
+  async start() {
+    this.trigger.on("stateChanged", this.onTriggerStateChanged);
+    await this.trigger.start();
+  }
+
+  /**
    * Stop executing the rule
    */
   stop() {
     this.trigger.removeListener("stateChanged", this.onTriggerStateChanged);
     this.trigger.stop();
+  }
+
+  /**
+   * On a state changed event, pass the state forward to the rule's effect
+   * @param {any} state
+   */
+  onTriggerStateChanged(state: { on: boolean; value?: any }) {
+    if (!this.enabled) {
+      return;
+    }
+    this.effect.setState(state.on);
   }
 }

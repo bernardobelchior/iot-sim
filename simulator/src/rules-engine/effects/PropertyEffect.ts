@@ -33,9 +33,10 @@ export default class PropertyEffect extends Effect {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a property effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       property: this.property.toDescription(),
     });

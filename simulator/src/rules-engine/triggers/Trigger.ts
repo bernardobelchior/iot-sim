@@ -30,9 +30,10 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return {
       type: this.type,
       label: this.label

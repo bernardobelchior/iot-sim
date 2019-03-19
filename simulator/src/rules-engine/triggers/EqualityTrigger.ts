@@ -34,9 +34,10 @@ export default class EqualityTrigger extends PropertyTrigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a equality trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(
       super.toDescription(),
       {

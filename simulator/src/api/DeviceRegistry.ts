@@ -5,39 +5,30 @@ import { vars } from "../util/vars";
 
 type ThingMap = { [id: string]: Thing };
 
-export class DeviceRegistry {
+export default class DeviceRegistry {
   private simulatedThings: ThingMap = {};
   private things: ThingMap = {};
   private messageQueue?: MessageQueue;
 
-  constructor(messageQueue?: MessageQueue) {
-    this.messageQueue = messageQueue;
-  }
-
-  initFromConfig() {
-    const filePath = `${process.cwd()}/src/environment/sensors.json`;
-    const data = JSON.parse(fs.readFileSync(filePath).toString());
-    data.things.forEach((t: any) => {
-      const thing = Thing.fromDescription(t);
-      this.things[thing.id] = thing;
-    });
-
-    return this.init();
-  }
+  constructor() {}
 
   /**
    * Subscribes to the message queue. If this is not called, then messages
    * published to the message queue will not be consumed.
    */
-  init() {
-    if (this.messageQueue)
-      return this.messageQueue.subscribe("register", this.consume.bind(this));
-    return;
-  }
+  public init = async () => {
+    const filePath = `${process.cwd()}/src/environment/sensors.json`;
+    const data = JSON.parse(fs.readFileSync(filePath).toString());
+    data.forEach((t: any) => {
+      // const thing = Thing.fromDescription(t);
+      // this.things[thing.id] = thing;
+    });
 
-  setMessageQueue(messageQueue: MessageQueue): any {
-    this.messageQueue = messageQueue;
-  }
+    if (!this.messageQueue)
+      this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
+
+    this.messageQueue.subscribe("register", this.consume.bind(this));
+  };
 
   /**
    * Get map of virtual things
@@ -98,7 +89,7 @@ export class DeviceRegistry {
    */
   async addThing(thing: Thing) {
     const messageQueue = await messageQueueBuilder(vars.MQ_URI);
-    thing.configureNotifications(messageQueue);
+    thing.start(messageQueue);
     if (thing.isSimulated()) {
       this.simulatedThings[thing.id] = thing;
     } else {
@@ -174,9 +165,8 @@ export class DeviceRegistry {
     }
   }
 
-  clearState() {
-    this.things = {};
-    this.simulatedThings = {};
+  setMessageQueue(messageQueue: MessageQueue) {
+    this.messageQueue = messageQueue;
   }
 
   private consume(_topic: string, msg: Buffer) {
@@ -189,5 +179,3 @@ export class DeviceRegistry {
     }
   }
 }
-
-export const DeviceRegistrySingleton = new DeviceRegistry();

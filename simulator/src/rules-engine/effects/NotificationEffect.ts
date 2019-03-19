@@ -32,9 +32,10 @@ export default class NotificationEffect extends Effect {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a notification effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(
       super.toDescription(),
       {

@@ -1,4 +1,3 @@
-import { DeviceRegistrySingleton } from "../../src/api/DeviceRegistry";
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
@@ -110,9 +109,12 @@ describe("rules engine", () => {
   let ruleId: string;
   let appInstance: any = undefined;
 
-  function addDevice(desc: any) {
-    const { id } = desc;
-    DeviceRegistrySingleton.createThing(id, desc);
+  async function addDevice(desc: any) {
+    const res = await request(appInstance)
+      .post(`/things`)
+      .set("Accept", "application/json")
+      .send(desc);
+    expect(res.status).toEqual(200);
   }
 
   async function deleteRule(id: string) {
@@ -125,10 +127,9 @@ describe("rules engine", () => {
 
   beforeEach(async () => {
     appInstance = await app();
-    DeviceRegistrySingleton.clearState();
-    addDevice(thingLight1);
-    addDevice(thingLight2);
-    addDevice(thingLight3);
+    await addDevice(thingLight1);
+    await addDevice(thingLight2);
+    await addDevice(thingLight3);
   });
 
   it("gets a list of 0 rules", async () => {

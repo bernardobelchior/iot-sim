@@ -5,7 +5,7 @@ type RuleMap = { [id: string]: Rule };
 /**
  * An engine for running and managing list of rules
  */
-export class Engine {
+export default class Engine {
   rules: RuleMap = {};
 
   /**
@@ -88,5 +88,3 @@ export class Engine {
     }
   }
 }
-
-export const EngineSingleton = new Engine();

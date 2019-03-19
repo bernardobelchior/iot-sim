@@ -42,9 +42,10 @@ export default class PulseEffect extends PropertyEffect {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a pulse effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(
       super.toDescription(),
       { value: this.value, on: this.on }
@@ -55,22 +56,23 @@ export default class PulseEffect extends PropertyEffect {
    * @param {boolean} state
    */
   setState(state: boolean) {
-     if (state) {
+    if (state) {
       // If we're already active, just perform the effect again
       if (this.on) {
         return this.property.set(this.value);
       }
       // Activate the effect and save our current state to revert to upon
       // deactivation
-      this.property.get().then((value) => {
-        if (value !== this.value) {
-          this.oldValue = value;
-        } else {
-          this.oldValue = undefined;
-        }
-        this.on = true;
-        return this.property.set(this.value);
-      });
+      const value = this.property.get();
+
+      if (value !== this.value) {
+        this.oldValue = value;
+      } else {
+        this.oldValue = undefined;
+      }
+      this.on = true;
+      return this.property.set(this.value);
+
     } else if (this.on) {
       // Revert to our original value if we pulsed to a new value
       this.on = false;

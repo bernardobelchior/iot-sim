@@ -30,9 +30,10 @@ export default class PropertyTrigger extends Trigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a property trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), { property: this.property.toDescription() });
   }
 
@@ -41,10 +42,10 @@ export default class PropertyTrigger extends Trigger {
     await this.property.start();
   }
 
-  onValueChanged(_value: any) {}
-
   stop() {
     this.property.removeListener("valueChanged", this.onValueChanged);
     this.property.stop();
   }
+
+  onValueChanged(_value: any) {}
 }

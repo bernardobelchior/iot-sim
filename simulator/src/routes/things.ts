@@ -1,5 +1,5 @@
 import PromiseRouter from "express-promise-router";
-import { DeviceRegistry } from "../api/DeviceRegistry";
+import DeviceRegistry from "../api/DeviceRegistry";
 import * as thingsController from "../api/controllers/things";
 import * as propertiesController from "../api/controllers/properties";
 import * as actionsController from "../api/controllers/actions";

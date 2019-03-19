@@ -28,9 +28,10 @@ export default class MultiEffect extends Effect {
   }
 
   /**
-   * @return
+   * Creates a JSON object from a multi effect instance
+   * @return {Object}
    */
-  toDescription() {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       effects: this.effects.map((effect) => effect.toDescription()),
     });

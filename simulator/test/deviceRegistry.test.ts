@@ -1,7 +1,7 @@
 import waitForExpect from "wait-for-expect";
 import { messageQueueBuilder } from "../src/api/MessageQueue";
 import { vars } from "../src/util/vars";
-import { DeviceRegistry } from "../src/api/DeviceRegistry";
+import DeviceRegistry from "../src/api/DeviceRegistry";
 
 const things = [
   {
@@ -35,7 +35,7 @@ const things = [
 describe("DeviceRegistry", () => {
   it("registers devices correctly", async () => {
     const messageQueue = await messageQueueBuilder(vars.MQ_URI);
-    const deviceRegistry = new DeviceRegistry(messageQueue);
+    const deviceRegistry = new DeviceRegistry();
     await deviceRegistry.init();
 
     expect(Object.values(deviceRegistry.getThings())).toHaveLength(0);

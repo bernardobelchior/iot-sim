@@ -1,6 +1,5 @@
 import { Response } from "express";
 import { IRequest } from "../registryMiddleware";
-import { DeviceRegistrySingleton } from "../DeviceRegistry";
 import APIError from "../../util/APIError";
 
 /**
@@ -42,7 +41,7 @@ export const create = (req: IRequest, res: Response) => {
       res.status(400).send(new APIError("Failed to add thing", "ID missing").toString());
       return;
     }
-    const thing = DeviceRegistrySingleton.createThing(req.body.id, req.body);
+    const thing = req.registry.createThing(req.body.id, req.body);
     res.send({ id: thing.id });
   } catch (e) {
     res.status(404).send(new APIError("Failed to add thing", e).toString());

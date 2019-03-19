@@ -26,9 +26,10 @@ export default class Effect {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return {
       type: this.type,
       label: this.label,

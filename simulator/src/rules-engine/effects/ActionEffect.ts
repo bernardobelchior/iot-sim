@@ -1,5 +1,5 @@
 import Effect from "./Effect";
-import { DeviceRegistrySingleton } from "../../api/DeviceRegistry";
+import { SimulatorSingleton } from "../../Simulator";
 import { Action } from "../../api/models/Action";
 
 /**
@@ -37,9 +37,10 @@ export default class ActionEffect extends Effect {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a action effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       thing: this.thingId,
       action: this.action,
@@ -60,7 +61,8 @@ export default class ActionEffect extends Effect {
 
   async createAction() {
     try {
-      const thing = await DeviceRegistrySingleton.getThing(this.thingId);
+      const registry = SimulatorSingleton.getRegistry();
+      const thing = await registry.getThing(this.thingId);
 
       thing.requestAction(this.action);
     } catch (e) {

@@ -45,9 +45,10 @@ export default class MultiTrigger extends Trigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a multi trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       op: this.op,
       triggers: this.triggers.map(trigger => trigger.toDescription())

@@ -437,7 +437,7 @@ export class Thing {
 
   }
 
-  configureNotifications(messageQueue: MessageQueue): any {
+  start(messageQueue: MessageQueue): any {
     if (!this.messageQueue) {
       this.messageQueue = messageQueue;
     }

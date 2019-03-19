@@ -34,10 +34,12 @@ export default class SetEffect extends PropertyEffect {
     const p = new Property(desc.property.type, desc.property.id, desc.property.thing, desc.property.unit, desc.property.description);
     return new this(desc.label, p, desc.value);
   }
+
   /**
-   * @return {any}
+   * Creates a JSON object from a set effect instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): Object {
     return Object.assign(
       super.toDescription(),
       { value: this.value, on: this.on }

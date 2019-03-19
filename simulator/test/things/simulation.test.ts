@@ -1,5 +1,5 @@
 import * as controller from "../../src/api/controllers/simulation";
-import { DeviceRegistry } from "../../src/api/DeviceRegistry";
+import DeviceRegistry from "../../src/api/DeviceRegistry";
 import { MockMessageQueue } from "../MockMessageQueue";
 import { IRequest } from "../../src/api/registryMiddleware";
 import express = require("express");
@@ -21,10 +21,11 @@ const thing = {
 
 describe("controllers/simulation", () => {
   it("adds simulated thing when called", async () => {
-    const deviceRegistry = new DeviceRegistry(new MockMessageQueue());
+    const deviceRegistry = new DeviceRegistry();
+    deviceRegistry.setMessageQueue(new MockMessageQueue());
     const sendStatus = jest.fn();
 
-    deviceRegistry.addThing(Thing.fromDescription(thing));
+    await deviceRegistry.addThing(Thing.fromDescription(thing));
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(0);
 

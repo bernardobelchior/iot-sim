@@ -37,7 +37,8 @@ export default class BooleanTrigger extends PropertyTrigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a boolean trigger instance
+   * @return {Object}
    */
   toDescription(): any {
     return Object.assign(super.toDescription(), { onValue: this.onValue });

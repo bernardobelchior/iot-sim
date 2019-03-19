@@ -1,5 +1,5 @@
 import Trigger from "./Trigger";
-import { DeviceRegistrySingleton } from "../../api/DeviceRegistry";
+import { SimulatorSingleton } from "../../Simulator";
 
 /**
  * A trigger activated when an event occurs
@@ -30,9 +30,10 @@ export default class EventTrigger extends Trigger {
   }
 
   /**
-   * @return {any}
+   * Creates a JSON object from a event trigger instance
+   * @return {Object}
    */
-  toDescription(): any {
+  toDescription(): object {
     return Object.assign(super.toDescription(), {
       thingId: this.thingId,
       event: this.event,
@@ -42,7 +43,8 @@ export default class EventTrigger extends Trigger {
 
   async start() {
     this.stopped = false;
-    const thing = DeviceRegistrySingleton.getThing(this.thingId);
+    const registry = SimulatorSingleton.getRegistry();
+    const thing = registry.getThing(this.thingId);
     if (this.stopped) {
       return;
     }
@@ -60,7 +62,8 @@ export default class EventTrigger extends Trigger {
 
   stop() {
     this.stopped = true;
-    const thing = DeviceRegistrySingleton.getThing(this.thingId);
+    const registry = SimulatorSingleton.getRegistry();
+    const thing = registry.getThing(this.thingId);
     thing.removeEventSubscription(this.onEvent);
   }
 }

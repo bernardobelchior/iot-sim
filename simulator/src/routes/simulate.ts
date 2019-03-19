@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DeviceRegistry } from "../api/DeviceRegistry";
+import DeviceRegistry from "../api/DeviceRegistry";
 import { IRequest, registryMiddleware } from "../api/registryMiddleware";
 import * as simulationController from "../api/controllers/simulation";
 
