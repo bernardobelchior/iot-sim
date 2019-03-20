@@ -17,19 +17,13 @@ export default (state: State = initialState, action: RootActions): State => {
     case getType(actions.things.fetchThingsAction.success):
       return {
         ...state,
-        things: {
-          ...state.things,
-          ...action.payload
-        }
+        things: action.payload
       };
 
     case getType(actions.things.fetchThingsWithPropertyValuesAction.success):
       return {
         ...state,
-        things: {
-          ...state.things,
-          ...action.payload.things
-        }
+        things: action.payload.things
       };
 
     default:
