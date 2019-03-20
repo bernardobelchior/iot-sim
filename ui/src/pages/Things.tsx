@@ -5,17 +5,19 @@ import ThingsTable from "../components/ThingsTable/ThingsTable";
 import { Thing } from "../models/Thing";
 import { ActionCreatorsMapObject, bindActionCreators, Dispatch } from "redux";
 import { RootActions } from "../store/actions";
-import { fetchThings } from "../store/actions/things";
+import { fetchThingsWithPropertyValues } from "../store/actions/things";
 
 interface IProps {
   things: Thing[];
 }
 
-const Things: FC<IProps & ActionCreatorsMapObject> = ({ things, fetchThings }) => (
-  <div style={{ margin: "16px" }}>
-    <ThingsTable things={things} fetchThings={fetchThings} />
-  </div>
-);
+const Things: FC<IProps & ActionCreatorsMapObject> = ({ things, fetchThingsWithPropertyValues }) => {
+  return (
+    <div style={{ margin: "16px" }}>
+      <ThingsTable things={things} update={fetchThingsWithPropertyValues}/>
+    </div>
+  );
+};
 
 const mapStateToProps = ({ things: { things } }: RootState): IProps => ({
   things: Object.values(things),
@@ -24,7 +26,7 @@ const mapStateToProps = ({ things: { things } }: RootState): IProps => ({
 const mapDispatchToProps = (dispatch: Dispatch<RootActions>) =>
   bindActionCreators(
     {
-      fetchThings
+      fetchThingsWithPropertyValues
     },
     dispatch
   );

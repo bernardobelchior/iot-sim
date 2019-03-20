@@ -34,16 +34,16 @@ const columns = [
 
 interface IProps {
   things: Thing[];
-  fetchThings: () => void;
+  update: () => void;
 }
 
-const ThingsTable: FC<IProps> = ({ things, fetchThings }) => {
+const ThingsTable: FC<IProps> = ({ things, update }) => {
   const options: MUIDataTableOptions = {
     filterType: "checkbox",
     selectableRows: false,
     expandableRows: true,
     viewColumns: false,
-    customToolbar: () => (<IconButton onClick={fetchThings}><UpdateIcon/></IconButton>),
+    customToolbar: () => (<IconButton onClick={update}><UpdateIcon/></IconButton>),
 
     renderExpandableRow: (rowData, rowMeta) => (
       <tr>

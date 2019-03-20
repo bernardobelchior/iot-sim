@@ -29,6 +29,23 @@ export default (
           [action.payload.id]: action.payload.properties
         }
       };
+    case getType(actions.things.fetchThingsWithPropertyValuesAction.success):
+      const obj = action.payload.properties.reduce(
+        (obj, thingProp) => {
+          obj[thingProp.id] = thingProp.properties;
+
+          return obj;
+        },
+        {} as { [id: string]: Properties }
+      );
+
+      return {
+        ...state,
+        properties: {
+          ...state.properties,
+          ...obj
+        }
+      };
 
     default:
       return state;

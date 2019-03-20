@@ -23,6 +23,15 @@ export default (state: State = initialState, action: RootActions): State => {
         }
       };
 
+    case getType(actions.things.fetchThingsWithPropertyValuesAction.success):
+      return {
+        ...state,
+        things: {
+          ...state.things,
+          ...action.payload.things
+        }
+      };
+
     default:
       return state;
   }
