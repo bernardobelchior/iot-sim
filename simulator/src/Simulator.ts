@@ -82,7 +82,7 @@ export class Simulator {
    */
   async init() {
     this.mainBus = await messageQueueBuilder(vars.MQ_URI);
-    this.mainBus.subscribe("things/light2/properties", this.parseMessage.bind(this));
+    this.mainBus.subscribe("#", this.parseMessage.bind(this));
     await this.registry.init();
   }
 
