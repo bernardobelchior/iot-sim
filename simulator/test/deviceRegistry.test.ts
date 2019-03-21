@@ -40,10 +40,8 @@ describe("DeviceRegistry", () => {
 
     expect(Object.values(deviceRegistry.getThings())).toHaveLength(0);
 
-    things.forEach(
-      async thing =>
-        await messageQueue.publish("register", JSON.stringify(thing))
-    );
+    await messageQueue.publish("register", JSON.stringify(things[0]));
+    await messageQueue.publish("register", JSON.stringify(things[1]));
 
     await waitForExpect(() =>
       expect(Object.values(deviceRegistry.getThings())).toHaveLength(2)

@@ -127,12 +127,12 @@ describe("rules engine", () => {
 
   beforeEach(async () => {
     appInstance = await app();
-    await addDevice(thingLight1);
-    await addDevice(thingLight2);
-    await addDevice(thingLight3);
   });
 
   it("gets a list of 0 rules", async () => {
+    await addDevice(thingLight1);
+    await addDevice(thingLight2);
+    await addDevice(thingLight3);
     const res = await request(appInstance)
       .get(`/rules`)
       .set("Accept", "application/json")

@@ -1,11 +1,11 @@
 import { IPropertyMetadata } from "./Property";
 
 enum DataType {
-  INTEGER = "integer",
-  BOOLEAN = "boolean",
-  ENUM = "enum",
-  STRING = "string",
-  NUMBER = "number"
+  integer = "integer",
+  boolean = "boolean",
+  enum = "enum",
+  string = "string",
+  number = "number"
 }
 
 export class ValueGenerator {

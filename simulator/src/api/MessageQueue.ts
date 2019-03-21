@@ -33,13 +33,33 @@ export class MessageQueue {
   }
 
   private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
-    // TODO: Add support for '+' and '#' wildcards
-
     Object.keys(this.messageHandlers).forEach(key => {
-      if (key === topic) {
+      const match = this.testTopic(key, topic);
+      if (match) {
         this.messageHandlers[key](topic, payload, packet);
       }
     });
+  }
+
+  private testTopic(pattern: string, key: string): boolean {
+    console.log(pattern)
+    console.log(key)
+    const regEx = this.replaceRoutingKey(pattern);
+    console.log(regEx);
+    return regEx.test(key);
+  }
+
+  private replaceRoutingKey = (pattern: string) => {
+    const rules = [
+      { regExp: new RegExp("\\/", "g"), rep: "\\/" },
+      { regExp: new RegExp("\\*", "g"), rep: "([\\w|-]+)" },
+      { regExp: new RegExp("#", "g"), rep: "([\\w|.|-]*)" },
+    ];
+    let p = pattern;
+    rules.forEach(function (rule: { regExp: RegExp, rep: string }) {
+      p = p.replace(rule.regExp, rule.rep);
+    });
+    return new RegExp("^" + p + "$");
   }
 
   /**

@@ -30,7 +30,7 @@ type PropertyEmitter = StrictEventEmitter<EventEmitter, Events>;
  */
 export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
   id: string;
-  title: string;
+  title?: string;
   description: string;
   type: string;
 
@@ -49,9 +49,9 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
    */
   constructor(
     id: string,
-    title: string,
     description: string,
-    type: string
+    type: string,
+    title?: string,
   ) {
     super();
     this.id = id;
@@ -97,10 +97,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
     }
   }
 
-  initValue(value: any): any {
-    this.value = value;
-  }
-
   /**
    *
    * @param {IPropertyMetadata} metadata
@@ -138,14 +134,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
     } else {
       throw new Error(ajv.errorsText());
     }
-  }
-
-  /**
-   * Defines a new value forwarder
-   * @param {Function} g Function that define the method to update the value
-   */
-  setValueGenerator(g: Function) {
-    // this.valueGenerator = g;
   }
 
   /**

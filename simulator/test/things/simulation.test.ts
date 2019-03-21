@@ -29,7 +29,7 @@ describe("controllers/simulation", () => {
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(0);
 
-    controller.post(
+    await controller.post(
       {
         registry: deviceRegistry,
         params: {
@@ -42,7 +42,7 @@ describe("controllers/simulation", () => {
     );
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(1);
-    expect(Object.values(deviceRegistry.getThings())).toHaveLength(1);
+    expect(Object.values(deviceRegistry.getThings())).toHaveLength(2);
     expect(sendStatus).toHaveBeenCalledWith(200);
   });
 });

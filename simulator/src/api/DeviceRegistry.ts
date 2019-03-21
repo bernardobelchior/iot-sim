@@ -19,10 +19,13 @@ export default class DeviceRegistry {
   public init = async () => {
     const filePath = `${process.cwd()}/src/environment/sensors.json`;
     const data = JSON.parse(fs.readFileSync(filePath).toString());
-    data.forEach((t: any) => {
-      // const thing = Thing.fromDescription(t);
-      // this.things[thing.id] = thing;
-    });
+    for (const t of data) {
+      const thing = Thing.fromDescription(t);
+      await this.addThing(thing);
+    }
+
+    const a = this.getThing("light2");
+    a.propertyNotify("bri");
 
     if (!this.messageQueue)
       this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
@@ -169,13 +172,13 @@ export default class DeviceRegistry {
     this.messageQueue = messageQueue;
   }
 
-  private consume(_topic: string, msg: Buffer) {
+  private async consume(_topic: string, msg: Buffer) {
     if (msg !== null) {
       const obj = JSON.parse(msg.toString());
 
       const thing = Thing.fromDescription(obj);
 
-      this.addThing(thing);
+      await this.addThing(thing);
     }
   }
 }

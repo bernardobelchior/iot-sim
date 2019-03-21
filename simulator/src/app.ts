@@ -10,7 +10,6 @@ import * as routes from "./routes";
 
 async function app() {
   mongo();
-  await SimulatorSingleton.init();
 
   // Create Express server
   const app = express();
@@ -26,6 +25,8 @@ async function app() {
 
   app.use("/things", routes.thingsRouter(SimulatorSingleton.getRegistry()));
   app.use("/rules", routes.rulesRouter(SimulatorSingleton.getRulesEngine()));
+
+  await SimulatorSingleton.init();
 
   return app;
 }

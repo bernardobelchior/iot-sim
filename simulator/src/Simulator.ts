@@ -73,7 +73,7 @@ export class Simulator {
    */
   private parseMessage(topic: string, msg: Buffer) {
     if (msg !== null) {
-
+      console.log(msg);
     }
   }
 
@@ -81,9 +81,9 @@ export class Simulator {
    * Initializes the registry and the asynchronous channels of communication
    */
   async init() {
-    await this.registry.init();
     this.mainBus = await messageQueueBuilder(vars.MQ_URI);
-    this.mainBus.subscribe("#", this.parseMessage.bind(this));
+    this.mainBus.subscribe("things/light2/properties", this.parseMessage.bind(this));
+    await this.registry.init();
   }
 
   /**

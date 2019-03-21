@@ -42,7 +42,9 @@ export class Thing {
     this.description = description;
     this.context = context;
     this.type = type || [];
-    this.href = this.href = `/things/${this.id}`;
+    // Removed first slash so that the queues created don't have an extra topic
+    // https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/
+    this.href = this.href = `things/${this.id}`;
   }
 
   static fromDescription(desc: any): Thing {
@@ -118,10 +120,10 @@ export class Thing {
   addProperties(properties: any): void {
     for (const key in properties) {
       const obj = properties[key];
-      const p = new Property(key, obj.title, obj.description, obj.type);
+      const p = new Property(key, obj.description, obj.type, obj.title);
 
       if (obj.hasOwnProperty("value")) {
-        p.initValue(obj.value);
+        p.notifyValue(obj.value);
       }
 
       p.defineMetadata({
@@ -390,21 +392,14 @@ export class Thing {
    *
    * @param {String} actionName Name of the action
    * @param {String} actionId ID of the action
-   * @returns {Object} The requested action if found, else null
+   * @returns {ActionRequest} The requested action if found, else null
    */
-  getAction(actionName: string, actionId: string) {
+  getAction(actionName: string, actionId: string): ActionRequest | undefined {
     if (!this.actions.hasOwnProperty(actionName)) {
       return undefined;
     }
 
     return this.actionsQueue.find((x: ActionRequest) => x.id === actionId);
-  }
-
-  /**
-   * Store in a database the properties current values
-   */
-  publishProperties() {
-    // const propValues = this.getProperties();
   }
 
   /**
