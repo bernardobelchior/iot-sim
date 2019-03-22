@@ -2,6 +2,7 @@ import { Agent } from "./environment/Agent";
 import { Layout } from "./environment/Layout";
 import Engine from "./rules-engine/Engine";
 import DeviceRegistry from "./api/DeviceRegistry";
+import Message from './db/Message';
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { vars } from "./util/vars";
 
@@ -71,9 +72,19 @@ export class Simulator {
    * @param {string} topic
    * @param {Buffer} msg
    */
-  private parseMessage(topic: string, msg: Buffer) {
+  private async parseMessage(topic: string, msg: Buffer | string) {
     if (msg !== null) {
-      console.log(msg);
+      let obj: any = undefined;
+      if (Buffer.isBuffer(msg)) {
+        obj = JSON.parse(msg.toString());
+      } else {
+        obj = JSON.parse(msg);
+      }
+      const levels = topic.split("/");
+      if (levels[0] === "things" && obj.hasOwnProperty("messageType")) {
+        const { messageType, ...data } = obj;
+        await Message.create({ thing: levels[1], messageType, data: data });
+      }
     }
   }
 
