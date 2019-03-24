@@ -1,19 +1,18 @@
 import Effect from "./Effect";
 import { SimulatorSingleton } from "../../Simulator";
-import { Action } from "../../api/models/Action";
 
 /**
  * An Effect which creates an action
  */
 export default class ActionEffect extends Effect {
   thingId: string;
-  action: any;
+  action: string;
   parameters: any = {};
 
   /**
    * @param {IActionEffect} desc
    */
-  constructor(label: string, thingId: string, action: Action, parameters?: any) {
+  constructor(label: string, thingId: string, action: string, parameters?: any) {
     super(label);
 
     this.thingId = thingId;
@@ -32,8 +31,7 @@ export default class ActionEffect extends Effect {
     if (!desc.hasOwnProperty("action")) {
       throw new Error("Action property missing from object.");
     }
-    const action = new Action(desc.action.id, desc.action.title, desc.action.description);
-    return new this(desc.label, desc.thingId, action);
+    return new this(desc.label, desc.thingId, desc.action, desc.parameters);
   }
 
   /**
@@ -64,7 +62,7 @@ export default class ActionEffect extends Effect {
       const registry = SimulatorSingleton.getRegistry();
       const thing = await registry.getThing(this.thingId);
 
-      thing.requestAction(this.action);
+      thing.requestAction(this.action, this.parameters);
     } catch (e) {
       console.warn("Unable to dispatch action", e);
     }

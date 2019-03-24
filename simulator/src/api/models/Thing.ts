@@ -6,9 +6,10 @@ import { ActionRequest } from "./ActionRequest";
 import { MessageQueue } from "../MessageQueue";
 
 import Ajv from "ajv";
+import { timestamp } from "./ValueGenerator";
 const ajv = new Ajv();
 
-type EventDispatched = { name: string,  data?: any, timestamp: string };
+type EventDispatched = { name: string,  data?: any, time: string };
 
 /**
  * The Thing Description provides a vocabulary for describing physical devices connected to the World Wide Web
@@ -26,7 +27,7 @@ export class Thing {
   events: Map<string, Event> = new Map<string, Event>(); // available events
   links: Link[] = [];
 
-  actionsQueue: ActionRequest[] = [];
+  actionsRequests: ActionRequest[] = [];
   eventsDispatched: EventDispatched[] = [];
 
   messageQueue?: MessageQueue;
@@ -306,9 +307,9 @@ export class Thing {
   getActionRequests(actionName?: string): ActionRequest[] {
     let res: ActionRequest[] = [];
     if (actionName) {
-      res = this.actionsQueue.filter(ar => ar.name === actionName);
+      res = this.actionsRequests.filter(ar => ar.name === actionName);
     } else {
-      res = this.actionsQueue;
+      res = this.actionsRequests;
     }
 
     return res;
@@ -337,7 +338,7 @@ export class Thing {
   requestAction(actionName: string, input?: any): ActionRequest {
     const actionRequest = new ActionRequest(this, actionName, input);
     actionRequest.startAction();
-    this.actionsQueue.push(actionRequest);
+    this.actionsRequests.push(actionRequest);
     return actionRequest;
   }
 
@@ -350,10 +351,10 @@ export class Thing {
    */
   getAction(actionName: string, actionId: string): ActionRequest {
     if (!this.actions.hasOwnProperty(actionName)) {
-      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
+      throw new Error(`Action ${actionName} doesn't exist.`);
     }
 
-    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
+    const actionRequest = this.actionsRequests.find(x => x.id === actionId && x.name === actionName);
 
     if (!actionRequest) {
       throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
@@ -367,7 +368,7 @@ export class Thing {
    * @param {String} actionId Id of the action
    */
   cancelAction(actionName: string, actionId: string): boolean {
-    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
+    const actionRequest = this.actionsRequests.find(x => x.id === actionId && x.name === actionName);
     if (!actionRequest) {
       throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
     }
@@ -375,12 +376,33 @@ export class Thing {
     return true;
   }
 
-  addEventSubscription(onEvent: (eventName: string) => void): any {
-    throw new Error("Method not implemented.");
+  addEvent(eventName: string, data?: any) {
+    if (!this.events.hasOwnProperty(eventName)) {
+      throw new Error(`Event ${eventName} doesn't exist.`);
+    }
+    const e: EventDispatched = {
+      name: eventName,
+      time: timestamp(),
+      data
+    };
+    this.eventsDispatched.push(e);
+    this.eventNotify(e);
   }
 
-  removeEventSubscription(onEvent: (eventName: string) => void): any {
-    throw new Error("Method not implemented.");
+  async addEventSubscription(eventName: string, onEvent: (event: string) => void): Promise<boolean> {
+    if (this.messageQueue) {
+      await this.messageQueue.subscribe(eventName, onEvent);
+      return Promise.resolve(true);
+    }
+    return Promise.resolve(false);
+  }
+
+  async removeEventSubscription(eventName: string): Promise<boolean> {
+    if (this.messageQueue) {
+      await this.messageQueue.unsubscribe(eventName);
+      return Promise.resolve(true);
+    }
+    return Promise.resolve(false);
   }
 
   /**
@@ -424,7 +446,7 @@ export class Thing {
         messageType: "event",
         data: {
           [event.name]: {
-            timestamp: event.timestamp,
+            time: event.time,
             data: event.data
           }
         }

@@ -48,7 +48,7 @@ export class MessageQueue {
       { regExp: new RegExp("#", "g"), rep: "([\\w|/|-]*)" }
     ];
     let p = pattern;
-    rules.forEach(function(rule: { regExp: RegExp; rep: string }) {
+    rules.forEach(function (rule: { regExp: RegExp; rep: string }) {
       p = p.replace(rule.regExp, rule.rep);
     });
     return new RegExp("^" + p + "$").test(key);
@@ -82,6 +82,19 @@ export class MessageQueue {
     });
 
     this.messageHandlers[topic] = onMessage;
+  }
+
+  /**
+   * Unsubscribes from a topic.
+   * @param topic Topic to unsubscribe.
+   */
+  async unsubscribe(topic: string | string[]) {
+    await this.client.unsubscribe(topic);
+    if (Array.isArray(topic)) {
+      topic.forEach(t => delete this.messageHandlers[t]);
+    } else {
+      delete this.messageHandlers[topic];
+    }
   }
 
   /**

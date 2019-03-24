@@ -48,7 +48,7 @@ export default class EventTrigger extends Trigger {
     if (this.stopped) {
       return;
     }
-    thing.addEventSubscription(this.onEvent);
+    await thing.addEventSubscription(this.event, this.onEvent);
   }
 
   onEvent(eventName: string) {
@@ -60,10 +60,10 @@ export default class EventTrigger extends Trigger {
     this.emit("stateChanged", { on: false, value: Date.now() });
   }
 
-  stop() {
+  async stop() {
     this.stopped = true;
     const registry = SimulatorSingleton.getRegistry();
     const thing = registry.getThing(this.thingId);
-    thing.removeEventSubscription(this.onEvent);
+    await thing.removeEventSubscription(this.event);
   }
 }
