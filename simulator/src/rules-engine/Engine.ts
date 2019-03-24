@@ -1,4 +1,6 @@
 import Rule from "./Rule";
+import { MessageQueue, messageQueueBuilder } from "../MessageQueue";
+import { vars } from "../util/vars";
 
 type RuleMap = { [id: string]: Rule };
 type RuleRecord = { ruleId: string; state: boolean; date: number };
@@ -9,6 +11,15 @@ type RuleRecord = { ruleId: string; state: boolean; date: number };
 export default class Engine {
   rules: RuleMap = {};
   records: RuleRecord[] = [];
+  private messageQueue?: MessageQueue;
+
+  /**
+   * Subscribes to the message queue.
+   */
+  public init = async () => {
+    if (!this.messageQueue)
+      this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
+  };
 
   /**
    * Get a list of all current rules
@@ -43,6 +54,8 @@ export default class Engine {
       this.rules[rule.id] = rule;
       await this.rules[rule.id].start();
 
+      // TODO subscribe to topics and pass correct functions as callback
+
       this.records.push({
         ruleId: rule.id,
         state: rule.enabled,
@@ -69,6 +82,8 @@ export default class Engine {
       const oldRule = this.rules[ruleId];
       oldRule.stop();
       this.rules[ruleId] = updatedRule;
+
+      // TODO update topics subscription and pass correct functions as callback
 
       if (rule.enabled !== updatedRule.enabled) {
         this.records.push({
@@ -99,6 +114,8 @@ export default class Engine {
       const delRule = this.rules[ruleId];
       delRule.stop();
       delete this.rules[ruleId];
+
+      // TODO delete topics subscription
 
       this.records = this.records.filter(record => record.ruleId !== ruleId);
 

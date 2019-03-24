@@ -1,4 +1,4 @@
-import { messageQueueBuilder } from "../src/api/MessageQueue";
+import { messageQueueBuilder } from "../src/MessageQueue";
 import { vars } from "../src/util/vars";
 import { start } from "../src/server";
 

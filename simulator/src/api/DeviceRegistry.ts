@@ -1,6 +1,6 @@
 import fs from "fs";
 import { Thing } from "./models/Thing";
-import { MessageQueue, messageQueueBuilder } from "./MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "../MessageQueue";
 import { vars } from "../util/vars";
 
 type ThingMap = { [id: string]: Thing };

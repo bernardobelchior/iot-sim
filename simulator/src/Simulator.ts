@@ -3,7 +3,7 @@ import { Layout } from "./environment/Layout";
 import Engine from "./rules-engine/Engine";
 import DeviceRegistry from "./api/DeviceRegistry";
 import Message from "./db/Message";
-import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "./MessageQueue";
 import { vars } from "./util/vars";
 
 enum SimulationState {
@@ -95,6 +95,7 @@ export class Simulator {
     this.mainBus = await messageQueueBuilder(vars.MQ_URI);
     this.mainBus.subscribe("#", this.parseMessage.bind(this));
     await this.registry.init();
+    await this.rulesEngine.init();
   }
 
   /**

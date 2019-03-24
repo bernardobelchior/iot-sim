@@ -57,7 +57,7 @@ export const requestActions = async (req: IRequest, res: Response) => {
 };
 
 /**
- * Handle a GET request to /<thingId>/actions/<action_name>.
+ * Handle a GET request to /<thingId>/actions/<action>.
  *
  * @param {Request} req The request object
  * @param {Response} res The response object
@@ -74,7 +74,7 @@ export const getAction = async (req: IRequest, res: Response) => {
 };
 
 /**
- * Handle a POST request to /<thingId>/actions/<action_name>.
+ * Handle a POST request to /<thingId>/actions/<action>.
  *
  * @param {Request} req The request object
  * @param {Response} res The response object
@@ -107,7 +107,7 @@ export const requestAction = async (req: IRequest, res: Response) => {
 };
 
 /**
- * Handle a GET request to /<thingId>/actions/<action_name>/<action_id>.
+ * Handle a GET request to /<thingId>/actions/<action>/<action_id>.
  *
  * @param {Request} req The request object
  * @param {Response} res The response object
@@ -128,7 +128,7 @@ export const getActionRequest = async (req: IRequest, res: Response) => {
 };
 
 /**
- * Handle a DELETE request to /<thingId>/actions/<action_name>/<action_id>.
+ * Handle a DELETE request to /<thingId>/actions/<action>/<action_id>.
  *
  * @param {Request} req The request object
  * @param {Response} res The response object

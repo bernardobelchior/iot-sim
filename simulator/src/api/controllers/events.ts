@@ -1,5 +1,6 @@
 import { Response } from "express";
 import { IRequest } from "../registryMiddleware";
+import APIError from "../../util/APIError";
 
 /**
  * Handle a GET request to /<thingId>/events.
@@ -8,14 +9,13 @@ import { IRequest } from "../registryMiddleware";
  * @param {Response} res The response object
  */
 export const list = async (req: IRequest, res: Response) => {
-  const thingId = req.params.thingId;
-  const thing = await req.registry.getThing(thingId);
-  if (thing === null || thing === undefined) {
-    res.status(404).end();
-    return;
+  try {
+    const thingId = req.params.thingId;
+    const thing = req.registry.getThing(thingId);
+    res.json(thing.getEventsDispatched());
+  } catch (e) {
+    res.status(404).send(new APIError(`Failed to cancel action`, e).toString());
   }
-
-  res.json(thing.getEventDescriptions());
 };
 
 /**
@@ -25,12 +25,12 @@ export const list = async (req: IRequest, res: Response) => {
  * @param {Response} res The response object
  */
 export const get = async (req: IRequest, res: Response) => {
-  const thingId = req.params.thingId;
-  const thing = await req.registry.getThing(thingId);
-  if (thing === null || thing === undefined) {
-    res.status(404).end();
-    return;
+  try {
+    const thingId = req.params.thingId;
+    const thing = req.registry.getThing(thingId);
+    const eventName = req.params.eventName;
+    res.json(thing.getEventsDispatched(eventName));
+  } catch (e) {
+    res.status(404).send(new APIError(`Failed to cancel action`, e).toString());
   }
-  const eventName = req.params.eventName;
-  res.json(thing.getEventDescriptions(eventName));
 };

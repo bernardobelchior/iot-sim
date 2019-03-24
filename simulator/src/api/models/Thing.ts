@@ -389,6 +389,19 @@ export class Thing {
     this.eventNotify(e);
   }
 
+  /**
+   * Gets the list of events dispatched by the device
+   * @param eventName
+   * @returns {EventDispatched[]}
+   */
+  getEventsDispatched(eventName?: string): EventDispatched[] {
+    if (eventName) {
+      return this.eventsDispatched.filter(ed => ed.name === eventName);
+    } else {
+      return this.eventsDispatched;
+    }
+  }
+
   async addEventSubscription(eventName: string, onEvent: (event: string) => void): Promise<boolean> {
     if (this.messageQueue) {
       await this.messageQueue.subscribe(eventName, onEvent);
@@ -426,10 +439,10 @@ export class Thing {
    *
    * @param {Object} action
    */
-  actionNotify(actionRequest: any): void {
+  actionNotify(actionRequest: ActionRequest): void {
     const data = {
       messageType: "actionStatus",
-      data: actionRequest
+      data: actionRequest.getActionRequest()
     };
     this.sendMessage(`${this.href}/actions`, JSON.stringify(data));
   }
