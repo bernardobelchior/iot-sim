@@ -43,12 +43,12 @@ export class MessageQueue {
 
   private testTopic(pattern: string, key: string): boolean {
     const rules = [
-      { regExp: new RegExp("\\/", "g"), rep: "\/" },
+      { regExp: new RegExp("\\/", "g"), rep: "/" },
       { regExp: new RegExp("\\+", "g"), rep: "([\\w|-]+)" },
-      { regExp: new RegExp("#", "g"), rep: "([\\w|\/|-]*)" },
+      { regExp: new RegExp("#", "g"), rep: "([\\w|/|-]*)" }
     ];
     let p = pattern;
-    rules.forEach(function (rule: { regExp: RegExp, rep: string }) {
+    rules.forEach(function(rule: { regExp: RegExp; rep: string }) {
       p = p.replace(rule.regExp, rule.rep);
     });
     return new RegExp("^" + p + "$").test(key);

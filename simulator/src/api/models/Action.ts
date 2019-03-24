@@ -18,7 +18,6 @@ export interface IInput {
  * An action object describes a function which can be carried out on a device
  */
 export class Action {
-  id: string;
   title: string;
   description: string;
   links: Link[] = [];
@@ -29,8 +28,7 @@ export class Action {
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    */
-  constructor(id: string, title: string, description: string) {
-    this.id = id;
+  constructor(title: string, description: string) {
     this.title = title;
     this.description = description;
   }

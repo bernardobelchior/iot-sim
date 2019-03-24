@@ -35,13 +35,13 @@ export const get = (req: IRequest, res: Response) => {
  * @param {Request} req The request object
  * @param {Response} res The response object
  */
-export const create = (req: IRequest, res: Response) => {
+export const create = async (req: IRequest, res: Response) => {
   try {
     if (!req.body.hasOwnProperty("id")) {
       res.status(400).send(new APIError("Failed to add thing", "ID missing").toString());
       return;
     }
-    const thing = req.registry.createThing(req.body.id, req.body);
+    const thing = await req.registry.createThing(req.body.id, req.body);
     res.send({ id: thing.id });
   } catch (e) {
     res.status(404).send(new APIError("Failed to add thing", e).toString());

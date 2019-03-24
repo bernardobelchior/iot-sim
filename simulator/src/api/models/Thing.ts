@@ -1,12 +1,14 @@
 import { Property } from "./Property";
 import { Action } from "./Action";
 import { Event } from "./Event";
-import { Link, ILink } from "./Link";
+import { Link } from "./Link";
 import { ActionRequest } from "./ActionRequest";
 import { MessageQueue } from "../MessageQueue";
 
 import Ajv from "ajv";
 const ajv = new Ajv();
+
+type EventDispatched = { name: string,  data?: any, timestamp: string };
 
 /**
  * The Thing Description provides a vocabulary for describing physical devices connected to the World Wide Web
@@ -20,11 +22,12 @@ export class Thing {
   href: string;
   description: string;
   properties: Map<string, Property> = new Map<string, Property>();
-  actions: Map<string, Action> = new Map<string, Action>();
-  events: Map<string, Event> = new Map<string, Event>();
+  actions: Map<string, Action> = new Map<string, Action>(); // available actions
+  events: Map<string, Event> = new Map<string, Event>(); // available events
   links: Link[] = [];
 
   actionsQueue: ActionRequest[] = [];
+  eventsDispatched: EventDispatched[] = [];
 
   messageQueue?: MessageQueue;
 
@@ -64,7 +67,13 @@ export class Thing {
     t.addProperties(desc.properties || []);
     t.addActions(desc.actions || []);
     t.addEvents(desc.events || []);
-    t.addLinks(desc.links || []);
+
+    if (desc.links && Array.isArray(desc.links)) {
+      for (const linkData of desc.links) {
+        const link = new Link(linkData);
+        t.links.push(link);
+      }
+    }
 
     return t;
   }
@@ -102,12 +111,10 @@ export class Thing {
 
     this.actions.forEach((value: Action, key: string) => {
       thing.actions[key] = JSON.parse(JSON.stringify(value));
-      delete thing.actions[key]["id"];
     });
 
     this.events.forEach((value: Event, key: string) => {
       thing.events[key] = JSON.parse(JSON.stringify(value));
-      delete thing.events[key]["id"];
     });
 
     return thing;
@@ -149,7 +156,7 @@ export class Thing {
   addActions(actions: any): void {
     for (const key in actions) {
       const obj = actions[key];
-      const a = new Action(key, obj.title, obj.description);
+      const a = new Action(obj.title, obj.description);
       a.defineInput(obj.input);
       a.addLinks(this.href, obj.links);
 
@@ -164,7 +171,7 @@ export class Thing {
   addEvents(events: any): void {
     for (const key in events) {
       const obj = events[key];
-      const e = new Event(key, obj.title, obj.description, obj["@type"]);
+      const e = new Event(obj.description, obj.title, obj["@type"]);
       e.defineMetadata({
         type: obj.type,
         unit: obj.unit,
@@ -179,14 +186,61 @@ export class Thing {
   }
 
   /**
+   * Get the thing's properties as an object.
    *
-   * @param links
+   * @returns {Object} Properties, i.e. name -> description
    */
-  addLinks(links: ILink[]): void {
-    links.forEach((linkData: ILink) => {
-      const link = new Link(linkData);
-      this.links.push(link);
+  getPropertyDescriptions() {
+    const descriptions: any = {};
+    this.properties.forEach((value: Property, key: string) => {
+      descriptions[key] = value.asPropertyDescription();
     });
+
+    return descriptions;
+  }
+
+  /**
+   * Get the thing's actions as an array.
+   *
+   * @param {String?} actionName Optional action name to get descriptions for
+   *
+   * @returns {Object} Action descriptions.
+   */
+  getActionDescriptions(actionName?: string) {
+    const availableActions: any = {};
+    if (actionName !== undefined) {
+      const action = this.actions.get(actionName);
+      if (action !== undefined) {
+        availableActions[actionName] = JSON.parse(JSON.stringify(action));
+      }
+    } else {
+      this.actions.forEach((value: Action, key: string) => {
+        availableActions[key] = JSON.parse(JSON.stringify(value));
+      });
+    }
+    return availableActions;
+  }
+
+  /**
+   * Get the thing's events as an array.
+   *
+   * @param {String?} eventName Optional event name to get descriptions for
+   *
+   * @returns {Object} Event descriptions.
+   */
+  getEventDescriptions(eventName?: string): any {
+    const availableEvents: any = {};
+    if (eventName !== undefined) {
+      const event = this.events.get(eventName);
+      if (event !== undefined) {
+        availableEvents[eventName] = JSON.parse(JSON.stringify(event));
+      }
+    } else {
+      this.events.forEach((value: Event, key: string) => {
+        availableEvents[key] = JSON.parse(JSON.stringify(value));
+      });
+    }
+    return availableEvents;
   }
 
   /**
@@ -209,7 +263,7 @@ export class Thing {
    *
    * @returns {Boolean} Indication of property presence
    */
-  hasProperty(propertyName: string) {
+  hasProperty(propertyName: string): boolean {
     return this.properties.has(propertyName);
   }
 
@@ -245,34 +299,65 @@ export class Thing {
   }
 
   /**
+   * Obtains a list of action requests
+   * @param actionName Optional arg to specify the requests to obtain
+   * @returns {ActionRequest[]}
+   */
+  getActionRequests(actionName?: string): ActionRequest[] {
+    let res: ActionRequest[] = [];
+    if (actionName) {
+      res = this.actionsQueue.filter(ar => ar.name === actionName);
+    } else {
+      res = this.actionsQueue;
+    }
+
+    return res;
+  }
+
+  checkActionRequest(actionName: string, input?: any): boolean {
+    const action = this.actions.get(actionName);
+    if (!action) {
+      return false;
+    }
+
+    if (action.input && action.input.properties) {
+      return ajv.validate(action.input.properties, input) as boolean;
+    }
+
+    return true;
+  }
+
+  /**
    * Requests an action to be executed.
    *
    * @param {String} actionName Name of the action
    * @param {} input Action inputs
    * @returns {ActionRequest} The action that was created.
    */
-  requestAction(actionName: string, input?: any): ActionRequest | undefined {
-    const action = this.actions.get(actionName);
-    if (!action) {
-      return;
-    }
-
-    if (action.input && action.input.properties) {
-      const valid = ajv.validate(action.input.properties, input);
-
-      if (!valid) {
-        return;
-      }
-
-      const actionRequest = new ActionRequest(this, actionName, input);
-      this.actionsQueue.push(actionRequest);
-
-      return actionRequest;
-    }
-
+  requestAction(actionName: string, input?: any): ActionRequest {
     const actionRequest = new ActionRequest(this, actionName, input);
+    actionRequest.startAction();
     this.actionsQueue.push(actionRequest);
     return actionRequest;
+  }
+
+  /**
+   * Get an action.
+   *
+   * @param {String} actionName Name of the action
+   * @param {String} actionId ID of the action
+   * @returns {ActionRequest} The requested action if found, else null
+   */
+  getAction(actionName: string, actionId: string): ActionRequest {
+    if (!this.actions.hasOwnProperty(actionName)) {
+      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
+    }
+
+    const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
+
+    if (!actionRequest) {
+      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
+    } else return actionRequest;
   }
 
   /**
@@ -284,10 +369,18 @@ export class Thing {
   cancelAction(actionName: string, actionId: string): boolean {
     const actionRequest = this.actionsQueue.find(x => x.id === actionId && x.name === actionName);
     if (!actionRequest) {
-      return false;
+      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
     }
     actionRequest.cancelAction();
     return true;
+  }
+
+  addEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
+  }
+
+  removeEventSubscription(onEvent: (eventName: string) => void): any {
+    throw new Error("Method not implemented.");
   }
 
   /**
@@ -324,15 +417,15 @@ export class Thing {
    *
    * @param {Object} event The event that occurred
    */
-  eventNotify(eventId: string): void {
-    const event = this.events.get(eventId);
-
+  eventNotify(event: EventDispatched): void {
     if (event) {
+      this.eventsDispatched.push(event);
       const data = {
         messageType: "event",
         data: {
-          [event.id]: {
-            timestamp: new Date().toISOString()
+          [event.name]: {
+            timestamp: event.timestamp,
+            data: event.data
           }
         }
       };
@@ -341,85 +434,11 @@ export class Thing {
   }
 
   /**
-   * Get the thing's events as an array.
-   *
-   * @returns {Map<string, Event>} Thing's available events.
-   */
-  getAvailableEvents() {
-    return this.events;
-  }
-
-  /**
-   * Get the thing's properties as an object.
-   *
-   * @returns {Object} Properties, i.e. name -> description
-   */
-  getPropertyDescriptions() {
-    const descriptions: any = {};
-    this.properties.forEach((value: Property, key: string) => {
-      descriptions[key] = value.asPropertyDescription();
-    });
-
-    return descriptions;
-  }
-
-  /**
-   * Get the thing's actions as an array.
-   *
-   * @param {String?} actionName Optional action name to get descriptions for
-   *
-   * @returns {Object} Action descriptions.
-   */
-  getActionDescriptions(actionName?: string) {
-    const availableActions: any = {};
-    if (actionName !== undefined) {
-      const action = this.actions.get(actionName);
-      if (action !== undefined) {
-        availableActions[actionName] = JSON.parse(JSON.stringify(action));
-        delete availableActions[actionName]["id"];
-      }
-    } else {
-      this.actions.forEach((value: Action, key: string) => {
-        availableActions[key] = JSON.parse(JSON.stringify(value));
-        delete availableActions[key]["id"];
-      });
-    }
-    return availableActions;
-  }
-
-  /**
-   * Get an action.
-   *
-   * @param {String} actionName Name of the action
-   * @param {String} actionId ID of the action
-   * @returns {ActionRequest} The requested action if found, else null
-   */
-  getAction(actionName: string, actionId: string): ActionRequest | undefined {
-    if (!this.actions.hasOwnProperty(actionName)) {
-      return undefined;
-    }
-
-    return this.actionsQueue.find((x: ActionRequest) => x.id === actionId);
-  }
-
-  /**
    * Returns whether or not this Thing is being simulated.
    * If it is, then the `@type` key will have `Simulated` as a value.
    */
   isSimulated() {
     return this.type.find(t => t === "Simulated");
-  }
-
-  removeEventSubscription(onEvent: (eventName: string) => void): any {
-    throw new Error("Method not implemented.");
-  }
-
-  getEventDescriptions(eventName?: string): any {
-    throw new Error("Method not implemented.");
-  }
-
-  addEventSubscription(onEvent: (eventName: string) => void): any {
-    throw new Error("Method not implemented.");
   }
 
   sendMessage(topic: string, data: string) {
@@ -432,12 +451,11 @@ export class Thing {
 
   }
 
-  start(messageQueue: MessageQueue): any {
+  async start(messageQueue: MessageQueue): Promise<void> {
     if (!this.messageQueue) {
       this.messageQueue = messageQueue;
     }
 
-    this.messageQueue.subscribe(this.href, this.consumeMessage.bind(this));
+    await this.messageQueue.subscribe(this.href, this.consumeMessage.bind(this));
   }
-
 }

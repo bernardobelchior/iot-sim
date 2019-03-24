@@ -2,7 +2,7 @@ import { Agent } from "./environment/Agent";
 import { Layout } from "./environment/Layout";
 import Engine from "./rules-engine/Engine";
 import DeviceRegistry from "./api/DeviceRegistry";
-import Message from './db/Message';
+import Message from "./db/Message";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { vars } from "./util/vars";
 

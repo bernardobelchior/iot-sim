@@ -43,7 +43,11 @@ export default class Engine {
       this.rules[rule.id] = rule;
       await this.rules[rule.id].start();
 
-      this.records.push({ ruleId: rule.id, state: rule.enabled, date: Date.now() });
+      this.records.push({
+        ruleId: rule.id,
+        state: rule.enabled,
+        date: Date.now()
+      });
       return rule.id;
     } catch (error) {
       throw new Error(`Error creating rule.`);
@@ -67,7 +71,11 @@ export default class Engine {
       this.rules[ruleId] = updatedRule;
 
       if (rule.enabled !== updatedRule.enabled) {
-        this.records.push({ ruleId: rule.id, state: updatedRule.enabled, date: Date.now() });
+        this.records.push({
+          ruleId: rule.id,
+          state: updatedRule.enabled,
+          date: Date.now()
+        });
       }
 
       await this.rules[ruleId].start();

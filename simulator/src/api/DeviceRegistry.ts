@@ -75,13 +75,13 @@ export default class DeviceRegistry {
    * @param String id ID to give Thing.
    * @param Object description Thing description.
    */
-  createThing(id: string, description: any): Thing {
+  async createThing(id: string, description: any): Promise<Thing> {
     const t = this.things[id];
     if (t) {
       throw new Error(`Thing ${id} already exists.`);
     }
     const thing = Thing.fromDescription({ ...description, id });
-    this.addThing(thing);
+    await this.addThing(thing);
     return thing;
   }
 
