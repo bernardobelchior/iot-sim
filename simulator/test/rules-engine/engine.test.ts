@@ -117,6 +117,22 @@ describe("rules engine", () => {
     expect(res.status).toEqual(200);
   }
 
+  async function addRule(desc: any) {
+    const res = await request(appInstance)
+      .post(`/rules`)
+      .set("Accept", "application/json")
+      .send(desc);
+    expect(res.status).toEqual(200);
+  }
+
+  async function setThingProperty(thing: string, property: string, data: any) {
+    const res = await request(appInstance)
+      .put(`/things/${thing}/properties/${property}`)
+      .set("Accept", "application/json")
+      .send(data);
+    expect(res.status).toEqual(200);
+  }
+
   async function deleteRule(id: string) {
     const res = await request(appInstance)
       .delete(`/rules/${id}`)
@@ -228,5 +244,15 @@ describe("rules engine", () => {
       .set("Accept", "application/json")
       .send(testRule);
     expect(err.status).toEqual(404);
+  });
+
+  function delay<T>(millis: number, value?: T): Promise<T> {
+  return new Promise((resolve) => setTimeout(() => { resolve(value); }, 100));
+}
+
+  it("boolean trigger and pulse effect", async () => {
+    await addRule(testRule);
+    await setThingProperty("light1", "on", { on: true });
+    await delay(4000);
   });
 });

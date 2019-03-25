@@ -428,7 +428,7 @@ export class Thing {
         messageType: "propertyStatus",
         [p.id]: p.getValue()
       };
-      this.sendMessage(`${this.href}/properties/${p.id}`, JSON.stringify(data));
+      this.sendMessage(`things/${this.id}/properties/${p.id}`, JSON.stringify(data));
     }
   }
 
@@ -442,7 +442,7 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest.getActionRequest()
     };
-    this.sendMessage(`${this.href}/actions/${actionRequest.name}`, JSON.stringify(data));
+    this.sendMessage(`things/${this.id}/actions/${actionRequest.name}`, JSON.stringify(data));
   }
 
   /**
@@ -462,7 +462,7 @@ export class Thing {
           }
         }
       };
-      this.sendMessage(`${this.href}/events/${event.name}`, JSON.stringify(data));
+      this.sendMessage(`things/${this.id}/events/${event.name}`, JSON.stringify(data));
     }
   }
 
@@ -479,7 +479,7 @@ export class Thing {
       this.messageQueue.publish(topic, data);
     }
   }
-  
+
   async start(messageQueue: MessageQueue): Promise<void> {
     if (!this.messageQueue) {
       this.messageQueue = messageQueue;

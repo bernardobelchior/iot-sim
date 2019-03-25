@@ -56,18 +56,7 @@ export default class Engine {
     try {
       this.rules[rule.id] = rule;
 
-      if (this.messageQueue) {
-        const ruleSubscriptions = rule.getSubscriptions();
-        for (const sub of ruleSubscriptions) {
-          this.subscriptions.push({ ruleId: rule.id, topic: sub });
-          await this.messageQueue.subscribe(
-            sub,
-            this.parseMessage,
-            QoS.AtMostOnce
-          );
-        }
-      }
-
+      await this.subscribeTopics(rule.id, rule.getSubscriptions());
       await this.rules[rule.id].start();
 
       this.records.push({
@@ -97,17 +86,11 @@ export default class Engine {
       oldRule.stop();
       this.rules[ruleId] = updatedRule;
 
-      const newSubs = rule.getSubscriptions();
-      const delSubs = oldRule
-        .getSubscriptions()
-        .filter(s => !newSubs.includes(s));
-      this.subscriptions.forEach(sub => {
-        const idx = delSubs.findIndex(s => s === sub.topic);
-        if (idx !== -1) {
-          delSubs.splice(idx, 1);
-        }
-      });
+      const oldSubs = oldRule.getSubscriptions();
+      const newSubs = rule.getSubscriptions().filter(s => !oldSubs.includes(s));
+      await this.subscribeTopics(ruleId, newSubs);
 
+      const delSubs = oldSubs.filter(s => !newSubs.includes(s));
       if (this.messageQueue && delSubs && Array.isArray(delSubs)) {
         await this.messageQueue.unsubscribe(delSubs);
       }
@@ -124,6 +107,20 @@ export default class Engine {
       return ruleId;
     } catch (error) {
       return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
+    }
+  }
+
+  private async subscribeTopics(ruleId: string, topics: string[]) {
+    if (!this.messageQueue) {
+      return Promise.resolve();
+    }
+    for (const t of topics) {
+      this.subscriptions.push({ ruleId, topic: t });
+      await this.messageQueue.subscribe(
+        t,
+        this.parseMessage.bind(this),
+        QoS.AtMostOnce
+      );
     }
   }
 

@@ -80,6 +80,6 @@ export default class PulseEffect extends PropertyEffect {
         return this.property.set(this.oldValue);
       }
     }
-    return Promise.resolve();
+    return;
   }
 }

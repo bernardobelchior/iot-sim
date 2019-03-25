@@ -176,7 +176,7 @@ export default class DeviceRegistry {
       const obj = JSON.parse(msg.toString());
 
       const thing = Thing.fromDescription(obj);
-      (await this.addThing(thing));
+      await this.addThing(thing);
     }
   }
 }

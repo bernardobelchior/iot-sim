@@ -57,6 +57,6 @@ export default class SetEffect extends PropertyEffect {
     if (this.on && !state) {
       this.on = false;
     }
-    return Promise.resolve();
+    return;
   }
 }

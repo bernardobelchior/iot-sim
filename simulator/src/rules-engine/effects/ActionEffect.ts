@@ -57,10 +57,10 @@ export default class ActionEffect extends Effect {
     this.createAction();
   }
 
-  async createAction() {
+  createAction() {
     try {
       const registry = SimulatorSingleton.getRegistry();
-      const thing = await registry.getThing(this.thingId);
+      const thing = registry.getThing(this.thingId);
 
       thing.requestAction(this.action, this.parameters);
     } catch (e) {

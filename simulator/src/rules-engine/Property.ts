@@ -42,7 +42,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     }
 
     this.onPropertyChanged = this.onPropertyChanged.bind(this);
-    this.onThingAdded = this.onThingAdded.bind(this);
+    this.getInitialValue();
   }
 
   /**
@@ -112,30 +112,12 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     }
   }
 
-  async start() {
-    // TODO
-  }
-
-  stop() {
-    // TODO
-  }
-
   getInitialValue() {
     const initialValue = this.get();
     if (typeof initialValue === "undefined") {
       throw new Error("Did not get a real value");
     }
     this.emit("valueChanged", initialValue);
-  }
-
-  /**
-   * @param {String} thing - thing id
-   */
-  onThingAdded(thing: string) {
-    if (thing !== this.thing) {
-      return;
-    }
-    this.getInitialValue();
   }
 
   onPropertyChanged(

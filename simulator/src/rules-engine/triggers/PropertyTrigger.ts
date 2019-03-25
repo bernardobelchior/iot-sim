@@ -39,12 +39,10 @@ export default class PropertyTrigger extends Trigger {
 
   async start() {
     this.property.on("valueChanged", this.onValueChanged);
-    await this.property.start();
   }
 
   stop() {
     this.property.removeListener("valueChanged", this.onValueChanged);
-    this.property.stop();
   }
 
   onValueChanged(_value: any) {}
@@ -68,11 +66,11 @@ export default class PropertyTrigger extends Trigger {
       const levels = topic.split("/");
       const thing = levels[1];
       const property = levels[3];
-      const keys = Object(data).keys();
+      const keys = Object.keys(data);
       if (keys[0] !== property) {
         return;
       }
-      this.property.onPropertyChanged(thing, property, keys[0]);
+      this.property.onPropertyChanged(thing, property, data[keys[0]]);
     }
   }
 }
