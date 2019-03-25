@@ -1,7 +1,6 @@
 import { EventEmitter } from "events";
 import { TriggerEmitter } from "./Events";
 import { SimulatorSingleton } from "../Simulator";
-import { Property as ThingProperty } from "../api/models/Property";
 
 /**
  * Utility to support operations on Thing's properties
@@ -24,6 +23,12 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     description?: string
   ) {
     super();
+
+    const registry = SimulatorSingleton.getRegistry();
+    const t = registry.getThing(thing);
+    if (!t.hasProperty(id)) {
+      throw new Error(`Property ${id} doesn't exist on thing ${thing}.`);
+    }
 
     this.type = type;
     this.thing = thing;
@@ -133,13 +138,17 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     this.getInitialValue();
   }
 
-  onPropertyChanged(propertyDevice: string, property: ThingProperty) {
+  onPropertyChanged(
+    propertyDevice: string,
+    propertyId: string,
+    propertyValue: any
+  ) {
     if (propertyDevice !== this.thing) {
       return;
     }
-    if (property.title !== this.id) {
+    if (propertyId !== this.id) {
       return;
     }
-    this.emit("valueChanged", property.value);
+    this.emit("valueChanged", propertyValue);
   }
 }

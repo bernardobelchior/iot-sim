@@ -1,1 +1,3 @@
-export class Activity {}
+export class Activity {
+  constructor() {}
+}

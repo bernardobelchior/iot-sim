@@ -8,6 +8,7 @@ import { TriggerEmitter } from "../Events";
 export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }) {
   type: string;
   label: string;
+
   /**
    * Create a Trigger based on a wire-format description with a property
    * @param {string} label
@@ -52,5 +53,12 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
    */
   stop() {
     throw new Error("Unimplemented");
+  }
+
+  /**
+   * Get the subscriptions necessary for the trigger to activate when the condition is met
+   */
+  getSubscriptions(): string | string[] {
+    return [];
   }
 }

@@ -48,4 +48,12 @@ export default class PropertyTrigger extends Trigger {
   }
 
   onValueChanged(_value: any) {}
+
+  /**
+   * Get the subscriptions necessary for the trigger to activate when the condition is met
+   * When the trigger uses a property, the subscription is made to the respective thing property
+   */
+  getSubscriptions(): string | string[] {
+    return `things/${this.property.thing}/properties/${this.property.id}`;
+  }
 }

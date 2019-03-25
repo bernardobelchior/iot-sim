@@ -1,6 +1,6 @@
 import { Thing } from "./Thing";
 import { v4 as uuid } from "uuid";
-import { timestamp } from "./ValueGenerator";
+import { timestamp } from "../../util";
 
 /**
  *

@@ -92,4 +92,13 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
     }
     this.effect.setState(state.on);
   }
+
+  /**
+   *
+   */
+  getSubscriptions(): string | string[] {
+    return this.trigger.getSubscriptions();
+  }
+
+  parseSubscriptionMessage(_topic: string, msg: Buffer | string) {}
 }

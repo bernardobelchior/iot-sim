@@ -1,9 +1,11 @@
 import Rule from "./Rule";
-import { MessageQueue, messageQueueBuilder } from "../MessageQueue";
+import { MessageQueue, messageQueueBuilder, QoS } from "../MessageQueue";
 import { vars } from "../util/vars";
+import { timestamp } from "../util";
 
 type RuleMap = { [id: string]: Rule };
-type RuleRecord = { ruleId: string; state: boolean; date: number };
+type RuleSubscription = { [id: string]: string };
+type RuleRecord = { ruleId: string; state: boolean; time: string };
 
 /**
  * An engine for running and managing list of rules
@@ -11,6 +13,7 @@ type RuleRecord = { ruleId: string; state: boolean; date: number };
 export default class Engine {
   rules: RuleMap = {};
   records: RuleRecord[] = [];
+  subscriptions: RuleSubscription[] = [];
   private messageQueue?: MessageQueue;
 
   /**
@@ -52,14 +55,21 @@ export default class Engine {
   async addRule(rule: Rule): Promise<string> {
     try {
       this.rules[rule.id] = rule;
-      await this.rules[rule.id].start();
 
-      // TODO subscribe to topics and pass correct functions as callback
+      if (this.messageQueue) {
+        const ruleSubscriptions = rule.getSubscriptions();
+        for (const sub of ruleSubscriptions) {
+          this.subscriptions.push({ [rule.id]: sub });
+          this.messageQueue.subscribe(sub, this.parseMessage, QoS.AtMostOnce);
+        }
+      }
+
+      await this.rules[rule.id].start();
 
       this.records.push({
         ruleId: rule.id,
         state: rule.enabled,
-        date: Date.now()
+        time: timestamp()
       });
       return rule.id;
     } catch (error) {
@@ -89,7 +99,7 @@ export default class Engine {
         this.records.push({
           ruleId: rule.id,
           state: updatedRule.enabled,
-          date: Date.now()
+          time: timestamp()
         });
       }
 
@@ -124,4 +134,6 @@ export default class Engine {
       throw new Error(`Rule ${ruleId} does not exist`);
     }
   }
+
+  parseMessage(topic: string, msg: Buffer | string) {}
 }

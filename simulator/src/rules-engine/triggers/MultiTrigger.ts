@@ -87,4 +87,18 @@ export default class MultiTrigger extends Trigger {
       this.emit("stateChanged", { on: this.state });
     }
   }
+
+  /**
+   * Get the subscriptions necessary for the trigger to activate when the condition is met
+   */
+  getSubscriptions(): string | string[] {
+    return this.triggers.reduce((acc: string[], currT: Trigger) => {
+      const subs = currT.getSubscriptions();
+      if (Array.isArray(subs)) {
+        return [...acc, ...subs];
+      }
+      acc.push(subs);
+      return acc;
+    }, []);
+  }
 }

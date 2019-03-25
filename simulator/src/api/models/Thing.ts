@@ -3,10 +3,10 @@ import { Action } from "./Action";
 import { Event } from "./Event";
 import { Link } from "./Link";
 import { ActionRequest } from "./ActionRequest";
-import { MessageQueue } from "../MessageQueue";
+import { MessageQueue } from "../../MessageQueue";
 
 import Ajv from "ajv";
-import { timestamp } from "./ValueGenerator";
+import { timestamp } from "../../util";
 const ajv = new Ajv();
 
 type EventDispatched = { name: string,  data?: any, time: string };
@@ -430,7 +430,7 @@ export class Thing {
         messageType: "propertyStatus",
         [p.id]: p.getValue()
       };
-      this.sendMessage(`${this.href}/properties`, JSON.stringify(data));
+      this.sendMessage(`${this.href}/properties/${p.id}`, JSON.stringify(data));
     }
   }
 
@@ -444,7 +444,7 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest.getActionRequest()
     };
-    this.sendMessage(`${this.href}/actions`, JSON.stringify(data));
+    this.sendMessage(`${this.href}/actions/${actionRequest.name}`, JSON.stringify(data));
   }
 
   /**
@@ -464,7 +464,7 @@ export class Thing {
           }
         }
       };
-      this.sendMessage(`${this.href}/events`, JSON.stringify(data));
+      this.sendMessage(`${this.href}/events/${event.name}`, JSON.stringify(data));
     }
   }
 

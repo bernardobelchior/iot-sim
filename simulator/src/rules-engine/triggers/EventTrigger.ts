@@ -1,5 +1,4 @@
 import Trigger from "./Trigger";
-import { SimulatorSingleton } from "../../Simulator";
 
 /**
  * A trigger activated when an event occurs
@@ -43,16 +42,10 @@ export default class EventTrigger extends Trigger {
 
   async start() {
     this.stopped = false;
-    const registry = SimulatorSingleton.getRegistry();
-    const thing = registry.getThing(this.thingId);
-    if (this.stopped) {
-      return;
-    }
-    await thing.addEventSubscription(this.event, this.onEvent);
   }
 
   onEvent(eventName: string) {
-    if (this.event !== eventName) {
+    if (this.event !== eventName || this.stopped) {
       return;
     }
 
@@ -62,8 +55,13 @@ export default class EventTrigger extends Trigger {
 
   async stop() {
     this.stopped = true;
-    const registry = SimulatorSingleton.getRegistry();
-    const thing = registry.getThing(this.thingId);
-    await thing.removeEventSubscription(this.event);
+  }
+
+  /**
+   * Get the subscriptions necessary for the trigger to activate when the condition is met
+   * When the trigger uses an event, the subscription is made to the respective thing event
+   */
+  getSubscriptions(): string | string[] {
+    return `things/${this.thingId}/events/${this.event}`;
   }
 }
