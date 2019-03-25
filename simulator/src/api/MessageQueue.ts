@@ -23,7 +23,7 @@ export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
 export class MessageQueue {
   url: string;
   client: AsyncMqttClient;
-  messageHandlers: { [topic: string]: OnMessageCallback } = {};
+  messageHandlers: { [topic: string]: OnMessageCallback[] } = {};
 
   constructor(url: string, client: AsyncMqttClient) {
     this.url = url;
@@ -35,9 +35,9 @@ export class MessageQueue {
   private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
     // TODO: Add support for '+' and '#' wildcards
 
-    Object.keys(this.messageHandlers).forEach(key => {
+    Object.entries(this.messageHandlers).forEach(([key, handlers]) => {
       if (key === topic) {
-        this.messageHandlers[key](topic, payload, packet);
+        handlers.forEach(handler => handler(topic, payload, packet));
       }
     });
   }
@@ -69,7 +69,8 @@ export class MessageQueue {
       qos
     });
 
-    this.messageHandlers[topic] = onMessage;
+    this.messageHandlers[topic] = this.messageHandlers[topic] || [];
+    this.messageHandlers[topic].push(onMessage);
   }
 
   /**

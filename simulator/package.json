@@ -20,8 +20,8 @@
   },
   "dependencies": {
     "ajv": "^6.10.0",
-    "async-mqtt": "^2.2.0",
-    "compression": "^1.7.3",
+    "async-mqtt": "^2.2.1",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
     "errorhandler": "^1.5.0",
@@ -43,8 +43,8 @@
     "@types/jest": "^24.0.11",
     "@types/mocha": "^5.2.6",
     "@types/mongodb": "^3.1.22",
-    "@types/mongoose": "^5.3.22",
-    "@types/node": "^11.11.3",
+    "@types/mongoose": "^5.3.23",
+    "@types/node": "^11.11.6",
     "@types/request": "^2.48.1",
     "@types/supertest": "^2.0.7",
     "@types/uuid": "^3.4.4",
@@ -54,8 +54,8 @@
     "prettier": "1.16.4",
     "ts-jest": "^24.0.0",
     "tslint": "^5.14.0",
-    "typescript": "^3.3.3333",
-    "wait-for-expect": "^1.1.0"
+    "typescript": "^3.3.4000",
+    "wait-for-expect": "^1.1.1"
   },
   "jest": {
     "globals": {
