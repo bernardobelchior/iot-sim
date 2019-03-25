@@ -68,7 +68,7 @@ export class Simulator {
   }
 
   /**
-   * Consumes and parses sent to the general channel of communication (topic #)
+   * Consumes and parses all messages (topic #)
    * @param {string} topic
    * @param {Buffer} msg
    */
@@ -83,7 +83,8 @@ export class Simulator {
       const levels = topic.split("/");
       if (levels[0] === "things" && obj.hasOwnProperty("messageType")) {
         const { messageType, ...data } = obj;
-        await Message.create({ thing: levels[1], messageType, data: data });
+        if (process.env.NODE_ENV !== "test")
+          await Message.create({ thing: levels[1], messageType, data: data });
       }
     }
   }

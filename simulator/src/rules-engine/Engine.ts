@@ -108,7 +108,7 @@ export default class Engine {
         }
       });
 
-      if (this.messageQueue) {
+      if (this.messageQueue && delSubs && Array.isArray(delSubs)) {
         await this.messageQueue.unsubscribe(delSubs);
       }
 
@@ -136,7 +136,7 @@ export default class Engine {
     try {
       const rule = this.rules[ruleId];
       if (!rule) {
-        throw new Error(`Rule ${ruleId} does not exist`);
+        return Promise.reject(`Rule ${ruleId} does not exist`);
       }
       const delRule = this.rules[ruleId];
       delRule.stop();
@@ -168,11 +168,11 @@ export default class Engine {
 
       return ruleId;
     } catch (error) {
-      throw new Error(`Rule ${ruleId} does not exist`);
+      return Promise.reject(`Rule ${ruleId} does not exist`);
     }
   }
 
-  parseMessage(topic: string, msg: Buffer | string) {
+  async parseMessage(topic: string, msg: Buffer | string) {
     if (msg !== null) {
       let obj: any = undefined;
       if (Buffer.isBuffer(msg)) {

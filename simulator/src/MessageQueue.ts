@@ -27,13 +27,13 @@ export class MessageQueue {
     this.client.on("message", this.messageHandler.bind(this));
   }
 
-  private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
-    Object.keys(this.messageHandlers).forEach(key => {
+  private async messageHandler(topic: string, payload: Buffer, packet: Packet): Promise<void> {
+    for (const key of Object.keys(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
       if (match) {
-        this.messageHandlers[key](topic, payload, packet);
+        (await this.messageHandlers[key](topic, payload, packet));
       }
-    });
+    }
   }
 
   private testTopic(pattern: string, key: string): boolean {
@@ -83,11 +83,12 @@ export class MessageQueue {
    * @param topic Topic to unsubscribe.
    */
   async unsubscribe(topic: string | string[]) {
-    await this.client.unsubscribe(topic);
     if (Array.isArray(topic)) {
+      if (topic.length > 0) await this.client.unsubscribe(topic);
       topic.forEach(t => delete this.messageHandlers[t]);
     } else {
       delete this.messageHandlers[topic];
+      await this.client.unsubscribe(topic);
     }
   }
 

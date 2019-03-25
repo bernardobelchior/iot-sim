@@ -46,9 +46,7 @@ export class Thing {
     this.description = description;
     this.context = context;
     this.type = type || [];
-    // Removed first slash so that the queues created don't have an extra topic
-    // https://www.hivemq.com/blog/mqtt-essentials-part-5-mqtt-topics-best-practices/
-    this.href = this.href = `things/${this.id}`;
+    this.href = this.href = `/things/${this.id}`;
   }
 
   static fromDescription(desc: any): Thing {
@@ -481,16 +479,10 @@ export class Thing {
       this.messageQueue.publish(topic, data);
     }
   }
-
-  consumeMessage(_topic: string, msg: Buffer) {
-
-  }
-
+  
   async start(messageQueue: MessageQueue): Promise<void> {
     if (!this.messageQueue) {
       this.messageQueue = messageQueue;
     }
-
-    await this.messageQueue.subscribe(this.href, this.consumeMessage.bind(this));
   }
 }

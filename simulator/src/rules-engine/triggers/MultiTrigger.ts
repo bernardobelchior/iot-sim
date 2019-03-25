@@ -101,4 +101,18 @@ export default class MultiTrigger extends Trigger {
       return acc;
     }, []);
   }
+
+  /**
+   * Check if the conditions are met to activate the trigger
+   * @param topic
+   * @param data
+   */
+  update(topic: string, data: any) {
+    this.triggers.forEach(trigger => {
+      const subs = trigger.getSubscriptions();
+      if (subs.includes(topic)) {
+        trigger.update(topic, data);
+      }
+    });
+  }
 }

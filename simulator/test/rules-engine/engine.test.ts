@@ -125,14 +125,14 @@ describe("rules engine", () => {
     expect(res.status).toEqual(200);
   }
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     appInstance = await app();
-  });
-
-  it("gets a list of 0 rules", async () => {
     await addDevice(thingLight1);
     await addDevice(thingLight2);
     await addDevice(thingLight3);
+  });
+
+  it("gets a list of 0 rules", async () => {
     const res = await request(appInstance)
       .get(`/rules`)
       .set("Accept", "application/json")
@@ -224,7 +224,7 @@ describe("rules engine", () => {
 
   it("fails to modify a nonexistent rule", async () => {
     const err = await request(appInstance)
-      .delete(`/rules/invalid-rule`)
+      .put(`/rules/invalid-rule`)
       .set("Accept", "application/json")
       .send(testRule);
     expect(err.status).toEqual(404);

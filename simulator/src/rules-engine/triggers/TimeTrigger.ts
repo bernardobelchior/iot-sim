@@ -57,7 +57,7 @@ export default class TimeTrigger extends Trigger {
     nextTime.setUTCHours(hours, minutes, 0, 0);
 
     if (nextTime.getTime() < Date.now()) {
-      // NB: this will wrap properly into the next month/year
+      // This will wrap properly into the next month/year
       nextTime.setDate(nextTime.getDate() + 1);
     }
 

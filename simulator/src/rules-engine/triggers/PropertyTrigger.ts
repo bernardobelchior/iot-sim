@@ -56,4 +56,23 @@ export default class PropertyTrigger extends Trigger {
   getSubscriptions(): string | string[] {
     return `things/${this.property.thing}/properties/${this.property.id}`;
   }
+
+  /**
+   * Check if the conditions are met to activate the trigger
+   * @param topic
+   * @param data
+   */
+  update(topic: string, data: any) {
+    const sub = this.getSubscriptions() as string;
+    if (sub === topic) {
+      const levels = topic.split("/");
+      const thing = levels[1];
+      const property = levels[3];
+      const keys = Object(data).keys();
+      if (keys[0] !== property) {
+        return;
+      }
+      this.property.onPropertyChanged(thing, property, keys[0]);
+    }
+  }
 }

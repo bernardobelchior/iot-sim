@@ -14,7 +14,7 @@
         ]
       }
     },
-    "href": "/things/switch"
+    "id": "switch"
   },
   {
     "@context": "https://iot.mozilla.org/schemas/",
@@ -114,7 +114,7 @@
         "href": "/things/lamp"
       }
     ],
-    "href": "/things/lamp"
+    "id": "lamp"
   },
   {
     "name": "WoT Pi",
@@ -188,7 +188,7 @@
         "href": "/things/pi"
       }
     ],
-    "href": "/things/pi"
+    "id": "pi"
   },
   {
     "id": "light1",

@@ -1,5 +1,5 @@
 import { fromDescription as eFromDescription } from "./effects";
-import { fromDescription as tFromDescription, EventTrigger } from "./triggers";
+import { fromDescription as tFromDescription } from "./triggers";
 import { TriggerEmitter } from "./Events";
 import Effect from "./effects/Effect";
 import Trigger from "./triggers/Trigger";

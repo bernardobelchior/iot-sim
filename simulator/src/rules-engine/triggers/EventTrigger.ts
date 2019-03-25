@@ -64,4 +64,19 @@ export default class EventTrigger extends Trigger {
   getSubscriptions(): string | string[] {
     return `things/${this.thingId}/events/${this.event}`;
   }
+
+  /**
+   * Check if the conditions are met to activate the trigger
+   * @param topic
+   * @param data
+   */
+  update(topic: string, data: any) {
+    const sub = this.getSubscriptions() as string;
+    if (sub === topic) {
+      const levels = topic.split("/");
+      const event = levels[3];
+
+      this.onEvent(event);
+    }
+  }
 }
