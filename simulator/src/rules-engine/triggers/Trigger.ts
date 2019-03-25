@@ -42,14 +42,14 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
   }
 
   /**
-   *
+   * Starts the trigger execution
    */
   async start() {
     throw new Error("Unimplemented");
   }
 
   /**
-   *
+   * Stops the trigger execution
    */
   stop() {
     throw new Error("Unimplemented");
@@ -61,4 +61,11 @@ export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }
   getSubscriptions(): string | string[] {
     return [];
   }
+
+  /**
+   * Check if the conditions are met to activate the trigger
+   * @param topic
+   * @param data
+   */
+  update(topic: string, data: any) {}
 }

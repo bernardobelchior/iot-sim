@@ -1,5 +1,5 @@
 import { fromDescription as eFromDescription } from "./effects";
-import { fromDescription as tFromDescription } from "./triggers";
+import { fromDescription as tFromDescription, EventTrigger } from "./triggers";
 import { TriggerEmitter } from "./Events";
 import Effect from "./effects/Effect";
 import Trigger from "./triggers/Trigger";
@@ -96,9 +96,12 @@ export default class Rule extends (EventEmitter as { new (): TriggerEmitter }) {
   /**
    *
    */
-  getSubscriptions(): string | string[] {
-    return this.trigger.getSubscriptions();
+  getSubscriptions(): string[] {
+    const subs = this.trigger.getSubscriptions();
+    if (Array.isArray(subs)) {
+      return subs.filter(function(elem, index, self) {
+        return index === self.indexOf(elem);
+      });
+    } else return [subs];
   }
-
-  parseSubscriptionMessage(_topic: string, msg: Buffer | string) {}
 }

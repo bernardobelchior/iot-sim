@@ -4,7 +4,7 @@ import { vars } from "../util/vars";
 import { timestamp } from "../util";
 
 type RuleMap = { [id: string]: Rule };
-type RuleSubscription = { [id: string]: string };
+type RuleSubscription = { ruleId: string; topic: string };
 type RuleRecord = { ruleId: string; state: boolean; time: string };
 
 /**
@@ -59,8 +59,12 @@ export default class Engine {
       if (this.messageQueue) {
         const ruleSubscriptions = rule.getSubscriptions();
         for (const sub of ruleSubscriptions) {
-          this.subscriptions.push({ [rule.id]: sub });
-          this.messageQueue.subscribe(sub, this.parseMessage, QoS.AtMostOnce);
+          this.subscriptions.push({ ruleId: rule.id, topic: sub });
+          await this.messageQueue.subscribe(
+            sub,
+            this.parseMessage,
+            QoS.AtMostOnce
+          );
         }
       }
 
@@ -93,7 +97,20 @@ export default class Engine {
       oldRule.stop();
       this.rules[ruleId] = updatedRule;
 
-      // TODO update topics subscription and pass correct functions as callback
+      const newSubs = rule.getSubscriptions();
+      const delSubs = oldRule
+        .getSubscriptions()
+        .filter(s => !newSubs.includes(s));
+      this.subscriptions.forEach(sub => {
+        const idx = delSubs.findIndex(s => s === sub.topic);
+        if (idx !== -1) {
+          delSubs.splice(idx, 1);
+        }
+      });
+
+      if (this.messageQueue) {
+        await this.messageQueue.unsubscribe(delSubs);
+      }
 
       if (rule.enabled !== updatedRule.enabled) {
         this.records.push({
@@ -115,7 +132,7 @@ export default class Engine {
    * @param {number} rule id
    * @return {string}
    */
-  deleteRule(ruleId: string): string {
+  async deleteRule(ruleId: string): Promise<string> {
     try {
       const rule = this.rules[ruleId];
       if (!rule) {
@@ -125,7 +142,27 @@ export default class Engine {
       delRule.stop();
       delete this.rules[ruleId];
 
-      // TODO delete topics subscription
+      const topics: string[] = this.subscriptions.reduce(
+        (acc: string[], currValue) => {
+          if (currValue.ruleId === ruleId) {
+            acc.push(currValue.topic);
+          }
+          return acc;
+        },
+        []
+      );
+      this.subscriptions = this.subscriptions.filter(s => s.ruleId !== ruleId);
+
+      this.subscriptions.forEach(sub => {
+        const idx = topics.findIndex(t => t === sub.topic);
+        if (idx !== -1) {
+          topics.splice(idx, 1);
+        }
+      });
+
+      if (this.messageQueue) {
+        await this.messageQueue.unsubscribe(topics);
+      }
 
       this.records = this.records.filter(record => record.ruleId !== ruleId);
 
@@ -135,5 +172,24 @@ export default class Engine {
     }
   }
 
-  parseMessage(topic: string, msg: Buffer | string) {}
+  parseMessage(topic: string, msg: Buffer | string) {
+    if (msg !== null) {
+      let obj: any = undefined;
+      if (Buffer.isBuffer(msg)) {
+        obj = JSON.parse(msg.toString());
+      } else {
+        obj = JSON.parse(msg);
+      }
+      const levels = topic.split("/");
+      if (levels[0] === "things" && obj.hasOwnProperty("messageType")) {
+        const { messageType, ...data } = obj;
+
+        const subs = this.subscriptions.filter(sub => sub.topic === topic);
+        subs.forEach(sub => {
+          const rule = this.getRule(sub.ruleId);
+          rule.trigger.update(topic, data);
+        });
+      }
+    }
+  }
 }
