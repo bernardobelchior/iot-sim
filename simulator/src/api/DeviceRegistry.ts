@@ -83,9 +83,6 @@ export class DeviceRegistry {
   }
 
   private consume(topic: string, msg: Buffer) {
-    console.log(
-      `Received message in topic '${topic}' with content: '${msg.toString()}'`
-    );
     switch (topic) {
       case REGISTER_TOPIC:
         this.handleRegistry(topic, msg);

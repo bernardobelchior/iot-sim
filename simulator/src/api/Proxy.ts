@@ -87,9 +87,6 @@ class Proxy {
     }
 
     if (!this.registry.isThingSimulated(id)) {
-      console.log(
-        `Proxying message in topic '${topic}' with content: '${message.toString()}'`
-      );
       await this.reverseMessageQueue.publish(topic, message, packet.qos);
       return;
     }
@@ -97,9 +94,6 @@ class Proxy {
     const msg = JSON.parse(message.toString());
 
     if (typeof msg === "object" && msg["simulated"]) {
-      console.log(
-        `Proxying simulated message in topic '${topic}' with content: '${message.toString()}'`
-      );
       await this.reverseMessageQueue.publish(
         topic,
         Proxy.removeSimulatedProperty(message),
