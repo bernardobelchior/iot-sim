@@ -11,25 +11,29 @@ export enum QoS {
   ExactlyOnce = 2
 }
 
-export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
-  const client = await connect(url);
+export async function messageQueueBuilder(
+  readUrl: string,
+  writeUrl: string
+): Promise<MessageQueue> {
+  const readClient = await connect(readUrl);
+  const writeClient = await connect(writeUrl);
 
-  return new MessageQueue(url, client);
+  return new MessageQueue(readClient, writeClient);
 }
 
 /**
  * Message Queue class that abstracts message queue internals.
  */
 export class MessageQueue {
-  url: string;
-  client: AsyncMqttClient;
+  readClient: AsyncMqttClient;
+  writeClient: AsyncMqttClient;
   messageHandlers: { [topic: string]: OnMessageCallback[] } = {};
 
-  constructor(url: string, client: AsyncMqttClient) {
-    this.url = url;
-    this.client = client;
+  constructor(readClient: AsyncMqttClient, writeClient: AsyncMqttClient) {
+    this.readClient = readClient;
+    this.writeClient = writeClient;
 
-    this.client.on("message", this.messageHandler.bind(this));
+    this.readClient.on("message", this.messageHandler.bind(this));
   }
 
   private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
@@ -49,7 +53,7 @@ export class MessageQueue {
    * @param qos Quality of Service. Default value is at most once.
    */
   publish(topic: string, message: Buffer | string, qos: QoS = QoS.AtMostOnce) {
-    return this.client.publish(topic, message, {
+    return this.writeClient.publish(topic, message, {
       qos
     });
   }
@@ -65,7 +69,7 @@ export class MessageQueue {
     onMessage: OnMessageCallback,
     qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
   ) {
-    await this.client.subscribe(topic, {
+    await this.readClient.subscribe(topic, {
       qos
     });
 
@@ -77,6 +81,6 @@ export class MessageQueue {
    * Closes the connection gracefully. Promise resolves once all messages have been ACKed.
    */
   end() {
-    return this.client.end();
+    return Promise.all([this.readClient.end(), this.writeClient.end()]);
   }
 }

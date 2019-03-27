@@ -54,7 +54,10 @@ const simulatedThing: Thing = parseWebThing({
 
 describe("DeviceRegistry", () => {
   it("registers devices correctly", async () => {
-    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    const messageQueue = await messageQueueBuilder(
+      vars.READ_MQ_URI,
+      vars.WRITE_MQ_URI
+    );
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
 
@@ -88,7 +91,10 @@ describe("DeviceRegistry", () => {
       }
     };
 
-    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    const messageQueue = await messageQueueBuilder(
+      vars.READ_MQ_URI,
+      vars.WRITE_MQ_URI
+    );
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
 
@@ -107,7 +113,10 @@ describe("DeviceRegistry", () => {
 
   it("correctly overrides physical thing with a simulated one", async () => {
     const thing = things[0];
-    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    const messageQueue = await messageQueueBuilder(
+      vars.READ_MQ_URI,
+      vars.WRITE_MQ_URI
+    );
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
 
@@ -128,7 +137,10 @@ describe("DeviceRegistry", () => {
   it("correctly retrieves property of simulated device over the physical one", async () => {
     const thing = things[0];
 
-    const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+    const messageQueue = await messageQueueBuilder(
+      vars.READ_MQ_URI,
+      vars.WRITE_MQ_URI
+    );
     const deviceRegistry = new DeviceRegistry(messageQueue);
 
     await deviceRegistry.init();

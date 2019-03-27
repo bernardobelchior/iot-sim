@@ -7,7 +7,7 @@ import { OnMessageCallback, IPublishPacket, connect } from "async-mqtt";
  */
 export class MockMessageQueue extends MessageQueue {
   constructor() {
-    super("", connect(""));
+    super(connect(""), connect(""));
   }
 
   async subscribe(
@@ -35,7 +35,7 @@ export class MockMessageQueue extends MessageQueue {
     return Promise.resolve(ret);
   }
 
-  end(): Promise<void> {
-    return Promise.resolve();
+  end(): Promise<[void, void]> {
+    return Promise.all([Promise.resolve(), Promise.resolve()]);
   }
 }

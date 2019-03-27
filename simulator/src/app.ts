@@ -19,7 +19,10 @@ export interface IApp extends Express {
 }
 
 async function app(): Promise<IApp> {
-  const messageQueue = await messageQueueBuilder(vars.MQ_URI);
+  const messageQueue = await messageQueueBuilder(
+    vars.READ_MQ_URI,
+    vars.WRITE_MQ_URI
+  );
   const deviceRegistry = new DeviceRegistry(messageQueue);
   await deviceRegistry.init();
 
