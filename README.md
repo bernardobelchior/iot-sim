@@ -72,3 +72,11 @@ Note: in some cases, TypeScript compilation may be slower than running the examp
 ### `setProperty` message
 
 * Added `"simulated": true` field to the `setProperty` message to signal that is comes from a simulated device.
+
+
+# Simulator
+
+## RabbitMQ Setup
+
+In order for the simulator proxying to work, there must be two different virtual hosts. Once vhost will host the reading of messages by the devices, while the other will host the writing. 
+The simulator's proxy will take care of routing between both. 

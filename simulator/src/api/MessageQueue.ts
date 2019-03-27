@@ -45,7 +45,7 @@ export class MessageQueue {
     // TODO: Add support for '+' and '#' wildcards
 
     Object.entries(this.messageHandlers).forEach(([key, handlers]) => {
-      if (key === topic) {
+      if (key === topic || key === "#") {
         handlers.forEach(handler =>
           handler(topic, payload, packet as IPublishPacket)
         );

@@ -3,7 +3,7 @@ import { SimulatedThingModel } from "./SimulatedThingModel";
 
 export class SimpleSimulatedSensor extends SimulatedThingModel {
   description = {
-    type: ["Simulated"],
+    "@type": ["Simulated"],
     name: "Thermometer",
     description: "A simulated web connected thermometer",
     properties: {

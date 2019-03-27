@@ -62,6 +62,10 @@ export class DeviceRegistry {
     return this.getThings()[id];
   }
 
+  hasThing(id: string): boolean {
+    return this.getThing(id) !== undefined;
+  }
+
   addThing(thing: Thing) {
     if (thing.isSimulated()) {
       this.simulatedThings[thing.id] = thing;
@@ -69,10 +73,19 @@ export class DeviceRegistry {
       this.things[thing.id] = thing;
     }
 
-    return this.messageQueue.subscribe(thing.href, this.consume.bind(this));
+    /* Make sure we don't subscribe twice to the same thing, otherwise messages
+     * can be delivered twice. */
+    if (!this.hasThing(thing.id)) {
+      return this.messageQueue.subscribe(thing.href, this.consume.bind(this));
+    }
+
+    return Promise.resolve();
   }
 
   private consume(topic: string, msg: Buffer) {
+    console.log(
+      `Received message in topic '${topic}' with content: '${msg.toString()}'`
+    );
     switch (topic) {
       case REGISTER_TOPIC:
         this.handleRegistry(topic, msg);

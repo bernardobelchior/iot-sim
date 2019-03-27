@@ -422,7 +422,7 @@ export class Thing {
    * Returns whether or not this Thing is being simulated.
    * If it is, then the `@type` key will have `Simulated` as a value.
    */
-  isSimulated() {
-    return this.type.find(t => t === "Simulated");
+  isSimulated(): boolean {
+    return !!this.type.find(t => t === "Simulated");
   }
 }
