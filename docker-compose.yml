@@ -58,11 +58,15 @@ services:
 
   mongo:
     container_name: iot-sim.mongo
-    image: mongo
+    image: vepo/mongo
     restart: always
     environment:
-      MONGO_USERNAME: root
-      MONGO_PASSWORD: password
+      - AUTH=yes
+      - ADMIN_USER=admin
+      - ADMIN_PASS=admin123
+      - APPLICATION_DATABASE=simulator
+      - APPLICATION_USER=dev
+      - APPLICATION_PASS=dev12345
     ports:
       - 27017:27017
     networks:

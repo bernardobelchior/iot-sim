@@ -27,13 +27,32 @@ export default class PulseEffect extends PropertyEffect {
   }
 
   /**
-   * @return {any}
+   * Creates an effect from a given object
+   * @param {any} desc
    */
-  toDescription(): any {
-    return Object.assign(super.toDescription(), {
-      value: this.value,
-      on: this.on
-    });
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    if (!desc.hasOwnProperty("property")) {
+      throw new Error("Property missing from object.");
+    }
+    if (!desc.hasOwnProperty("value")) {
+      throw new Error("Value missing from object.");
+    }
+    const p = new Property(desc.property.type, desc.property.id, desc.property.thing, desc.property.unit, desc.property.description);
+    return new this(desc.label, p, desc.value);
+  }
+
+  /**
+   * Creates a JSON object from a pulse effect instance
+   * @return {Object}
+   */
+  toDescription(): Object {
+    return Object.assign(
+      super.toDescription(),
+      { value: this.value, on: this.on }
+    );
   }
 
   /**
@@ -47,15 +66,16 @@ export default class PulseEffect extends PropertyEffect {
       }
       // Activate the effect and save our current state to revert to upon
       // deactivation
-      this.property.get().then(value => {
-        if (value !== this.value) {
-          this.oldValue = value;
-        } else {
-          this.oldValue = undefined;
-        }
-        this.on = true;
-        return this.property.set(this.value);
-      });
+      const value = this.property.get();
+
+      if (value !== this.value) {
+        this.oldValue = value;
+      } else {
+        this.oldValue = undefined;
+      }
+      this.on = true;
+      return this.property.set(this.value);
+
     } else if (this.on) {
       // Revert to our original value if we pulsed to a new value
       this.on = false;
@@ -63,6 +83,6 @@ export default class PulseEffect extends PropertyEffect {
         return this.property.set(this.oldValue);
       }
     }
-    return Promise.resolve();
+    return;
   }
 }

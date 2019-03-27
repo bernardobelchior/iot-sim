@@ -1,3 +1,5 @@
+import { messageQueueBuilder } from "../src/api/MessageQueue";
+import { vars } from "../src/util/vars";
 import { start } from "../src/server";
 import { MessageQueue } from "../src/api/MessageQueue";
 import { REGISTER_TOPIC } from "../src/api/DeviceRegistry";

@@ -1,10 +1,9 @@
-import * as controller from "./simulation";
-import { DeviceRegistry } from "../DeviceRegistry";
+import * as controller from "../../src/api/controllers/simulation";
+import { DeviceRegistry } from "../../src/api/DeviceRegistry";
 import { MockMessageQueue } from "../MockMessageQueue";
-import { IRequest } from "../registryMiddleware";
+import { IRequest } from "../../src/api/registryMiddleware";
 import express = require("express");
-import { Thing } from "../models/Thing";
-import { parseWebThing } from "../builder";
+import { Thing } from "../../src/api/models/Thing";
 
 const thing = {
   name: "Lamp",
@@ -17,23 +16,24 @@ const thing = {
       links: [{ href: "/things/lamp/properties/on" }]
     }
   },
-  href: "/things/lamp"
+  id: "lamp"
 };
 
 describe("controllers/simulation", () => {
   it("adds simulated thing when called", async () => {
-    const deviceRegistry = new DeviceRegistry(new MockMessageQueue());
+    const deviceRegistry = new DeviceRegistry();
+    deviceRegistry.setMessageQueue(new MockMessageQueue());
     const sendStatus = jest.fn();
 
-    deviceRegistry.addThing(parseWebThing(thing));
+    await deviceRegistry.addThing(Thing.fromDescription(thing));
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(0);
 
-    controller.post(
+    await controller.post(
       {
         registry: deviceRegistry,
         params: {
-          id: Thing.generateIdFromHref(thing.href)
+          id: thing.id
         }
       } as IRequest,
       {
@@ -42,7 +42,7 @@ describe("controllers/simulation", () => {
     );
 
     expect(Object.values(deviceRegistry.getSimulatedThings())).toHaveLength(1);
-    expect(Object.values(deviceRegistry.getThings())).toHaveLength(1);
+    expect(Object.values(deviceRegistry.getThings())).toHaveLength(2);
     expect(sendStatus).toHaveBeenCalledWith(200);
   });
 });

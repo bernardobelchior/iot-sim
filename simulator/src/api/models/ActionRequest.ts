@@ -1,5 +1,6 @@
 import { Thing } from "./Thing";
 import { v4 as uuid } from "uuid";
+import { timestamp } from "../../util";
 
 /**
  *
@@ -20,8 +21,8 @@ export class ActionRequest {
   thing: Thing;
   href: string;
   status: ActionRequestStatus;
-  timeRequested: Date;
-  timeCompleted?: Date;
+  timeRequested: string;
+  timeCompleted?: string;
   input?: {};
 
   /**
@@ -34,9 +35,9 @@ export class ActionRequest {
     this.name = name;
     this.id = uuid();
     this.thing = thing;
-    this.href = `/actions/${this.name}/${this.id}`;
+    this.href = `actions/${this.name}/${this.id}`;
     this.status = ActionRequestStatus.created;
-    this.timeRequested = new Date();
+    this.timeRequested = timestamp();
     this.input = input;
 
     this.thing.actionNotify(this.getActionRequest());
@@ -50,7 +51,7 @@ export class ActionRequest {
       [this.id]: {
         href: this.href,
         status: ActionRequestStatus[this.status],
-        timeRequested: this.timeRequested.toISOString()
+        timeRequested: this.timeRequested
       }
     };
 
@@ -94,7 +95,7 @@ export class ActionRequest {
    *
    */
   finishAction() {
-    this.timeCompleted = new Date();
+    this.timeCompleted = timestamp();
     this.status = ActionRequestStatus.completed;
     this.thing.actionNotify(this.getActionRequest());
   }

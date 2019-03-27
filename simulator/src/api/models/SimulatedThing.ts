@@ -11,6 +11,11 @@ export class SimulatedThing extends Thing {
     );
   }
 
+  static fromDescription(desc: any) {
+    const thing = Thing.fromDescription(desc);
+    return new this(thing);
+  }
+
   private static makeSimulated(type: string[]) {
     if (type.includes("Simulated")) {
       return type;

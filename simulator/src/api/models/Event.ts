@@ -14,10 +14,9 @@ interface IEventMetadata {
  * An event object describes a kind of event which may be emitted by a device
  */
 export class Event {
-  id: string;
-  title: string;
   description: string;
-  semanticType: string;
+  semanticType?: string;
+  title?: string;
 
   metadata?: IEventMetadata;
 
@@ -30,14 +29,12 @@ export class Event {
    * @param {String} semanticType String identifying a type from the linked context
    */
   constructor(
-    id: string,
-    title: string,
     description: string,
-    semanticType: string
+    title?: string,
+    semanticType?: string
   ) {
-    this.id = id;
-    this.title = title;
     this.description = description;
+    this.title = title;
     this.semanticType = semanticType;
   }
 
@@ -56,12 +53,12 @@ export class Event {
    * Add relationships between events and remaining entities
    * @param {ILink[]} links
    */
-  addLinks(links: ILink[]): any {
+  addLinks(href: string, links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        const link = new Link(linkData);
-        link.setRel("event");
-        this.links.push(link);
+        linkData.href = `${href}${linkData.href}`;
+        this.links.push(new Link(linkData));
+        this.links.push(new Link({ ...linkData, rel: "event" }));
       });
     }
   }

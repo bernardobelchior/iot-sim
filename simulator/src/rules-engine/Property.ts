@@ -1,7 +1,6 @@
 import { EventEmitter } from "events";
 import { TriggerEmitter } from "./Events";
-import { DeviceRegistry } from "../api/DeviceRegistry";
-import { Property as ThingProperty } from "../api/models/Property";
+import { SimulatorSingleton } from "../Simulator";
 
 /**
  * Utility to support operations on Thing's properties
@@ -25,6 +24,12 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   ) {
     super();
 
+    const registry = SimulatorSingleton.getRegistry();
+    const t = registry.getThing(thing);
+    if (!t.hasProperty(id)) {
+      throw new Error(`Property ${id} doesn't exist on thing ${thing}.`);
+    }
+
     this.type = type;
     this.thing = thing;
     this.id = id;
@@ -37,10 +42,34 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     }
 
     this.onPropertyChanged = this.onPropertyChanged.bind(this);
-    this.onThingAdded = this.onThingAdded.bind(this);
+    this.getInitialValue();
   }
 
   /**
+   * Creates a property from an object
+   * @param desc
+   */
+  static fromDescription(desc: any): Property {
+    if (!desc.hasOwnProperty("type")) {
+      throw new Error("Type property missing from object.");
+    }
+    if (!desc.hasOwnProperty("id")) {
+      throw new Error("Id property missing from object.");
+    }
+    if (!desc.hasOwnProperty("thing")) {
+      throw new Error("Thing property missing from object.");
+    }
+    return new this(
+      desc.type,
+      desc.id,
+      desc.thing,
+      desc.unit,
+      desc.description
+    );
+  }
+
+  /**
+   * Creates an JSON object from the property instance
    * @return {any}
    */
   toDescription(): any {
@@ -59,73 +88,49 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   }
 
   /**
-   * @return {Promise} resolves to property's value or undefined if not found
+   * @return {any} resolves to property's value or undefined if not found
    */
-  async get(): Promise<any> {
+  get(): any {
     try {
-      return await DeviceRegistry.getThingProperty(this.thing, this.id);
+      const registry = SimulatorSingleton.getRegistry();
+      return registry.getThingProperty(this.thing, this.id);
     } catch (e) {
-      console.warn("Rule get failed", e);
+      console.warn("Property get failed", e);
     }
   }
 
   /**
    * @param {any} value
-   * @return {Promise} resolves when set is done
+   * @return {any} resolves when set is done
    */
-  async set(value: any) {
+  set(value: any): any {
     try {
-      return await DeviceRegistry.setThingProperty(this.thing, this.id, value);
+      const registry = SimulatorSingleton.getRegistry();
+      return registry.setThingProperty(this.thing, this.id, value);
     } catch (e) {
-      console.warn("Rule set failed", e);
+      console.warn("Property set failed", e);
     }
   }
 
-  async start() {
-    // AddonManager.on(Constants.PROPERTY_CHANGED, this.onPropertyChanged);
-
-    try {
-      await this.getInitialValue();
-    } catch (_e) {
-      // AddonManager.on(Constants.THING_ADDED, this.onThingAdded);
-    }
-  }
-
-  async getInitialValue() {
-    const initialValue = await this.get();
+  getInitialValue() {
+    const initialValue = this.get();
     if (typeof initialValue === "undefined") {
       throw new Error("Did not get a real value");
     }
     this.emit("valueChanged", initialValue);
   }
 
-  /**
-   * @param {String} thing - thing id
-   */
-  onThingAdded(thing: string) {
-    if (thing !== this.thing) {
-      return;
-    }
-    this.getInitialValue().catch(e => {
-      console.warn("Rule property unable to get value", e);
-    });
-  }
-
-  onPropertyChanged(propertyDevice: string, property: ThingProperty) {
+  onPropertyChanged(
+    propertyDevice: string,
+    propertyId: string,
+    propertyValue: any
+  ) {
     if (propertyDevice !== this.thing) {
       return;
     }
-    if (property.title !== this.id) {
+    if (propertyId !== this.id) {
       return;
     }
-    this.emit("valueChanged", property.value);
-  }
-
-  stop() {
-    /*  AddonManager.removeListener(
-      Constants.PROPERTY_CHANGED,
-      this.onPropertyChanged
-    );
-    AddonManager.removeListener(Constants.THING_ADDED, this.onThingAdded); */
+    this.emit("valueChanged", propertyValue);
   }
 }
