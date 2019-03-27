@@ -18,7 +18,7 @@ export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
 export class MessageQueue {
   url: string;
   client: AsyncMqttClient;
-  messageHandlers: { [topic: string]: OnMessageCallback } = {};
+  messageHandlers: { [topic: string]: OnMessageCallback[] } = {};
 
   constructor(url: string, client: AsyncMqttClient) {
     this.url = url;
@@ -28,10 +28,10 @@ export class MessageQueue {
   }
 
   private async messageHandler(topic: string, payload: Buffer, packet: Packet): Promise<void> {
-    for (const key of Object.keys(this.messageHandlers)) {
+    for (const [key, handlers] of Object.entries(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
       if (match) {
-        (await this.messageHandlers[key](topic, payload, packet));
+        handlers.map(handler => handler(topic, payload, packet));
       }
     }
   }
@@ -75,7 +75,8 @@ export class MessageQueue {
       qos
     });
 
-    this.messageHandlers[topic] = onMessage;
+    this.messageHandlers[topic] = this.messageHandlers[topic] || [];
+    this.messageHandlers[topic].push(onMessage);
   }
 
   /**

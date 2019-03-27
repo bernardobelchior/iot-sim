@@ -1,5 +1,5 @@
 import Rule from "./Rule";
-import { MessageQueue, messageQueueBuilder, QoS } from "../MessageQueue";
+import { MessageQueue, messageQueueBuilder, QoS } from "../api/MessageQueue";
 import { vars } from "../util/vars";
 import { timestamp } from "../util";
 
@@ -23,6 +23,11 @@ export default class Engine {
     if (!this.messageQueue)
       this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
   };
+
+  public finalize = async () => {
+    if (this.messageQueue)
+      this.messageQueue.end();
+  }
 
   /**
    * Get a list of all current rules

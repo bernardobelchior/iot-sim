@@ -33,7 +33,7 @@ export default class MultiEffect extends Effect {
    */
   toDescription(): Object {
     return Object.assign(super.toDescription(), {
-      effects: this.effects.map((effect) => effect.toDescription()),
+      effects: this.effects.map(effect => effect.toDescription())
     });
   }
 

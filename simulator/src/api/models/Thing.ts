@@ -3,7 +3,7 @@ import { Action } from "./Action";
 import { Event } from "./Event";
 import { Link } from "./Link";
 import { ActionRequest } from "./ActionRequest";
-import { MessageQueue } from "../../MessageQueue";
+import { MessageQueue } from "../MessageQueue";
 
 import Ajv from "ajv";
 import { timestamp } from "../../util";
@@ -84,6 +84,7 @@ export class Thing {
    */
   asThingDescription(): object {
     const thing: any = {
+      id: this.id,
       name: this.name,
       description: this.description,
       href: this.href,
@@ -283,6 +284,16 @@ export class Thing {
   }
 
   /**
+   * Sets multiple properties at once
+   * @param properties
+   */
+  public setProperties(properties: { [name: string]: any }): void {
+    Object.entries(properties).forEach(([name, value]) =>
+      this.setProperty(name, value)
+    );
+  }
+
+  /**
    * Set a property's value.
    *
    * @param {String} propertyName Name of the property to get the value of
@@ -424,11 +435,12 @@ export class Thing {
   propertyNotify(propertyId: string): void {
     const p = this.properties.get(propertyId);
     if (p) {
+      // @ts-ignore
       const data = {
         messageType: "propertyStatus",
         [p.id]: p.getValue()
       };
-      this.sendMessage(`things/${this.id}/properties/${p.id}`, JSON.stringify(data));
+      this.sendMessage(`${this.href}/properties/${p.id}`, JSON.stringify(data));
     }
   }
 
@@ -442,7 +454,7 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest.getActionRequest()
     };
-    this.sendMessage(`things/${this.id}/actions/${actionRequest.name}`, JSON.stringify(data));
+    this.sendMessage(`${this.href}/actions/${actionRequest.name}`, JSON.stringify(data));
   }
 
   /**
@@ -462,7 +474,7 @@ export class Thing {
           }
         }
       };
-      this.sendMessage(`things/${this.id}/events/${event.name}`, JSON.stringify(data));
+      this.sendMessage(`${this.href}/events/${event.name}`, JSON.stringify(data));
     }
   }
 

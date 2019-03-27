@@ -20,7 +20,10 @@ export default class PulseEffect extends PropertyEffect {
   constructor(label: string, property: Property, value: any) {
     super(label, property);
     this.value = value;
-    assert(typeof this.value === this.property.type, "set point and property must be same type");
+    assert(
+      typeof this.value === this.property.type,
+      "set point and property must be same type"
+    );
   }
 
   /**

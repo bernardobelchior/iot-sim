@@ -1,14 +1,15 @@
 import errorHandler from "errorhandler";
-import startApp from "./app";
+import startApp, { IApp } from "./app";
+import http from "http";
 
-export async function start() {
+export async function start(): Promise<{ app: IApp; server: http.Server }> {
   const app = await startApp();
   /**
    * Error Handler. Provides full stack - remove for production
    */
   app.use(errorHandler());
 
-  return app.listen(app.get("port"), () => {
+  const server = app.listen(app.get("port"), () => {
     console.log(
       `App is running at http://localhost:${app.get("port")} in ${app.get(
         "env"
@@ -16,4 +17,6 @@ export async function start() {
     );
     console.log("Press CTRL-C to stop\n");
   });
+
+  return { app, server };
 }

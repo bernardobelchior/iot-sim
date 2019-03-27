@@ -1,4 +1,4 @@
-import { MessageQueue, QoS } from "../src/MessageQueue";
+import { MessageQueue, QoS } from "../src/api/MessageQueue";
 import { OnMessageCallback, IPublishPacket, connect } from "async-mqtt";
 
 /**

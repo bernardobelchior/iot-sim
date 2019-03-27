@@ -3,9 +3,9 @@ import PropertyTrigger from "./PropertyTrigger";
 import { Property } from "../Property";
 
 enum LevelTriggerTypes {
-  LESS =  "LESS",
+  LESS = "LESS",
   EQUAL = "EQUAL",
-  GREATER = "GREATER",
+  GREATER = "GREATER"
 }
 
 /**
@@ -23,7 +23,12 @@ export default class LevelTrigger extends PropertyTrigger {
    * @param value
    * @param levelType
    */
-  constructor(label: string, property: Property, value: number, levelType: string) {
+  constructor(
+    label: string,
+    property: Property,
+    value: number,
+    levelType: string
+  ) {
     super(label, property);
     assert(this.property.type === "number" || this.property.type === "integer");
     if (!Object.values(LevelTriggerTypes).includes(levelType)) {
@@ -93,6 +98,6 @@ export default class LevelTrigger extends PropertyTrigger {
         break;
     }
 
-    this.emit("stateChanged", {on: on, value: propValue});
+    this.emit("stateChanged", { on: on, value: propValue });
   }
 }

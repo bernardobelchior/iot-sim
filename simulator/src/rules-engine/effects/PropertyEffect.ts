@@ -38,7 +38,7 @@ export default class PropertyEffect extends Effect {
    */
   toDescription(): Object {
     return Object.assign(super.toDescription(), {
-      property: this.property.toDescription(),
+      property: this.property.toDescription()
     });
   }
 }

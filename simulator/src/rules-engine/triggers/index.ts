@@ -15,7 +15,7 @@ const triggers: any = {
   MultiTrigger,
   PropertyTrigger,
   TimeTrigger,
-  Trigger,
+  Trigger
 };
 
 /**

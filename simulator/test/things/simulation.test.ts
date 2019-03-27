@@ -1,5 +1,5 @@
 import * as controller from "../../src/api/controllers/simulation";
-import DeviceRegistry from "../../src/api/DeviceRegistry";
+import { DeviceRegistry } from "../../src/api/DeviceRegistry";
 import { MockMessageQueue } from "../MockMessageQueue";
 import { IRequest } from "../../src/api/registryMiddleware";
 import express = require("express");

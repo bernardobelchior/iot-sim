@@ -70,7 +70,7 @@ export default class MultiTrigger extends Trigger {
     });
   }
 
-  onStateChanged(triggerIndex: number, state: { on: boolean, value?: any }) {
+  onStateChanged(triggerIndex: number, state: { on: boolean; value?: any }) {
     this.states[triggerIndex] = state.on;
 
     let value = this.states[0];

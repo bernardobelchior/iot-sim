@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import DeviceRegistry from "./DeviceRegistry";
+import { DeviceRegistry } from "./DeviceRegistry";
 
 export interface IRequest extends Request {
   registry: DeviceRegistry;

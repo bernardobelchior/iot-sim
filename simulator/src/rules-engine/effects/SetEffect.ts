@@ -13,8 +13,10 @@ export default class SetEffect extends PropertyEffect {
   constructor(label: string, property: Property, value: any) {
     super(label, property);
     this.value = value;
-    assert(typeof this.value === this.property.type,
-      "set point and property must be same type");
+    assert(
+      typeof this.value === this.property.type,
+      "set point and property must be same type"
+    );
   }
 
   /**
@@ -50,7 +52,7 @@ export default class SetEffect extends PropertyEffect {
    * @param {boolean} state
    */
   setState(state: boolean) {
-     if (!this.on && state) {
+    if (!this.on && state) {
       this.on = true;
       return this.property.set(this.value);
     }

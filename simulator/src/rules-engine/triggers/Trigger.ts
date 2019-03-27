@@ -5,7 +5,9 @@ import { TriggerEmitter } from "../Events";
  * The trigger component of a Rule which monitors some state and passes on
  * whether to be active to the Rule's effect
  */
-export default class Trigger extends (EventEmitter as { new (): TriggerEmitter }) {
+export default class Trigger extends (EventEmitter as {
+  new (): TriggerEmitter;
+}) {
   type: string;
   label: string;
 

@@ -11,7 +11,7 @@ const effects: any = {
   MultiEffect,
   NotificationEffect,
   SetEffect,
-  PulseEffect,
+  PulseEffect
 };
 
 /**
@@ -27,7 +27,6 @@ function fromDescription(desc: any): Effect {
   }
   return EffectClass.fromDescription(desc);
 }
-
 
 export {
   Effect,

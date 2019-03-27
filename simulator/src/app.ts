@@ -1,14 +1,25 @@
-import express from "express";
+import express, { Express } from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
 import expressValidator from "express-validator";
 import cors from "cors";
 import mongo from "./db/config";
 import { vars } from "./util/vars";
+import { DeviceRegistry } from "./api/DeviceRegistry";
+import { MessageQueue } from "./api/MessageQueue";
 import { SimulatorSingleton } from "./Simulator";
 import * as routes from "./routes";
 
-async function app() {
+type Settings = {
+  messageQueue: MessageQueue;
+  registry: DeviceRegistry;
+};
+
+export interface IApp extends Express {
+  settings: Settings;
+}
+
+async function app(): Promise<IApp> {
   mongo();
 
   // Create Express server
@@ -23,8 +34,13 @@ async function app() {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  app.use("/things", routes.thingsRouter(SimulatorSingleton.getRegistry()));
+  const registry = SimulatorSingleton.getRegistry();
+
+  app.use("/things", routes.thingsRouter(registry));
   app.use("/rules", routes.rulesRouter(SimulatorSingleton.getRulesEngine()));
+
+  app.set("messageQueue", registry.getMessageQueue());
+  app.set("registry", registry);
 
   await SimulatorSingleton.init();
 

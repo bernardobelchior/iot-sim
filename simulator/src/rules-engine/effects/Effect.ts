@@ -32,7 +32,7 @@ export default class Effect {
   toDescription(): Object {
     return {
       type: this.type,
-      label: this.label,
+      label: this.label
     };
   }
 

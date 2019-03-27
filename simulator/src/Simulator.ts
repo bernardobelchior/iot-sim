@@ -1,9 +1,9 @@
 import { Agent } from "./environment/Agent";
 import { Layout } from "./environment/Layout";
 import Engine from "./rules-engine/Engine";
-import DeviceRegistry from "./api/DeviceRegistry";
+import { DeviceRegistry } from "./api/DeviceRegistry";
 import Message from "./db/Message";
-import { MessageQueue, messageQueueBuilder } from "./MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { vars } from "./util/vars";
 
 enum SimulationState {
@@ -97,6 +97,14 @@ export class Simulator {
     this.mainBus.subscribe("#", this.parseMessage.bind(this));
     await this.registry.init();
     await this.rulesEngine.init();
+  }
+
+  async finalize() {
+    if (this.mainBus) {
+      this.mainBus.end();
+    }
+    await this.rulesEngine.finalize();
+    await this.registry.finalize();
   }
 
   /**

@@ -1,6 +1,7 @@
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
+import { SimulatorSingleton } from "../../src/Simulator";
 
 const thingLight1 = {
   id: "light1",
@@ -148,6 +149,10 @@ describe("rules engine", () => {
     await addDevice(thingLight3);
   });
 
+  afterAll(async () => {
+    await SimulatorSingleton.finalize();
+  });
+
   it("gets a list of 0 rules", async () => {
     const res = await request(appInstance)
       .get(`/rules`)
@@ -246,13 +251,8 @@ describe("rules engine", () => {
     expect(err.status).toEqual(404);
   });
 
-  function delay<T>(millis: number, value?: T): Promise<T> {
-  return new Promise((resolve) => setTimeout(() => { resolve(value); }, 100));
-}
-
   it("boolean trigger and pulse effect", async () => {
     await addRule(testRule);
     await setThingProperty("light1", "on", { on: true });
-    await delay(4000);
   });
 });

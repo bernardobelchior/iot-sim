@@ -1,11 +1,13 @@
 import fs from "fs";
 import { Thing } from "./models/Thing";
-import { MessageQueue, messageQueueBuilder } from "../MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "./MessageQueue";
 import { vars } from "../util/vars";
 
 type ThingMap = { [id: string]: Thing };
 
-export default class DeviceRegistry {
+export const REGISTER_TOPIC = "__register";
+
+export class DeviceRegistry {
   private simulatedThings: ThingMap = {};
   private things: ThingMap = {};
   private messageQueue?: MessageQueue;
@@ -29,8 +31,13 @@ export default class DeviceRegistry {
     if (!this.messageQueue)
       this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
 
-    this.messageQueue.subscribe("register", this.consume.bind(this));
+    this.messageQueue.subscribe(`${REGISTER_TOPIC}`, this.consume.bind(this));
   };
+
+  public finalize = async () => {
+    if (this.messageQueue)
+      this.messageQueue.end();
+  }
 
   /**
    * Get map of virtual things
@@ -63,8 +70,11 @@ export default class DeviceRegistry {
    */
   getThing(id: string): Thing {
     const thing = this.things[id];
-    if (!thing) {
+    const sThing = this.simulatedThings[id];
+    if (!thing && !sThing) {
       throw new Error(`Thing ${id} does not exist`);
+    } else if (sThing) {
+      return sThing;
     } else return thing;
   }
 
@@ -97,6 +107,10 @@ export default class DeviceRegistry {
     } else {
       this.things[thing.id] = thing;
     }
+
+    if (this.messageQueue) {
+      return this.messageQueue.subscribe(thing.href, this.consume.bind(this));
+    } else return Promise.resolve();
   }
 
   /**
@@ -171,12 +185,44 @@ export default class DeviceRegistry {
     this.messageQueue = messageQueue;
   }
 
-  private async consume(_topic: string, msg: Buffer) {
-    if (msg !== null) {
-      const obj = JSON.parse(msg.toString());
+  getMessageQueue(): MessageQueue | undefined {
+    return this.messageQueue;
+  }
 
-      const thing = Thing.fromDescription(obj);
-      await this.addThing(thing);
+  private consume(topic: string, msg: Buffer) {
+    switch (topic) {
+      case REGISTER_TOPIC:
+        this.handleRegistry(topic, msg);
+        break;
+      default:
+        this.handleWebSocketMessage(topic, msg);
+        break;
+    }
+  }
+
+  private handleRegistry(_topic: string, msg: Buffer) {
+    const obj = JSON.parse(msg.toString());
+    const thing = Thing.fromDescription(obj);
+    return this.addThing(thing);
+  }
+
+  private handleWebSocketMessage(topic: string, msg: Buffer) {
+    const levels = topic.split("/");
+
+    const obj: any = JSON.parse(msg.toString());
+
+    switch (obj.messageType) {
+      case "setProperty":
+      case "propertyStatus":
+        const thing = this.getThing(levels[2]);
+
+        if (thing !== undefined) {
+          thing.setProperties(obj.data);
+        }
+
+        break;
+      default:
+        break;
     }
   }
 }

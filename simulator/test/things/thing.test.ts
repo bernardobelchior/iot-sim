@@ -2,6 +2,7 @@ import request from "supertest";
 import "jest";
 import app from "../../src/app";
 import { Thing } from "../../src/api/models/Thing";
+import { SimulatorSingleton } from "../../src/Simulator";
 
 const TEST_THING = {
   id: "test-1",
@@ -116,6 +117,10 @@ describe("things/", function() {
 
   beforeEach(async () => {
     appInstance = await app();
+  });
+
+  afterAll(async () => {
+    await SimulatorSingleton.finalize();
   });
 
   it("GET with no things", async () => {

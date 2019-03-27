@@ -1,48 +1,50 @@
-import { BooleanTrigger, LevelTrigger, EqualityTrigger, MultiTrigger } from "../../src/rules-engine/triggers";
+import {
+  BooleanTrigger,
+  LevelTrigger,
+  EqualityTrigger,
+  MultiTrigger
+} from "../../src/rules-engine/triggers";
 import { Property } from "../../src/rules-engine/Property";
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
-
+import { SimulatorSingleton } from "../../src/Simulator";
 
 const booleanTrigger = {
   property: {
     type: "boolean",
     thing: "light1",
-    id: "on",
+    id: "on"
   },
   type: "BooleanTrigger",
-  onValue: true,
+  onValue: true
 };
 
 const levelTrigger = {
   property: {
     type: "number",
     thing: "light2",
-    id: "hue",
+    id: "hue"
   },
   type: "LevelTrigger",
   levelType: "LESS",
-  value: 120,
+  value: 120
 };
 
 const equalityTrigger = {
   property: {
     type: "string",
     thing: "light2",
-    id: "color",
+    id: "color"
   },
   type: "EqualityTrigger",
-  value: "#ff7700",
+  value: "#ff7700"
 };
 
 const andTrigger = {
-  triggers: [
-    booleanTrigger,
-    levelTrigger,
-  ],
+  triggers: [booleanTrigger, levelTrigger],
   type: "MultiTrigger",
-  op: "AND",
+  op: "AND"
 };
 
 const thingLight1 = {
@@ -101,29 +103,53 @@ describe("triggers", () => {
     await addDevice(thingLight2);
   });
 
+  afterAll(async () => {
+    await SimulatorSingleton.finalize();
+  });
 
   it("should parse a BooleanTrigger", () => {
     const p = new Property("boolean", "on", "light1");
-    const trigger = new BooleanTrigger(booleanTrigger.type, p, booleanTrigger.onValue);
+    const trigger = new BooleanTrigger(
+      booleanTrigger.type,
+      p,
+      booleanTrigger.onValue
+    );
     expect(trigger).toMatchObject(booleanTrigger);
   });
 
   it("should parse a LevelTrigger", () => {
     const p = new Property("number", "hue", "light2");
-    const trigger = new LevelTrigger(levelTrigger.type, p, levelTrigger.value, levelTrigger.levelType);
+    const trigger = new LevelTrigger(
+      levelTrigger.type,
+      p,
+      levelTrigger.value,
+      levelTrigger.levelType
+    );
     expect(trigger).toMatchObject(levelTrigger);
   });
 
   it("should parse an EqualityTrigger", () => {
     const p = new Property("string", "color", "light2");
-    const trigger = new EqualityTrigger(equalityTrigger.type, p, equalityTrigger.value);
+    const trigger = new EqualityTrigger(
+      equalityTrigger.type,
+      p,
+      equalityTrigger.value
+    );
     expect(trigger).toMatchObject(equalityTrigger);
   });
 
   it("should parse a MultiTrigger", () => {
     const p1 = new Property("boolean", "on", "light1");
     const p2 = new Property("number", "hue", "light2");
-    const triggers = [new BooleanTrigger(booleanTrigger.type, p1, booleanTrigger.onValue), new LevelTrigger(levelTrigger.type, p2, levelTrigger.value, levelTrigger.levelType)];
+    const triggers = [
+      new BooleanTrigger(booleanTrigger.type, p1, booleanTrigger.onValue),
+      new LevelTrigger(
+        levelTrigger.type,
+        p2,
+        levelTrigger.value,
+        levelTrigger.levelType
+      )
+    ];
     const trigger = new MultiTrigger(andTrigger.type, andTrigger.op, triggers);
     expect(trigger).toMatchObject(andTrigger);
   });
@@ -132,7 +158,12 @@ describe("triggers", () => {
     let err = undefined;
     try {
       const p = new Property("number", "hue", "light2");
-      new LevelTrigger(levelTrigger.type, p, levelTrigger.value, "INVALID_LEVEL");
+      new LevelTrigger(
+        levelTrigger.type,
+        p,
+        levelTrigger.value,
+        "INVALID_LEVEL"
+      );
     } catch (e) {
       err = e;
     }
