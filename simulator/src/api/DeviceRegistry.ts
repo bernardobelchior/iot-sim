@@ -80,7 +80,7 @@ export class DeviceRegistry {
 
     const thing = parseWebThing(obj);
 
-    this.addThing(thing);
+    return this.addThing(thing);
   }
 
   private handleWebSocketMessage(topic: string, msg: Buffer) {
@@ -90,6 +90,7 @@ export class DeviceRegistry {
 
     switch (obj.messageType) {
       case "setProperty":
+      case "propertyStatus":
         const thing = this.getThing(id);
 
         if (thing !== undefined) {

@@ -1,10 +1,11 @@
 import { ThingModel } from "./ThingModel";
 import { MessageQueue } from "../../src/api/MessageQueue";
 
-export class SimpleSensor extends ThingModel {
+export class SimpleSimulatedSensor extends ThingModel {
   description = {
+    type: ["Simulated"],
     name: "Thermometer",
-    description: "A web connected thermometer",
+    description: "A simulated web connected thermometer",
     properties: {
       temperature: {
         title: "Temperature",
@@ -22,10 +23,10 @@ export class SimpleSensor extends ThingModel {
   }
 
   measure() {
-    let tmp = 20;
+    let tmp = 10;
 
     setInterval(async () => {
-      tmp -= 0.1;
+      tmp += 0.5;
       const msg = {
         messageType: "propertyStatus",
         data: {
