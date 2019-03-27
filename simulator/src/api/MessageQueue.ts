@@ -1,9 +1,4 @@
-import {
-  AsyncMqttClient,
-  connect,
-  OnMessageCallback,
-  Packet
-} from "async-mqtt";
+import { AsyncMqttClient, connect, Packet, IPublishPacket } from "async-mqtt";
 
 export enum QoS {
   AtMostOnce = 0,
@@ -21,13 +16,23 @@ export async function messageQueueBuilder(
   return new MessageQueue(readClient, writeClient);
 }
 
+export type MessageCallback = (
+  topic: string,
+  payload: Buffer,
+  packet: IPublishPacket
+) => void;
+
 /**
  * Message Queue class that abstracts message queue internals.
+ * It reads and writes from different clients. The purpose of this
+ * is so that a proxy can be used between the different queues.
+ * If the read and write client are the same, then it will have the
+ * same effect as using just one client.
  */
 export class MessageQueue {
   readClient: AsyncMqttClient;
   writeClient: AsyncMqttClient;
-  messageHandlers: { [topic: string]: OnMessageCallback[] } = {};
+  messageHandlers: { [topic: string]: MessageCallback[] } = {};
 
   constructor(readClient: AsyncMqttClient, writeClient: AsyncMqttClient) {
     this.readClient = readClient;
@@ -41,7 +46,9 @@ export class MessageQueue {
 
     Object.entries(this.messageHandlers).forEach(([key, handlers]) => {
       if (key === topic) {
-        handlers.forEach(handler => handler(topic, payload, packet));
+        handlers.forEach(handler =>
+          handler(topic, payload, packet as IPublishPacket)
+        );
       }
     });
   }
@@ -66,7 +73,7 @@ export class MessageQueue {
    */
   async subscribe(
     topic: string,
-    onMessage: OnMessageCallback,
+    onMessage: MessageCallback,
     qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
   ) {
     await this.readClient.subscribe(topic, {

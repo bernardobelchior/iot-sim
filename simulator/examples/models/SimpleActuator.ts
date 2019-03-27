@@ -30,8 +30,12 @@ export class SimpleActuator extends ThingModel {
     super(messageQueue);
   }
 
-  getDescription(): string {
-    return JSON.stringify(this.description);
+  getHref(): string {
+    return this.description.href;
+  }
+
+  getDescription(): object {
+    return this.description;
   }
 
   onMessage(topic: string, msg: Buffer) {

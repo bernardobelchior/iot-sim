@@ -46,6 +46,14 @@ export class DeviceRegistry {
     return this.things;
   }
 
+  isThingSimulated(id: string) {
+    return this.getSimulatedThings()[id] !== undefined;
+  }
+
+  existsPhysicalThingWithId(id: string) {
+    return this.getPhysicalThings()[id] !== undefined;
+  }
+
   getThings(): ThingMap {
     return { ...this.things, ...this.simulatedThings };
   }

@@ -1,5 +1,5 @@
-import { MessageQueue, QoS } from "./MessageQueue";
-import { OnMessageCallback, IPublishPacket, connect } from "async-mqtt";
+import { MessageCallback, MessageQueue, QoS } from "./MessageQueue";
+import { IPublishPacket, connect } from "async-mqtt";
 
 /**
  * MessageQueue mock that is always successful and does not rely on
@@ -12,7 +12,7 @@ export class MockMessageQueue extends MessageQueue {
 
   async subscribe(
     topic: string,
-    onMessage: OnMessageCallback,
+    onMessage: MessageCallback,
     qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
   ): Promise<void> {
     return Promise.resolve();

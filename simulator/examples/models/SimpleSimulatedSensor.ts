@@ -1,7 +1,7 @@
-import { ThingModel } from "./ThingModel";
 import { MessageQueue } from "../../src/api/MessageQueue";
+import { SimulatedThingModel } from "./SimulatedThingModel";
 
-export class SimpleSimulatedSensor extends ThingModel {
+export class SimpleSimulatedSensor extends SimulatedThingModel {
   description = {
     type: ["Simulated"],
     name: "Thermometer",
@@ -22,23 +22,21 @@ export class SimpleSimulatedSensor extends ThingModel {
     super(messageQueue);
   }
 
+  getHref(): string {
+    return this.description.href;
+  }
+
   measure() {
     let tmp = 10;
 
     setInterval(async () => {
       tmp += 0.5;
-      const msg = {
-        messageType: "propertyStatus",
-        data: {
-          temperature: tmp
-        }
-      };
 
-      await this.mq.publish("/things/thermometer", JSON.stringify(msg));
+      await this.sendMessage("propertyStatus", { temperature: tmp });
     }, 1000);
   }
 
-  getDescription(): string {
-    return JSON.stringify(this.description);
+  getDescription(): object {
+    return this.description;
   }
 }
