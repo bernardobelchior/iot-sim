@@ -67,19 +67,24 @@ export class DeviceRegistry {
   }
 
   addThing(thing: Thing) {
+    let promise = Promise.resolve();
+
+    /* Make sure we don't subscribe twice to the same thing, otherwise messages
+     * can be delivered twice. */
+    if (!this.hasThing(thing.id)) {
+      promise = this.messageQueue.subscribe(
+        thing.href,
+        this.consume.bind(this)
+      );
+    }
+
     if (thing.isSimulated()) {
       this.simulatedThings[thing.id] = thing;
     } else {
       this.things[thing.id] = thing;
     }
 
-    /* Make sure we don't subscribe twice to the same thing, otherwise messages
-     * can be delivered twice. */
-    if (!this.hasThing(thing.id)) {
-      return this.messageQueue.subscribe(thing.href, this.consume.bind(this));
-    }
-
-    return Promise.resolve();
+    return promise;
   }
 
   private consume(topic: string, msg: Buffer) {

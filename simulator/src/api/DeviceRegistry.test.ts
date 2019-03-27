@@ -53,10 +53,10 @@ const simulatedThing: Thing = parseWebThing({
 });
 
 describe("DeviceRegistry", () => {
-  it("registers devices correctly", async () => {
+  it("should register devices correctly", async () => {
     const messageQueue = await messageQueueBuilder(
       vars.READ_MQ_URI,
-      vars.WRITE_MQ_URI
+      vars.READ_MQ_URI
     );
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
@@ -82,7 +82,7 @@ describe("DeviceRegistry", () => {
     await messageQueue.end();
   });
 
-  it("sets device property correctly", async () => {
+  it("should set device property", async () => {
     const thing = things[0];
     const message = {
       messageType: "setProperty",
@@ -93,8 +93,9 @@ describe("DeviceRegistry", () => {
 
     const messageQueue = await messageQueueBuilder(
       vars.READ_MQ_URI,
-      vars.WRITE_MQ_URI
+      vars.READ_MQ_URI
     );
+
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
 
@@ -111,11 +112,11 @@ describe("DeviceRegistry", () => {
     await messageQueue.end();
   });
 
-  it("correctly overrides physical thing with a simulated one", async () => {
+  it("should override physical thing with a simulated one", async () => {
     const thing = things[0];
     const messageQueue = await messageQueueBuilder(
       vars.READ_MQ_URI,
-      vars.WRITE_MQ_URI
+      vars.READ_MQ_URI
     );
     const deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
@@ -134,12 +135,13 @@ describe("DeviceRegistry", () => {
     await messageQueue.end();
   });
 
-  it("correctly retrieves property of simulated device over the physical one", async () => {
+  it("should retrieve property of simulated device over the physical one", async () => {
     const thing = things[0];
+    console.log(thing.id);
 
     const messageQueue = await messageQueueBuilder(
       vars.READ_MQ_URI,
-      vars.WRITE_MQ_URI
+      vars.READ_MQ_URI
     );
     const deviceRegistry = new DeviceRegistry(messageQueue);
 
