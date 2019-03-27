@@ -1,4 +1,9 @@
-import { AsyncMqttClient, connect, OnMessageCallback, Packet } from "async-mqtt";
+import {
+  AsyncMqttClient,
+  connect,
+  OnMessageCallback,
+  Packet
+} from "async-mqtt";
 
 export enum QoS {
   AtMostOnce = 0,
@@ -27,7 +32,11 @@ export class MessageQueue {
     this.client.on("message", this.messageHandler.bind(this));
   }
 
-  private async messageHandler(topic: string, payload: Buffer, packet: Packet): Promise<void> {
+  private async messageHandler(
+    topic: string,
+    payload: Buffer,
+    packet: Packet
+  ): Promise<void> {
     for (const [key, handlers] of Object.entries(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
       if (match) {
@@ -67,7 +76,11 @@ export class MessageQueue {
    * @param onMessage Function to call whenever a message is received. If this topic was subscribed previously, onMessage will replace the old handler.
    * @param qos QoS. Exactly once is not supported, since RabbitMQ does not support it. Default value is at most once.
    */
-  async subscribe(topic: string, onMessage: OnMessageCallback, qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce) {
+  async subscribe(
+    topic: string,
+    onMessage: OnMessageCallback,
+    qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
+  ) {
     if (this.messageHandlers.hasOwnProperty(topic)) {
       Promise.resolve();
     }

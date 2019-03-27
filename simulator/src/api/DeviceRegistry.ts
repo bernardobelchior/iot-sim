@@ -35,9 +35,8 @@ export class DeviceRegistry {
   };
 
   public finalize = async () => {
-    if (this.messageQueue)
-      this.messageQueue.end();
-  }
+    if (this.messageQueue) this.messageQueue.end();
+  };
 
   /**
    * Get map of virtual things

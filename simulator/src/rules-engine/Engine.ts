@@ -25,9 +25,8 @@ export default class Engine {
   };
 
   public finalize = async () => {
-    if (this.messageQueue)
-      this.messageQueue.end();
-  }
+    if (this.messageQueue) this.messageQueue.end();
+  };
 
   /**
    * Get a list of all current rules

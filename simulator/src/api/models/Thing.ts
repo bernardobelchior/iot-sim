@@ -46,7 +46,7 @@ export class Thing {
     this.description = description;
     this.context = context;
     this.type = type || [];
-    this.href = this.href = `/things/${this.id}`;
+    this.href = `/things/${this.id}`;
   }
 
   static fromDescription(desc: any): Thing {
