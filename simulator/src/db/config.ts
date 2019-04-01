@@ -17,7 +17,10 @@ mongoose.set("debug", true);
  */
 export default () => {
   mongoose.connect(vars.MONGODB_URI, {
-    keepAlive: true
+    useNewUrlParser: true,
+    keepAlive: true,
+    user: "dev",
+    pass: "dev12345"
   });
   return mongoose.connection;
 };

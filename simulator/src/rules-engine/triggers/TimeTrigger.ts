@@ -20,14 +20,31 @@ export default class TimeTrigger extends Trigger {
   }
 
   /**
-   * @return {any}
+   * Creates a trigger from a given object
+   * @param {any} desc
    */
-  toDescription(): any {
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("time")) {
+      throw new Error("Time property missing from object.");
+    }
+    return new this(desc.label, new Date(desc.time));
+  }
+
+  /**
+   * Creates a JSON object from a time trigger instance
+   * @return {Object}
+   */
+  toDescription(): Object {
     return Object.assign(super.toDescription(), { time: this.time });
   }
 
   async start() {
     this.scheduleNext();
+  }
+
+  stop() {
+    clearTimeout(this.timeout);
+    this.timeout = undefined;
   }
 
   scheduleNext() {
@@ -40,7 +57,7 @@ export default class TimeTrigger extends Trigger {
     nextTime.setUTCHours(hours, minutes, 0, 0);
 
     if (nextTime.getTime() < Date.now()) {
-      // NB: this will wrap properly into the next month/year
+      // This will wrap properly into the next month/year
       nextTime.setDate(nextTime.getDate() + 1);
     }
 
@@ -58,10 +75,5 @@ export default class TimeTrigger extends Trigger {
   sendOff() {
     this.emit("stateChanged", { on: false, value: Date.now() });
     this.scheduleNext();
-  }
-
-  stop() {
-    clearTimeout(this.timeout);
-    this.timeout = undefined;
   }
 }

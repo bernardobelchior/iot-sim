@@ -41,16 +41,34 @@ export class MessageQueue {
     this.readClient.on("message", this.messageHandler.bind(this));
   }
 
-  private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
-    // TODO: Add support for '+' and '#' wildcards
-
-    Object.entries(this.messageHandlers).forEach(([key, handlers]) => {
-      if (key === topic || key === "#") {
+  private messageHandler(
+    topic: string,
+    payload: Buffer,
+    packet: Packet
+  ): Promise<void> {
+    for (const [key, handlers] of Object.entries(this.messageHandlers)) {
+      const match = this.testTopic(key, topic);
+      if (match) {
         handlers.forEach(handler =>
           handler(topic, payload, packet as IPublishPacket)
         );
       }
+    }
+  }
+
+  private testTopic(pattern: string, key: string): boolean {
+    const rules = [
+      { regExp: new RegExp("\\/", "g"), rep: "/" },
+      { regExp: new RegExp("\\+", "g"), rep: "([\\w|-]+)" },
+      { regExp: new RegExp("#", "g"), rep: "([\\w|/|-]*)" }
+    ];
+    let p = pattern;
+
+    rules.forEach(function(rule: { regExp: RegExp; rep: string }) {
+      p = p.replace(rule.regExp, rule.rep);
     });
+
+    return new RegExp("^" + p + "$").test(key);
   }
 
   /**
@@ -82,6 +100,20 @@ export class MessageQueue {
 
     this.messageHandlers[topic] = this.messageHandlers[topic] || [];
     this.messageHandlers[topic].push(onMessage);
+  }
+
+  /**
+   * Unsubscribes from a topic.
+   * @param topic Topic to unsubscribe.
+   */
+  async unsubscribe(topic: string | string[]) {
+    if (Array.isArray(topic)) {
+      if (topic.length > 0) await this.readClient.unsubscribe(topic);
+      topic.forEach(t => delete this.messageHandlers[t]);
+    } else {
+      delete this.messageHandlers[topic];
+      await this.readClient.unsubscribe(topic);
+    }
   }
 
   /**

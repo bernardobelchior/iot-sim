@@ -17,9 +17,25 @@ export default class NotificationEffect extends Effect {
   }
 
   /**
-   * @return {any}
+   * Creates an effect from a given object
+   * @param {any} desc
    */
-  toDescription(): any {
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    if (!desc.hasOwnProperty("message")) {
+      throw new Error("Message missing from object.");
+    }
+
+    return new this(desc.label, desc.message);
+  }
+
+  /**
+   * Creates a JSON object from a notification effect instance
+   * @return {Object}
+   */
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       message: this.message
     });

@@ -29,7 +29,7 @@ function fromDescription(desc: any): Trigger {
   if (!TriggerClass) {
     throw new Error(`Unsupported or invalid trigger type:${desc.type}`);
   }
-  return new TriggerClass(desc);
+  return TriggerClass.fromDescription(desc);
 }
 
 export {

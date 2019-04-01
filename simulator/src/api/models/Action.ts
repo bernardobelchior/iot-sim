@@ -18,7 +18,6 @@ export interface IInput {
  * An action object describes a function which can be carried out on a device
  */
 export class Action {
-  id: string;
   title: string;
   description: string;
   links: Link[] = [];
@@ -29,8 +28,7 @@ export class Action {
    * @param {String} title Human friendly name
    * @param {String} description Human friendly description
    */
-  constructor(id: string, title: string, description: string) {
-    this.id = id;
+  constructor(title: string, description: string) {
     this.title = title;
     this.description = description;
   }
@@ -39,12 +37,12 @@ export class Action {
    * Add relationships between events and remaining entities
    * @param {ILink[]} links
    */
-  addLinks(links: ILink[]): any {
+  addLinks(href: string, links: ILink[]): any {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        const link = new Link(linkData);
-        link.setRel("action");
-        this.links.push(link);
+        linkData.href = `${href}${linkData.href}`;
+        this.links.push(new Link(linkData));
+        this.links.push(new Link({ ...linkData, rel: "action" }));
       });
     }
   }

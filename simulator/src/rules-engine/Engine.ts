@@ -1,56 +1,53 @@
-import RuleSchema from "../db/Rule";
 import Rule from "./Rule";
+import { MessageQueue, messageQueueBuilder, QoS } from "../api/MessageQueue";
+import { vars } from "../util/vars";
+import { timestamp } from "../util";
 
 type RuleMap = { [id: string]: Rule };
+type RuleSubscription = { ruleId: string; topic: string };
+type RuleRecord = { ruleId: string; state: boolean; time: string };
 
 /**
  * An engine for running and managing list of rules
  */
 export default class Engine {
   rules: RuleMap = {};
-  rulesPromise: any = undefined;
+  records: RuleRecord[] = [];
+  subscriptions: RuleSubscription[] = [];
+  private messageQueue?: MessageQueue;
+
+  /**
+   * Subscribes to the message queue.
+   */
+  public init = async () => {
+    if (!this.messageQueue)
+      this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
+  };
+
+  public finalize = async () => {
+    if (this.messageQueue) this.messageQueue.end();
+  };
 
   /**
    * Get a list of all current rules
    */
-  async getRules(): Promise<RuleMap> {
-    if (Object.keys(this.rules).length > 0) {
-      return Promise.resolve(this.rules);
-    }
-
-    if (this.rulesPromise) {
-      return this.rulesPromise.then((rules: RuleMap) => {
-        return rules;
-      });
-    }
-
-    this.rulesPromise = RuleSchema.find({}).then(async rulesDb => {
-      this.rulesPromise = undefined;
-
-      this.rules = {};
-      for (const rule of rulesDb) {
-        this.rules[rule.id] = Rule.fromDescription(rule);
-        await this.rules[rule.id].start();
-      }
-      return this.rules;
-    });
-
-    return this.rulesPromise;
+  getRules(): RuleMap {
+    return this.rules;
   }
 
   /**
    * Get a rule by id
-   * @param {number} id
-   * @return {Promise<Rule>}
+   * @param {string} id
+   * @return {Rule}
    */
-  async getRule(id: string): Promise<Rule> {
+  getRule(id: string): Rule {
     try {
-      const rule = (await this.getRules())[id];
+      const rule = this.rules[id];
       if (!rule) {
-        return Promise.reject(new Error(`Rule ${id} does not exist`));
-      } else return Promise.resolve(rule);
+        throw new Error(`Rule ${id} does not exist`);
+      } else return rule;
     } catch (error) {
-      return Promise.reject(new Error(`Rule ${id} does not exist`));
+      throw new Error(`Rule ${id} does not exist`);
     }
   }
 
@@ -61,13 +58,19 @@ export default class Engine {
    */
   async addRule(rule: Rule): Promise<string> {
     try {
-      const r = await RuleSchema.create(rule.toDescription());
-      rule.id = r.id;
-      this.rules[r.id] = rule;
-      await this.rules[r.id].start();
-      return r.id;
+      this.rules[rule.id] = rule;
+
+      await this.subscribeTopics(rule.id, rule.getSubscriptions());
+      await this.rules[rule.id].start();
+
+      this.records.push({
+        ruleId: rule.id,
+        state: rule.enabled,
+        time: timestamp()
+      });
+      return rule.id;
     } catch (error) {
-      return Promise.reject(new Error(`Error creating rule.`));
+      throw new Error(`Error creating rule.`);
     }
   }
 
@@ -77,18 +80,33 @@ export default class Engine {
    * @param {Rule} rule
    * @return {Promise<string>}
    */
-  async updateRule(ruleId: string, rule: Rule): Promise<string> {
+  async updateRule(ruleId: string, updatedRule: Rule): Promise<string> {
     try {
-      const rule = (await this.getRules())[ruleId];
+      const rule = this.rules[ruleId];
       if (!rule) {
         return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
       }
-      const uRule = await RuleSchema.update(ruleId, rule.toDescription(), {
-        new: true
-      });
       const oldRule = this.rules[ruleId];
       oldRule.stop();
-      this.rules[ruleId] = uRule.fromDescription();
+      this.rules[ruleId] = updatedRule;
+
+      const oldSubs = oldRule.getSubscriptions();
+      const newSubs = rule.getSubscriptions().filter(s => !oldSubs.includes(s));
+      await this.subscribeTopics(ruleId, newSubs);
+
+      const delSubs = oldSubs.filter(s => !newSubs.includes(s));
+      if (this.messageQueue && delSubs && Array.isArray(delSubs)) {
+        await this.messageQueue.unsubscribe(delSubs);
+      }
+
+      if (rule.enabled !== updatedRule.enabled) {
+        this.records.push({
+          ruleId: rule.id,
+          state: updatedRule.enabled,
+          time: timestamp()
+        });
+      }
+
       await this.rules[ruleId].start();
       return ruleId;
     } catch (error) {
@@ -96,24 +114,83 @@ export default class Engine {
     }
   }
 
+  private async subscribeTopics(ruleId: string, topics: string[]) {
+    if (!this.messageQueue) {
+      return Promise.resolve();
+    }
+    for (const t of topics) {
+      this.subscriptions.push({ ruleId, topic: t });
+      await this.messageQueue.subscribe(
+        t,
+        this.parseMessage.bind(this),
+        QoS.AtMostOnce
+      );
+    }
+  }
+
   /**
    * Delete an existing rule
    * @param {number} rule id
-   * @return {Promise<string>}
+   * @return {string}
    */
   async deleteRule(ruleId: string): Promise<string> {
     try {
-      const rule = (await this.getRules())[ruleId];
+      const rule = this.rules[ruleId];
       if (!rule) {
-        return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
+        return Promise.reject(`Rule ${ruleId} does not exist`);
       }
-      await RuleSchema.findByIdAndDelete(ruleId);
       const delRule = this.rules[ruleId];
-      await delRule.stop();
+      delRule.stop();
       delete this.rules[ruleId];
+
+      const topics: string[] = this.subscriptions.reduce(
+        (acc: string[], currValue) => {
+          if (currValue.ruleId === ruleId) {
+            acc.push(currValue.topic);
+          }
+          return acc;
+        },
+        []
+      );
+      this.subscriptions = this.subscriptions.filter(s => s.ruleId !== ruleId);
+
+      this.subscriptions.forEach(sub => {
+        const idx = topics.findIndex(t => t === sub.topic);
+        if (idx !== -1) {
+          topics.splice(idx, 1);
+        }
+      });
+
+      if (this.messageQueue) {
+        await this.messageQueue.unsubscribe(topics);
+      }
+
+      this.records = this.records.filter(record => record.ruleId !== ruleId);
+
       return ruleId;
     } catch (error) {
-      return Promise.reject(new Error(`Rule ${ruleId} does not exist`));
+      return Promise.reject(`Rule ${ruleId} does not exist`);
+    }
+  }
+
+  async parseMessage(topic: string, msg: Buffer | string) {
+    if (msg !== null) {
+      let obj: any = undefined;
+      if (Buffer.isBuffer(msg)) {
+        obj = JSON.parse(msg.toString());
+      } else {
+        obj = JSON.parse(msg);
+      }
+      const levels = topic.split("/");
+      if (levels[0] === "things" && obj.hasOwnProperty("messageType")) {
+        const { messageType, ...data } = obj;
+
+        const subs = this.subscriptions.filter(sub => sub.topic === topic);
+        subs.forEach(sub => {
+          const rule = this.getRule(sub.ruleId);
+          rule.trigger.update(topic, data);
+        });
+      }
     }
   }
 }

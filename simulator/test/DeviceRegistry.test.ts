@@ -1,9 +1,8 @@
 import waitForExpect from "wait-for-expect";
-import { messageQueueBuilder } from "./MessageQueue";
-import { vars } from "../util/vars";
-import { DeviceRegistry, REGISTER_TOPIC } from "./DeviceRegistry";
-import { Thing } from "./models/Thing";
-import { parseWebThing } from "./builder";
+import { MessageQueue, messageQueueBuilder } from "../src/api/MessageQueue";
+import { DeviceRegistry, REGISTER_TOPIC } from "../src/api/DeviceRegistry";
+import { Thing } from "../src/api/models/Thing";
+import { vars } from "../src/util/vars";
 
 const thingsDescription = [
   {
@@ -17,7 +16,7 @@ const thingsDescription = [
         links: [{ href: "/things/lamp/properties/on" }]
       }
     },
-    href: "/things/lamp"
+    id: "lamp"
   },
   {
     name: "Window",
@@ -30,13 +29,15 @@ const thingsDescription = [
         links: [{ href: "/things/window/properties/open" }]
       }
     },
-    href: "/things/window"
+    id: "window"
   }
 ];
 
-const things: Thing[] = thingsDescription.map(desc => parseWebThing(desc));
+const things: Thing[] = thingsDescription.map(desc =>
+  Thing.fromDescription(desc)
+);
 
-const simulatedThing: Thing = parseWebThing({
+const simulatedThing: Thing = Thing.fromDescription({
   "@type": ["Simulated"],
   name: "Lamp",
   description: "A simulated web connected lamp",
@@ -49,18 +50,27 @@ const simulatedThing: Thing = parseWebThing({
       links: [{ href: "/things/lamp/properties/on" }]
     }
   },
-  href: "/things/lamp"
+  id: "lamp"
 });
 
 describe("DeviceRegistry", () => {
-  it("should register devices correctly", async () => {
-    const messageQueue = await messageQueueBuilder(
+  let messageQueue: MessageQueue;
+  let deviceRegistry: DeviceRegistry;
+
+  beforeEach(async () => {
+    messageQueue = await messageQueueBuilder(
       vars.READ_MQ_URI,
       vars.READ_MQ_URI
     );
-    const deviceRegistry = new DeviceRegistry(messageQueue);
+    deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
+  });
 
+  afterEach(async () => {
+    await messageQueue.end();
+  });
+
+  it("should register devices", async () => {
     expect(Object.values(deviceRegistry.getThings())).toHaveLength(0);
 
     things.forEach(
@@ -78,8 +88,6 @@ describe("DeviceRegistry", () => {
     things.forEach(thing =>
       expect(deviceRegistry.getThing(thing.id)).toBeTruthy()
     );
-
-    await messageQueue.end();
   });
 
   it("should set device property", async () => {
@@ -91,65 +99,36 @@ describe("DeviceRegistry", () => {
       }
     };
 
-    const messageQueue = await messageQueueBuilder(
-      vars.READ_MQ_URI,
-      vars.READ_MQ_URI
-    );
-
-    const deviceRegistry = new DeviceRegistry(messageQueue);
-    await deviceRegistry.init();
-
     await deviceRegistry.addThing(thing);
 
     expect(thing.getPropertyValue("on")).toBeUndefined();
 
-    await messageQueue.publish(thing.href, JSON.stringify(message));
+    await messageQueue.publish(`/things/${thing.id}`, JSON.stringify(message));
 
     await waitForExpect(() =>
-      expect(thing.getPropertyValue("on")).toBe(message.data.on)
+      expect(deviceRegistry.getThing(thing.id).getPropertyValue("on")).toBe(message.data.on)
     );
-
-    await messageQueue.end();
   });
 
   it("should override physical thing with a simulated one", async () => {
     const thing = things[0];
-    const messageQueue = await messageQueueBuilder(
-      vars.READ_MQ_URI,
-      vars.READ_MQ_URI
-    );
-    const deviceRegistry = new DeviceRegistry(messageQueue);
-    await deviceRegistry.init();
-
     await deviceRegistry.addThing(thing);
-
     expect(deviceRegistry.getThing(thing.id)!.type).not.toContain("Simulated");
 
     await deviceRegistry.addThing(simulatedThing);
 
-    expect(deviceRegistry.getThing(thing.id)).toBe(simulatedThing);
+    expect(deviceRegistry.getThing(thing.id).asThingDescription()).toEqual(simulatedThing.asThingDescription());
     expect(deviceRegistry.getThing(simulatedThing.id)!.type).toContain(
       "Simulated"
     );
-
-    await messageQueue.end();
   });
 
   it("should retrieve property of simulated device over the physical one", async () => {
     const thing = things[0];
-    console.log(thing.id);
-
-    const messageQueue = await messageQueueBuilder(
-      vars.READ_MQ_URI,
-      vars.READ_MQ_URI
-    );
-    const deviceRegistry = new DeviceRegistry(messageQueue);
-
-    await deviceRegistry.init();
     await deviceRegistry.addThing(thing);
 
     await messageQueue.publish(
-      thing.href,
+      `/things/${thing.id}`,
       JSON.stringify({
         messageType: "setProperty",
         data: {
@@ -161,9 +140,8 @@ describe("DeviceRegistry", () => {
     await waitForExpect(() => expect(thing.getPropertyValue("on")).toBe(false));
 
     await deviceRegistry.addThing(simulatedThing);
-
     await messageQueue.publish(
-      simulatedThing.href,
+      `/things/${simulatedThing.id}`,
       JSON.stringify({
         messageType: "setProperty",
         data: {
@@ -177,7 +155,5 @@ describe("DeviceRegistry", () => {
         true
       )
     );
-
-    await messageQueue.end();
   });
 });

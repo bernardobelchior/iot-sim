@@ -1,13 +1,20 @@
 import { ILink, Link } from "./Link";
-import EventEmitter from "events";
+import StrictEventEmitter from "strict-event-emitter-types";
+import { EventEmitter } from "events";
+
+export interface Events {
+  update: (value: any) => void;
+}
+
 import Ajv from "ajv";
+import { ValueGenerator } from "./ValueGenerator";
 
 const ajv = new Ajv();
 
 export interface IPropertyMetadata {
   semanticType?: string;
   unit?: string;
-  enum?: number[];
+  enum?: any[];
   readOnly?: boolean;
   minimum?: number;
   maximum?: number;
@@ -16,18 +23,20 @@ export interface IPropertyMetadata {
   [key: string]: any;
 }
 
+type PropertyEmitter = StrictEventEmitter<EventEmitter, Events>;
+
 /**
  * A property object describes an attribute of a Thing and is indexed by a property id.
  */
-export class Property extends EventEmitter {
+export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
   id: string;
-  title: string;
+  title?: string;
   description: string;
   type: string;
 
   metadata?: IPropertyMetadata;
-  value: any;
-  valueGenerator: Function;
+  valueGenerator?: ValueGenerator;
+  value: any = undefined;
 
   links: Link[] = [];
 
@@ -38,17 +47,12 @@ export class Property extends EventEmitter {
    * @param {String} description Human friendly description
    * @param {String} type A primitive type
    */
-  constructor(id: string, title: string, description: string, type: string) {
+  constructor(id: string, description: string, type: string, title?: string) {
     super();
     this.id = id;
     this.title = title;
     this.description = description;
     this.type = type;
-
-    this.value = undefined;
-    this.valueGenerator = (value: any): any => {
-      return value;
-    };
   }
 
   /**
@@ -59,10 +63,16 @@ export class Property extends EventEmitter {
   asPropertyDescription() {
     let data: any = {
       title: this.title,
-      description: this.description
+      description: this.description,
+      type: this.type
     };
 
     data = { ...data, ...this.metadata };
+
+    if (data.hasOwnProperty("semanticType")) {
+      data["@type"] = data.semanticType;
+      delete data.semanticType;
+    }
     data.links = this.links;
 
     return data;
@@ -72,12 +82,12 @@ export class Property extends EventEmitter {
    * Add a set of relationships to the property
    * @param {ILink} links Array of objects containing links
    */
-  addLinks(links: ILink[]): void {
+  addLinks(href: string, links: ILink[]): void {
     if (Array.isArray(links)) {
       links.forEach((linkData: ILink) => {
-        const link = new Link(linkData);
-        link.setRel("property");
-        this.links.push(link);
+        linkData.href = `${href}${linkData.href}`;
+        this.links.push(new Link(linkData));
+        this.links.push(new Link({ ...linkData, rel: "property" }));
       });
     }
   }
@@ -91,6 +101,7 @@ export class Property extends EventEmitter {
       metadata[key] === undefined ? delete metadata[key] : ""
     );
     this.metadata = metadata;
+    this.valueGenerator = new ValueGenerator(this.type, this.metadata);
   }
 
   /**
@@ -109,21 +120,15 @@ export class Property extends EventEmitter {
       this.metadata.hasOwnProperty("readOnly") &&
       this.metadata.readOnly
     ) {
-      throw new Error("Property is defined as read-only.");
+      throw new Error(`Property ${this.id} is defined as read-only.`);
     }
 
     const valid = this.validateValue(newValue);
     if (valid) {
       this.notifyValue(newValue);
+    } else {
+      throw new Error(ajv.errorsText());
     }
-  }
-
-  /**
-   * Defines a new value forwarder
-   * @param {Function} g Function that define the method to update the value
-   */
-  setValueGenerator(g: Function) {
-    this.valueGenerator = g;
   }
 
   /**
@@ -134,7 +139,7 @@ export class Property extends EventEmitter {
   notifyValue(v: any) {
     if (typeof v !== "undefined" && v !== null && v !== this.value) {
       this.value = v;
-      super.emit("update", v);
+      this.emit("update", v);
     }
   }
 

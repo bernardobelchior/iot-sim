@@ -20,9 +20,28 @@ export default class EqualityTrigger extends PropertyTrigger {
   }
 
   /**
-   * @return {any}
+   * Creates a trigger from a given object
+   * @param {any} desc
    */
-  toDescription(): any {
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("value")) {
+      throw new Error("Value property missing from object.");
+    }
+    if (!desc.hasOwnProperty("property")) {
+      throw new Error("Property description missing from object.");
+    }
+    return new this(
+      desc.label,
+      Property.fromDescription(desc.property),
+      desc.value
+    );
+  }
+
+  /**
+   * Creates a JSON object from a equality trigger instance
+   * @return {Object}
+   */
+  toDescription(): Object {
     return Object.assign(super.toDescription(), {
       value: this.value
     });
@@ -33,6 +52,6 @@ export default class EqualityTrigger extends PropertyTrigger {
    */
   onValueChanged(propValue: string) {
     const on = propValue === this.value;
-    this.emit("stateChanged", { on: on, value: propValue });
+    this.emit("stateChanged", { on, value: propValue });
   }
 }

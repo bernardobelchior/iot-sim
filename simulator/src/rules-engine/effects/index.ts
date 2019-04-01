@@ -25,7 +25,7 @@ function fromDescription(desc: any): Effect {
   if (!EffectClass) {
     throw new Error(`Unsupported or invalid effect type:${desc.type}`);
   }
-  return new EffectClass(desc);
+  return EffectClass.fromDescription(desc);
 }
 
 export {

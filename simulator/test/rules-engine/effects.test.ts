@@ -4,6 +4,10 @@ import {
   MultiEffect
 } from "../../src/rules-engine/effects";
 import { Property } from "../../src/rules-engine/Property";
+import request from "supertest";
+import "jest";
+import app from "../../src/app";
+import { SimulatorSingleton } from "../../src/Simulator";
 
 const pulseEffect = {
   property: {
@@ -32,7 +36,64 @@ const bothEffect = {
   type: "MultiEffect"
 };
 
+const thingLight1 = {
+  id: "light1",
+  name: "light1",
+  type: "onOffSwitch",
+  "@context": "https://iot.mozilla.org/schemas",
+  "@type": ["OnOffSwitch"],
+  properties: {
+    on: { type: "boolean", value: false },
+    temp: { type: "number", value: 0 },
+    sat: { type: "number", value: 0 },
+    bri: { type: "number", value: 100 }
+  },
+  actions: {
+    blink: {
+      description: "Blink the switch on and off"
+    }
+  },
+  events: {
+    surge: {
+      description: "Surge in power detected"
+    }
+  }
+};
+
+const thermostat = {
+  id: "thermostat",
+  name: "thermostat",
+  type: "thermostat",
+  "@context": "https://iot.mozilla.org/schemas",
+  "@type": ["thermostat"],
+  properties: {
+    temp: { type: "number", value: 0 }
+  },
+  actions: {},
+  events: {}
+};
+
 describe("effects", () => {
+  let appInstance: any = undefined;
+
+  async function addDevice(desc: any) {
+    const res = await request(appInstance)
+      .post(`/things`)
+      .set("Accept", "application/json")
+      .send(desc);
+    expect(res.status).toEqual(200);
+  }
+
+  beforeAll(async () => {
+    appInstance = await app();
+    await addDevice(thingLight1);
+    await addDevice(thermostat);
+  });
+
+  afterAll(async () => {
+    await SimulatorSingleton.finalize();
+  });
+
   let p: Property;
   it("should create a PulseEffect, SetEffect and MultiEffect", () => {
     p = new Property(

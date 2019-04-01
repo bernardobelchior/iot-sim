@@ -5,6 +5,10 @@ import {
   MultiTrigger
 } from "../../src/rules-engine/triggers";
 import { Property } from "../../src/rules-engine/Property";
+import request from "supertest";
+import "jest";
+import app from "../../src/app";
+import { SimulatorSingleton } from "../../src/Simulator";
 
 const booleanTrigger = {
   property: {
@@ -43,7 +47,66 @@ const andTrigger = {
   op: "AND"
 };
 
+const thingLight1 = {
+  id: "light1",
+  name: "light1",
+  type: "onOffSwitch",
+  "@context": "https://iot.mozilla.org/schemas",
+  "@type": ["OnOffSwitch"],
+  properties: {
+    on: { type: "boolean", value: false },
+    hue: { type: "number", value: 0 },
+    sat: { type: "number", value: 0 },
+    bri: { type: "number", value: 100 }
+  },
+  actions: {
+    blink: {
+      description: "Blink the switch on and off"
+    }
+  },
+  events: {
+    surge: {
+      description: "Surge in power detected"
+    }
+  }
+};
+
+const thingLight2 = {
+  id: "light2",
+  name: "light2",
+  type: "onOffSwitch",
+  "@context": "https://iot.mozilla.org/schemas",
+  "@type": ["OnOffSwitch"],
+  properties: {
+    on: { type: "boolean", value: false },
+    hue: { type: "number", value: 0 },
+    sat: { type: "number", value: 0 },
+    bri: { type: "number", value: 100 },
+    color: { type: "number", value: 100 }
+  }
+};
+
 describe("triggers", () => {
+  let appInstance: any = undefined;
+
+  async function addDevice(desc: any) {
+    const res = await request(appInstance)
+      .post(`/things`)
+      .set("Accept", "application/json")
+      .send(desc);
+    expect(res.status).toEqual(200);
+  }
+
+  beforeAll(async () => {
+    appInstance = await app();
+    await addDevice(thingLight1);
+    await addDevice(thingLight2);
+  });
+
+  afterAll(async () => {
+    await SimulatorSingleton.finalize();
+  });
+
   it("should parse a BooleanTrigger", () => {
     const p = new Property("boolean", "on", "light1");
     const trigger = new BooleanTrigger(

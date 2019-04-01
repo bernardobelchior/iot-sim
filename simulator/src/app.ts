@@ -1,12 +1,13 @@
 import express, { Express } from "express";
 import compression from "compression";
 import bodyParser from "body-parser";
-import mongo from "./db/config";
 import expressValidator from "express-validator";
 import cors from "cors";
+import mongo from "./db/config";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
+import { SimulatorSingleton } from "./Simulator";
 import * as routes from "./routes";
 
 type Settings = {
@@ -42,9 +43,15 @@ async function app(): Promise<IApp> {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  /* Web Thing REST API is exposed on /things/ so that other endpoints can be used for other purposes */
-  app.use("/things", routes.thingsRouter(deviceRegistry));
-  app.use("/rules", routes.rulesRouter());
+  const registry = SimulatorSingleton.getRegistry();
+
+  app.use("/things", routes.thingsRouter(registry));
+  app.use("/rules", routes.rulesRouter(SimulatorSingleton.getRulesEngine()));
+
+  app.set("messageQueue", registry.getMessageQueue());
+  app.set("registry", registry);
+
+  await SimulatorSingleton.init();
 
   return app;
 }

@@ -10,6 +10,7 @@ export default class Trigger extends (EventEmitter as {
 }) {
   type: string;
   label: string;
+
   /**
    * Create a Trigger based on a wire-format description with a property
    * @param {string} label
@@ -21,9 +22,21 @@ export default class Trigger extends (EventEmitter as {
   }
 
   /**
-   * @return {any}
+   * Creates a trigger from a given object
+   * @param {any} desc
    */
-  toDescription(): any {
+  static fromDescription(desc: any) {
+    if (!desc.hasOwnProperty("label")) {
+      throw new Error("Label property missing from object.");
+    }
+    return new this(desc.label);
+  }
+
+  /**
+   * Creates a JSON object from a trigger instance
+   * @return {Object}
+   */
+  toDescription(): Object {
     return {
       type: this.type,
       label: this.label
@@ -31,16 +44,30 @@ export default class Trigger extends (EventEmitter as {
   }
 
   /**
-   *
+   * Starts the trigger execution
    */
   async start() {
     throw new Error("Unimplemented");
   }
 
   /**
-   *
+   * Stops the trigger execution
    */
   stop() {
     throw new Error("Unimplemented");
   }
+
+  /**
+   * Get the subscriptions necessary for the trigger to activate when the condition is met
+   */
+  getSubscriptions(): string | string[] {
+    return [];
+  }
+
+  /**
+   * Check if the conditions are met to activate the trigger
+   * @param topic
+   * @param data
+   */
+  update(topic: string, data: any) {}
 }

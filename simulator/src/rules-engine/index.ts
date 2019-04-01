@@ -1,13 +1,10 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { IRequest } from "./rulesMiddleware";
 import APIError from "../util/APIError";
-import Engine from "./Engine";
 
-const engine = new Engine();
-
-export const getAll = async (req: Request, res: Response) => {
+export const getAll = async (req: IRequest, res: Response) => {
   try {
-    const rules = await engine.getRules();
+    const rules = Object.values(req.engine.getRules());
     res.send(rules);
   } catch (error) {
     res
@@ -16,10 +13,10 @@ export const getAll = async (req: Request, res: Response) => {
   }
 };
 
-export const getRule = async (req: Request, res: Response) => {
+export const getRule = async (req: IRequest, res: Response) => {
   try {
     const id = req.params.id;
-    const rule = await engine.getRule(id);
+    const rule = req.engine.getRule(id);
     res.send(rule.toDescription());
   } catch (e) {
     res
@@ -30,7 +27,7 @@ export const getRule = async (req: Request, res: Response) => {
 
 export const addRule = async (req: IRequest, res: Response) => {
   try {
-    const ruleId = await engine.addRule(req.rule);
+    const ruleId = await req.engine.addRule(req.rule);
     res.send({ id: ruleId });
   } catch (e) {
     res
@@ -41,7 +38,7 @@ export const addRule = async (req: IRequest, res: Response) => {
 
 export const updateRule = async (req: IRequest, res: Response) => {
   try {
-    await engine.updateRule(req.params.id, req.rule);
+    await req.engine.updateRule(req.params.id, req.rule);
     res.send({});
   } catch (e) {
     res
@@ -50,9 +47,9 @@ export const updateRule = async (req: IRequest, res: Response) => {
   }
 };
 
-export const deleteRule = async (req: Request, res: Response) => {
+export const deleteRule = async (req: IRequest, res: Response) => {
   try {
-    await engine.deleteRule(req.params.id);
+    req.engine.deleteRule(req.params.id);
     res.send({});
   } catch (e) {
     res
