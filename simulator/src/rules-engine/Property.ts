@@ -83,7 +83,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   toDescription(): any {
     const desc: any = {
       type: this.type,
-      thing: this.thingId,
+      thingId: this.thingId,
       id: this.id
     };
     if (this.unit) {

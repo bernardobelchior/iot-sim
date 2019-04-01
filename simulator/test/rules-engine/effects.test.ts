@@ -12,7 +12,7 @@ import { Simulator } from "../../src/Simulator";
 const pulseEffect = {
   property: {
     type: "boolean",
-    thing: "light1",
+    thingId: "light1",
     id: "on"
   },
   type: "PulseEffect",
@@ -22,7 +22,7 @@ const pulseEffect = {
 const setEffect = {
   property: {
     type: "number",
-    thing: "thermostat",
+    thingId: "thermostat",
     id: "temp",
     unit: "celsius",
     description: "thermostat setpoint"
@@ -99,23 +99,23 @@ describe("effects", () => {
     p = new Property(
       pulseEffect.property.type,
       pulseEffect.property.id,
-      pulseEffect.property.thing
+      pulseEffect.property.thingId
     );
     const pEffect = new PulseEffect(pulseEffect.type, p, pulseEffect.value);
-    expect(pEffect).toMatchObject(pulseEffect);
+    expect(pEffect.toDescription()).toMatchObject(pulseEffect);
 
     p = new Property(
       setEffect.property.type,
       setEffect.property.id,
-      setEffect.property.thing,
+      setEffect.property.thingId,
       setEffect.property.unit,
       setEffect.property.description
     );
     const sEffect = new SetEffect(setEffect.type, p, setEffect.value);
-    expect(sEffect).toMatchObject(setEffect);
+    expect(sEffect.toDescription()).toMatchObject(setEffect);
 
     const mEffect = new MultiEffect(bothEffect.type, [pEffect, sEffect]);
-    expect(mEffect).toMatchObject(bothEffect);
+    expect(mEffect.toDescription()).toMatchObject(bothEffect);
   });
 
   it("should reject a value type disagreeing with property type", () => {
@@ -123,7 +123,7 @@ describe("effects", () => {
     p = new Property(
       pulseEffect.property.type,
       pulseEffect.property.id,
-      pulseEffect.property.thing
+      pulseEffect.property.thingId
     );
     try {
       new PulseEffect(pulseEffect.type, p, 12);

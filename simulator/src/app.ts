@@ -45,6 +45,7 @@ async function app(): Promise<IApp> {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
+  (await Simulator.getInstance()).setRegistry(registry);
   app.use("/things", routes.thingsRouter(registry));
   app.use(
     "/rules",

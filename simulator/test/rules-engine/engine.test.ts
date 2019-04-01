@@ -62,7 +62,7 @@ const testRule = {
     property: {
       type: "boolean",
       id: "on",
-      thing: "light1"
+      thingId: "light1"
     },
     type: "BooleanTrigger",
     onValue: true,
@@ -71,7 +71,7 @@ const testRule = {
   effect: {
     property: {
       type: "boolean",
-      thing: "light2",
+      thingId: "light2",
       id: "on"
     },
     type: "PulseEffect",
@@ -86,7 +86,7 @@ const numberTestRule = {
   trigger: {
     property: {
       type: "number",
-      thing: "light2",
+      thingId: "light2",
       id: "hue"
     },
     type: "LevelTrigger",
@@ -97,7 +97,7 @@ const numberTestRule = {
   effect: {
     property: {
       type: "number",
-      thing: "light3",
+      thingId: "light3",
       id: "bri"
     },
     type: "PulseEffect",

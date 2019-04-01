@@ -43,7 +43,7 @@ export class Simulator {
   constructor(mq: MessageQueue) {
     this.layout = new Layout();
     this.state = SimulationState.INITIALIZED;
-    this.rulesEngine = new Engine();
+    this.rulesEngine = new Engine(mq);
     this.registry = new DeviceRegistry(mq);
     this.mainBus = mq;
   }
@@ -54,6 +54,10 @@ export class Simulator {
    */
   public getRegistry(): DeviceRegistry {
     return this.registry;
+  }
+
+  public setRegistry(registry: DeviceRegistry) {
+    this.registry = registry;
   }
 
   /**

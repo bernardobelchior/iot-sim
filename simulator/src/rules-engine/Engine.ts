@@ -1,6 +1,5 @@
 import Rule from "./Rule";
-import { MessageQueue, messageQueueBuilder, QoS } from "../api/MessageQueue";
-import { vars } from "../util/vars";
+import { MessageQueue, QoS } from "../api/MessageQueue";
 import { timestamp } from "../util";
 
 type RuleMap = { [id: string]: Rule };
@@ -14,21 +13,19 @@ export default class Engine {
   rules: RuleMap = {};
   records: RuleRecord[] = [];
   subscriptions: RuleSubscription[] = [];
-  private messageQueue?: MessageQueue;
+  private messageQueue: MessageQueue;
+
+  public constructor(messageQueue: MessageQueue) {
+    this.messageQueue = messageQueue;
+  }
 
   /**
    * Subscribes to the message queue.
    */
-  public init = async () => {
-    if (!this.messageQueue)
-      this.messageQueue = await messageQueueBuilder(
-        vars.READ_MQ_URI,
-        vars.WRITE_MQ_URI
-      );
-  };
+  public init = async () => {};
 
   public finalize = async () => {
-    if (this.messageQueue) this.messageQueue.end();
+    return this.messageQueue.end();
   };
 
   /**
