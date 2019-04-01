@@ -27,7 +27,9 @@ async function app(): Promise<IApp> {
   const registry = new DeviceRegistry(messageQueue);
   await registry.init();
 
-  mongo();
+  if (vars.ENVIRONMENT !== "test") {
+    mongo();
+  }
 
   // Create Express server
   const app = express();

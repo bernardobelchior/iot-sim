@@ -191,10 +191,10 @@ describe("rules engine", () => {
       .get(`/rules`)
       .set("Accept", "application/json")
       .send();
+    expect(res.body[0]).toMatchObject(testRule);
     expect(res.status).toEqual(200);
     expect(Array.isArray(res.body)).toBeTruthy();
     expect(res.body.length).toEqual(1);
-    expect(res.body[0]).toMatchObject(testRule);
   });
 
   it("gets this rule specifically", async () => {

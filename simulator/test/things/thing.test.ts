@@ -115,7 +115,7 @@ describe("things/", function() {
     expect(res.status).toEqual(200);
   }
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     appInstance = await app();
   });
 
