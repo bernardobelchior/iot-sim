@@ -7,7 +7,7 @@ import { Property } from "../../src/rules-engine/Property";
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
-import { SimulatorSingleton } from "../../src/Simulator";
+import { Simulator } from "../../src/Simulator";
 
 const pulseEffect = {
   property: {
@@ -91,7 +91,7 @@ describe("effects", () => {
   });
 
   afterAll(async () => {
-    await SimulatorSingleton.finalize();
+    await (await Simulator.getInstance()).finalize();
   });
 
   let p: Property;

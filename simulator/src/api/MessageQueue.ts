@@ -41,11 +41,7 @@ export class MessageQueue {
     this.readClient.on("message", this.messageHandler.bind(this));
   }
 
-  private messageHandler(
-    topic: string,
-    payload: Buffer,
-    packet: Packet
-  ): Promise<void> {
+  private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
     for (const [key, handlers] of Object.entries(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
       if (match) {

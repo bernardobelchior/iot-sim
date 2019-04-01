@@ -21,7 +21,10 @@ export default class Engine {
    */
   public init = async () => {
     if (!this.messageQueue)
-      this.messageQueue = await messageQueueBuilder(vars.MQ_URI);
+      this.messageQueue = await messageQueueBuilder(
+        vars.READ_MQ_URI,
+        vars.WRITE_MQ_URI
+      );
   };
 
   public finalize = async () => {

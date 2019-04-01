@@ -1,7 +1,7 @@
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
-import { SimulatorSingleton } from "../../src/Simulator";
+import { Simulator } from "../../src/Simulator";
 
 const thingLight1 = {
   id: "light1",
@@ -150,7 +150,7 @@ describe("rules engine", () => {
   });
 
   afterAll(async () => {
-    await SimulatorSingleton.finalize();
+    await (await Simulator.getInstance()).finalize();
   });
 
   it("gets a list of 0 rules", async () => {

@@ -21,18 +21,31 @@ export class Simulator {
   private layout: Layout;
   private rulesEngine: Engine;
   private registry: DeviceRegistry;
-  private mainBus?: MessageQueue;
+  private mainBus: MessageQueue;
+  static simulator?: Simulator;
 
   state: SimulationState;
+
+  static async getInstance(): Promise<Simulator> {
+    if (this.simulator === undefined) {
+      const mq = await messageQueueBuilder(vars.READ_MQ_URI, vars.WRITE_MQ_URI);
+
+      this.simulator = new Simulator(mq);
+      await this.simulator.init();
+    }
+
+    return this.simulator;
+  }
 
   /**
    * Initializes the simulation data
    */
-  constructor() {
+  constructor(mq: MessageQueue) {
     this.layout = new Layout();
     this.state = SimulationState.INITIALIZED;
     this.rulesEngine = new Engine();
-    this.registry = new DeviceRegistry();
+    this.registry = new DeviceRegistry(mq);
+    this.mainBus = mq;
   }
 
   /**
@@ -93,16 +106,13 @@ export class Simulator {
    * Initializes the registry and the asynchronous channels of communication
    */
   async init() {
-    this.mainBus = await messageQueueBuilder(vars.MQ_URI);
-    this.mainBus.subscribe("#", this.parseMessage.bind(this));
+    await this.mainBus.subscribe("#", this.parseMessage.bind(this));
     await this.registry.init();
     await this.rulesEngine.init();
   }
 
   async finalize() {
-    if (this.mainBus) {
-      this.mainBus.end();
-    }
+    await this.mainBus.end();
     await this.rulesEngine.finalize();
     await this.registry.finalize();
   }
@@ -111,10 +121,6 @@ export class Simulator {
    * Starts the simulation
    */
   async startSimulation() {
-    if (!this.mainBus) {
-      await this.init();
-    }
+    await this.init();
   }
 }
-
-export const SimulatorSingleton = new Simulator();

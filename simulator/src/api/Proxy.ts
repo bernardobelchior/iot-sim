@@ -56,7 +56,7 @@ class Proxy {
     message: Buffer,
     packet: IPublishPacket
   ) {
-    const id = Thing.generateIdFromHref(topic);
+    const id = Thing.getIdFromHref(topic);
 
     /* Register message is forwarded as-is */
     if (topic === REGISTER_TOPIC) {
@@ -65,13 +65,13 @@ class Proxy {
     }
 
     /* Proxying of messages:
-     * If a physical thing with the given id exists, then one of the following
+     * If a physical thingId with the given id exists, then one of the following
      * must happen:
-     * - If there is also a simulated thing with the given id:
-     *   - AND the message came from a simulated thing (i.e., contains the
+     * - If there is also a simulated thingId with the given id:
+     *   - AND the message came from a simulated thingId (i.e., contains the
      *     `simulated` property), then the `simulated` property is removed and
      *     the message is forwarded to the read queue
-     *   - AND the message came from a physical thing (i.e., does not contain
+     *   - AND the message came from a physical thingId (i.e., does not contain
      *     the `simulated` property), then the message should be discarded since
      *     a simulated device has higher priority
      * - Otherwise, forward the message as-is, since there are no simulated

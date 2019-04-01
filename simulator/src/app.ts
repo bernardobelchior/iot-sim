@@ -7,7 +7,7 @@ import mongo from "./db/config";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
-import { SimulatorSingleton } from "./Simulator";
+import { Simulator } from "./Simulator";
 import * as routes from "./routes";
 
 type Settings = {
@@ -24,8 +24,8 @@ async function app(): Promise<IApp> {
     vars.READ_MQ_URI,
     vars.WRITE_MQ_URI
   );
-  const deviceRegistry = new DeviceRegistry(messageQueue);
-  await deviceRegistry.init();
+  const registry = new DeviceRegistry(messageQueue);
+  await registry.init();
 
   mongo();
 
@@ -35,7 +35,7 @@ async function app(): Promise<IApp> {
   // Express configuration
   app.set("port", vars.PORT || 8080);
   app.set("messageQueue", messageQueue);
-  app.set("registry", deviceRegistry);
+  app.set("registry", registry);
 
   app.use(compression());
   app.use(cors({ origin: "*" }));
@@ -43,15 +43,11 @@ async function app(): Promise<IApp> {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  const registry = SimulatorSingleton.getRegistry();
-
   app.use("/things", routes.thingsRouter(registry));
-  app.use("/rules", routes.rulesRouter(SimulatorSingleton.getRulesEngine()));
-
-  app.set("messageQueue", registry.getMessageQueue());
-  app.set("registry", registry);
-
-  await SimulatorSingleton.init();
+  app.use(
+    "/rules",
+    routes.rulesRouter((await Simulator.getInstance()).getRulesEngine())
+  );
 
   return app;
 }

@@ -23,9 +23,17 @@ export const get = (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     res.json(thing.asThingDescription());
   } catch (e) {
-    res.status(404).send(new APIError("Failed to get thing", e).toString());
+    res.status(404).send(new APIError("Failed to get thingId", e).toString());
   }
 };
 
@@ -40,12 +48,12 @@ export const create = async (req: IRequest, res: Response) => {
     if (!req.body.hasOwnProperty("id")) {
       res
         .status(400)
-        .send(new APIError("Failed to add thing", "ID missing").toString());
+        .send(new APIError("Failed to add thingId", "ID missing").toString());
       return;
     }
     const thing = await req.registry.createThing(req.body.id, req.body);
     res.send({ id: thing.id });
   } catch (e) {
-    res.status(404).send(new APIError("Failed to add thing", e).toString());
+    res.status(404).send(new APIError("Failed to add thingId", e).toString());
   }
 };

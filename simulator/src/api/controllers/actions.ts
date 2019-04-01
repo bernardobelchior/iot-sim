@@ -12,6 +12,14 @@ export const getActions = async (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
+
     res.json(thing.getActionRequests());
   } catch (e) {
     res
@@ -32,18 +40,30 @@ export const requestActions = async (req: IRequest, res: Response) => {
     const thing = req.registry.getThing(thingId);
     const response: any = {};
     const requests: { actionName: string; input?: any }[] = [];
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
+
     for (const actionName in req.body) {
       let input = undefined;
+
       if (req.body[actionName].hasOwnProperty("input")) {
         input = req.body[actionName].input;
       }
+
       const isValid = thing.checkActionRequest(actionName, input);
+
       if (isValid) {
         requests.push({ actionName, input });
       } else {
         res
           .status(400)
           .send(new APIError(`Action ${actionName} is invalid`).toString());
+        return;
       }
     }
 
@@ -72,6 +92,14 @@ export const getAction = async (req: IRequest, res: Response) => {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
     const actionName = req.params.actionName;
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
+
     res.json(thing.getActionRequests(actionName));
   } catch (e) {
     res
@@ -91,6 +119,13 @@ export const requestAction = async (req: IRequest, res: Response) => {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
     const response: any = {};
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
 
     const actionName = req.params.actionName;
     let input = undefined;
@@ -130,6 +165,13 @@ export const getActionRequest = async (req: IRequest, res: Response) => {
     const actionName = req.params.actionName;
     const actionId = req.params.actionId;
 
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
+
     const action = thing.getAction(actionName, actionId);
     res.json(action.getActionRequest());
   } catch (e) {
@@ -150,6 +192,13 @@ export const cancelActionRequest = async (req: IRequest, res: Response) => {
 
     const actionName = req.params.actionName;
     const actionId = req.params.actionId;
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found`).toString());
+      return;
+    }
 
     if (thing.cancelAction(actionName, actionId)) {
       res.status(204).end();

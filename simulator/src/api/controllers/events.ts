@@ -12,6 +12,14 @@ export const list = async (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     res.json(thing.getEventsDispatched());
   } catch (e) {
     res.status(404).send(new APIError(`Failed to cancel action`, e).toString());
@@ -28,6 +36,14 @@ export const get = async (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     const eventName = req.params.eventName;
     res.json(thing.getEventsDispatched(eventName));
   } catch (e) {

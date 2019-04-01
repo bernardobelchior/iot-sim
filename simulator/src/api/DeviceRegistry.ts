@@ -50,7 +50,7 @@ export class DeviceRegistry {
    * Get (physical and simulated) things.
    * Note: Simulated things have "priority" over physical ones,
    * as such, the physical ones won't show if there's one
-   * simulated thing with the same id.
+   * simulated thingId with the same id.
    * @return {ThingMap}
    */
   isThingSimulated(id: string) {
@@ -66,7 +66,7 @@ export class DeviceRegistry {
   }
 
   /**
-   * Get a thing by id
+   * Get a thingId by id
    * @param {string} id
    * @return {Thing | undefined } Thing, or undefined is not found.
    */
@@ -97,14 +97,14 @@ export class DeviceRegistry {
   }
 
   /**
-   * Add a thing to the registry
+   * Add a thingId to the registry
    *
    * @param {Thing} thing.
    */
   addThing(thing: Thing) {
     let promise = Promise.resolve();
 
-    /* Make sure we don't subscribe twice to the same thing, otherwise messages
+    /* Make sure we don't subscribe twice to the same thingId, otherwise messages
      * can be delivered twice. */
     if (!this.hasThing(thing.id)) {
       promise = this.messageQueue.subscribe(
@@ -156,6 +156,45 @@ export class DeviceRegistry {
         break;
       default:
         break;
+    }
+  }
+
+  /**
+   * @param {String} thingId
+   * @param {String} propertyName
+   * @return {any} resolves to value of property
+   */
+  getThingProperty(thingId: string, propertyName: string): any {
+    const thing = this.getThing(thingId);
+
+    if (thing === undefined) {
+      return undefined;
+    }
+
+    return thing.getPropertyValue(propertyName);
+  }
+
+  /**
+   * @param {String} thingId
+   * @param {String} propertyName
+   * @param {any} value
+   * @return {any} resolves to new value
+   */
+  setThingProperty(thingId: any, propertyName: string, value: any): any {
+    const thing = this.getThing(thingId);
+
+    if (thing === undefined) {
+      throw new Error(`Thing with ID '${thingId}' doesn't exist.`);
+    }
+
+    if (!thing.hasProperty(propertyName)) {
+      throw new Error(`Thing doesn't have specified property.`);
+    }
+
+    const property = thing.properties.get(propertyName);
+    if (property) {
+      property.setValue(value);
+      return property.getValue();
     }
   }
 }

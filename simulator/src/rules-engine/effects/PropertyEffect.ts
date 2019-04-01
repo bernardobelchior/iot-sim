@@ -31,7 +31,7 @@ export default class PropertyEffect extends Effect {
     const p = new Property(
       desc.property.type,
       desc.property.id,
-      desc.property.thing,
+      desc.property.thingId,
       desc.property.unit,
       desc.property.description
     );

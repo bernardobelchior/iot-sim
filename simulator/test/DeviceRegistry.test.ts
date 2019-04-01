@@ -103,21 +103,25 @@ describe("DeviceRegistry", () => {
 
     expect(thing.getPropertyValue("on")).toBeUndefined();
 
-    await messageQueue.publish(`/things/${thing.id}`, JSON.stringify(message));
+    await messageQueue.publish(thing.href, JSON.stringify(message));
 
     await waitForExpect(() =>
-      expect(deviceRegistry.getThing(thing.id).getPropertyValue("on")).toBe(message.data.on)
+      expect(deviceRegistry.getThing(thing.id)!.getPropertyValue("on")).toBe(
+        message.data.on
+      )
     );
   });
 
-  it("should override physical thing with a simulated one", async () => {
+  it("should override physical thingId with a simulated one", async () => {
     const thing = things[0];
     await deviceRegistry.addThing(thing);
     expect(deviceRegistry.getThing(thing.id)!.type).not.toContain("Simulated");
 
     await deviceRegistry.addThing(simulatedThing);
 
-    expect(deviceRegistry.getThing(thing.id).asThingDescription()).toEqual(simulatedThing.asThingDescription());
+    expect(deviceRegistry.getThing(thing.id)!.asThingDescription()).toEqual(
+      simulatedThing.asThingDescription()
+    );
     expect(deviceRegistry.getThing(simulatedThing.id)!.type).toContain(
       "Simulated"
     );
@@ -128,7 +132,7 @@ describe("DeviceRegistry", () => {
     await deviceRegistry.addThing(thing);
 
     await messageQueue.publish(
-      `/things/${thing.id}`,
+      thing.href,
       JSON.stringify({
         messageType: "setProperty",
         data: {
@@ -141,7 +145,7 @@ describe("DeviceRegistry", () => {
 
     await deviceRegistry.addThing(simulatedThing);
     await messageQueue.publish(
-      `/things/${simulatedThing.id}`,
+      simulatedThing.href,
       JSON.stringify({
         messageType: "setProperty",
         data: {

@@ -7,9 +7,11 @@ import { MessageQueue } from "../MessageQueue";
 
 import Ajv from "ajv";
 import { timestamp } from "../../util";
+import assert = require("assert");
+
 const ajv = new Ajv();
 
-type EventDispatched = { name: string,  data?: any, time: string };
+type EventDispatched = { name: string; data?: any; time: string };
 
 /**
  * The Thing Description provides a vocabulary for describing physical devices connected to the World Wide Web
@@ -40,13 +42,19 @@ export class Thing {
    * @param {String} context Optional annotation which can be used to provide a URI for a schema repository which defines standard schemas for common "types" of device capabilities.
    * @param {String} type Optional annotation which can be used to provide the names of schemas for types of capabilities a device supports, from a schema repository referred to in the @context member.
    */
-  constructor(name: string, description: string, id: string, context?: string, type?: string[]) {
+  constructor(
+    name: string,
+    description: string,
+    id: string,
+    context?: string,
+    type?: string[]
+  ) {
     this.name = name;
     this.id = id;
     this.description = description;
     this.context = context;
     this.type = type || [];
-    this.href = `/things/${this.id}`;
+    this.href = Thing.generateHrefFromId(id);
   }
 
   static fromDescription(desc: any): Thing {
@@ -77,10 +85,22 @@ export class Thing {
     return t;
   }
 
+  static generateHrefFromId(id: string): string {
+    return `/things/${id}`;
+  }
+
+  static getIdFromHref(href: string): string {
+    const levels = href.split("/");
+
+    assert(levels.length >= 3);
+
+    return levels[2];
+  }
+
   /**
-   * Return the thing state as a Thing Description.
+   * Return the thingId state as a Thing Description.
    *
-   * @returns {Object} Current thing state
+   * @returns {Object} Current thingId state
    */
   asThingDescription(): object {
     const thing: any = {
@@ -186,7 +206,7 @@ export class Thing {
   }
 
   /**
-   * Get the thing's properties as an object.
+   * Get the thingId's properties as an object.
    *
    * @returns {Object} Properties, i.e. name -> description
    */
@@ -200,7 +220,7 @@ export class Thing {
   }
 
   /**
-   * Get the thing's actions as an array.
+   * Get the thingId's actions as an array.
    *
    * @param {String?} actionName Optional action name to get descriptions for
    *
@@ -222,7 +242,7 @@ export class Thing {
   }
 
   /**
-   * Get the thing's events as an array.
+   * Get the thingId's events as an array.
    *
    * @param {String?} eventName Optional event name to get descriptions for
    *
@@ -257,7 +277,7 @@ export class Thing {
   }
 
   /**
-   * Determine whether or not this thing has a given property.
+   * Determine whether or not this thingId has a given property.
    *
    * @param {String} propertyName The property to look for
    *
@@ -363,10 +383,14 @@ export class Thing {
       throw new Error(`Action ${actionName} doesn't exist.`);
     }
 
-    const actionRequest = this.actionsRequests.find(x => x.id === actionId && x.name === actionName);
+    const actionRequest = this.actionsRequests.find(
+      x => x.id === actionId && x.name === actionName
+    );
 
     if (!actionRequest) {
-      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
+      throw new Error(
+        `Action ${actionName} with ID ${actionId} doesn't exist.`
+      );
     } else return actionRequest;
   }
 
@@ -377,9 +401,13 @@ export class Thing {
    * @param {String} actionId Id of the action
    */
   cancelAction(actionName: string, actionId: string): boolean {
-    const actionRequest = this.actionsRequests.find(x => x.id === actionId && x.name === actionName);
+    const actionRequest = this.actionsRequests.find(
+      x => x.id === actionId && x.name === actionName
+    );
     if (!actionRequest) {
-      throw new Error(`Action ${actionName} with ID ${actionId} doesn't exist.`);
+      throw new Error(
+        `Action ${actionName} with ID ${actionId} doesn't exist.`
+      );
     }
     actionRequest.cancelAction();
     return true;
@@ -411,7 +439,10 @@ export class Thing {
     }
   }
 
-  async addEventSubscription(eventName: string, onEvent: (event: string) => void): Promise<boolean> {
+  async addEventSubscription(
+    eventName: string,
+    onEvent: (event: string) => void
+  ): Promise<boolean> {
     if (this.messageQueue) {
       await this.messageQueue.subscribe(eventName, onEvent);
       return Promise.resolve(true);
@@ -454,7 +485,10 @@ export class Thing {
       messageType: "actionStatus",
       data: actionRequest.getActionRequest()
     };
-    this.sendMessage(`${this.href}/actions/${actionRequest.name}`, JSON.stringify(data));
+    this.sendMessage(
+      `${this.href}/actions/${actionRequest.name}`,
+      JSON.stringify(data)
+    );
   }
 
   /**
@@ -474,7 +508,10 @@ export class Thing {
           }
         }
       };
-      this.sendMessage(`${this.href}/events/${event.name}`, JSON.stringify(data));
+      this.sendMessage(
+        `${this.href}/events/${event.name}`,
+        JSON.stringify(data)
+      );
     }
   }
 

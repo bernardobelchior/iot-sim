@@ -1,5 +1,5 @@
 import Effect from "./Effect";
-import { SimulatorSingleton } from "../../Simulator";
+import { Simulator } from "../../Simulator";
 
 /**
  * An Effect which creates an action
@@ -9,9 +9,6 @@ export default class ActionEffect extends Effect {
   action: string;
   parameters: any = {};
 
-  /**
-   * @param {IActionEffect} desc
-   */
   constructor(
     label: string,
     thingId: string,
@@ -59,15 +56,15 @@ export default class ActionEffect extends Effect {
       return;
     }
 
-    this.createAction();
+    return this.createAction();
   }
 
-  createAction() {
+  async createAction() {
     try {
-      const registry = SimulatorSingleton.getRegistry();
+      const registry = (await Simulator.getInstance()).getRegistry();
       const thing = registry.getThing(this.thingId);
 
-      thing.requestAction(this.action, this.parameters);
+      thing!.requestAction(this.action, this.parameters);
     } catch (e) {
       console.warn("Unable to dispatch action", e);
     }

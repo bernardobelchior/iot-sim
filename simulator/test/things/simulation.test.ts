@@ -20,9 +20,8 @@ const thing = {
 };
 
 describe("controllers/simulation", () => {
-  it("adds simulated thing when called", async () => {
-    const deviceRegistry = new DeviceRegistry();
-    deviceRegistry.setMessageQueue(new MockMessageQueue());
+  it("adds simulated thingId when called", async () => {
+    const deviceRegistry = new DeviceRegistry(new MockMessageQueue());
     const sendStatus = jest.fn();
 
     await deviceRegistry.addThing(Thing.fromDescription(thing));
