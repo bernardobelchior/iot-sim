@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import { TriggerEmitter } from "./Events";
-import { SimulatorSingleton } from "../Simulator";
+import { Simulator } from "../Simulator";
+import { DeviceRegistry } from "../api/DeviceRegistry";
 
 /**
  * Utility to support operations on Thing's properties
@@ -8,7 +9,7 @@ import { SimulatorSingleton } from "../Simulator";
 export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   id: string;
   type: string;
-  thing: string;
+  thingId: string;
   unit?: string;
   description?: string;
 
@@ -18,25 +19,32 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   constructor(
     type: string,
     id: string,
-    thing: string,
+    thingId: string,
     unit?: string,
     description?: string
   ) {
     super();
 
-    const registry = SimulatorSingleton.getRegistry();
-    const t = registry.getThing(thing);
-    if (!t.hasProperty(id)) {
-      throw new Error(`Property ${id} doesn't exist on thing ${thing}.`);
-    }
+    Simulator.getInstance().then(i => {
+      const t = i.getRegistry().getThing(thingId);
+
+      if (t === undefined) {
+        throw new Error(`Thing with ID '${id}' doesn't exist.`);
+      }
+
+      if (!t.hasProperty(id)) {
+        throw new Error(`Property ${id} doesn't exist on thing ${thingId}.`);
+      }
+    });
 
     this.type = type;
-    this.thing = thing;
+    this.thingId = thingId;
     this.id = id;
 
     if (unit) {
       this.unit = unit;
     }
+
     if (description) {
       this.description = description;
     }
@@ -56,13 +64,13 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     if (!desc.hasOwnProperty("id")) {
       throw new Error("Id property missing from object.");
     }
-    if (!desc.hasOwnProperty("thing")) {
+    if (!desc.hasOwnProperty("thingId")) {
       throw new Error("Thing property missing from object.");
     }
     return new this(
       desc.type,
       desc.id,
-      desc.thing,
+      desc.thingId,
       desc.unit,
       desc.description
     );
@@ -75,7 +83,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   toDescription(): any {
     const desc: any = {
       type: this.type,
-      thing: this.thing,
+      thingId: this.thingId,
       id: this.id
     };
     if (this.unit) {
@@ -90,10 +98,10 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
   /**
    * @return {any} resolves to property's value or undefined if not found
    */
-  get(): any {
+  async get(): Promise<any> {
     try {
-      const registry = SimulatorSingleton.getRegistry();
-      return registry.getThingProperty(this.thing, this.id);
+      const registry: DeviceRegistry = (await Simulator.getInstance()).getRegistry();
+      return registry.getThingProperty(this.thingId, this.id);
     } catch (e) {
       console.warn("Property get failed", e);
     }
@@ -103,10 +111,10 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
    * @param {any} value
    * @return {any} resolves when set is done
    */
-  set(value: any): any {
+  async set(value: any): Promise<any> {
     try {
-      const registry = SimulatorSingleton.getRegistry();
-      return registry.setThingProperty(this.thing, this.id, value);
+      const registry = (await Simulator.getInstance()).getRegistry();
+      return registry.setThingProperty(this.thingId, this.id, value);
     } catch (e) {
       console.warn("Property set failed", e);
     }
@@ -125,7 +133,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
     propertyId: string,
     propertyValue: any
   ) {
-    if (propertyDevice !== this.thing) {
+    if (propertyDevice !== this.thingId) {
       return;
     }
     if (propertyId !== this.id) {

@@ -74,8 +74,8 @@ const columns: MUIDataTableColumnDef[] = [
 ];
 
 /**
- * Shows the properties, actions and events of a thing.
- * @param thing
+ * Shows the properties, actions and events of a thingId.
+ * @param thingId
  * @param numCols Number of columns to span
  */
 class ThingsDetails extends Component<IProps> {

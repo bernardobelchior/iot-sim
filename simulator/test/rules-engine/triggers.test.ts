@@ -8,12 +8,12 @@ import { Property } from "../../src/rules-engine/Property";
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
-import { SimulatorSingleton } from "../../src/Simulator";
+import { Simulator } from "../../src/Simulator";
 
 const booleanTrigger = {
   property: {
     type: "boolean",
-    thing: "light1",
+    thingId: "light1",
     id: "on"
   },
   type: "BooleanTrigger",
@@ -23,7 +23,7 @@ const booleanTrigger = {
 const levelTrigger = {
   property: {
     type: "number",
-    thing: "light2",
+    thingId: "light2",
     id: "hue"
   },
   type: "LevelTrigger",
@@ -34,7 +34,7 @@ const levelTrigger = {
 const equalityTrigger = {
   property: {
     type: "string",
-    thing: "light2",
+    thingId: "light2",
     id: "color"
   },
   type: "EqualityTrigger",
@@ -104,7 +104,7 @@ describe("triggers", () => {
   });
 
   afterAll(async () => {
-    await SimulatorSingleton.finalize();
+    await (await Simulator.getInstance()).finalize();
   });
 
   it("should parse a BooleanTrigger", () => {
@@ -114,7 +114,7 @@ describe("triggers", () => {
       p,
       booleanTrigger.onValue
     );
-    expect(trigger).toMatchObject(booleanTrigger);
+    expect(trigger.toDescription()).toMatchObject(booleanTrigger);
   });
 
   it("should parse a LevelTrigger", () => {
@@ -125,7 +125,7 @@ describe("triggers", () => {
       levelTrigger.value,
       levelTrigger.levelType
     );
-    expect(trigger).toMatchObject(levelTrigger);
+    expect(trigger.toDescription()).toMatchObject(levelTrigger);
   });
 
   it("should parse an EqualityTrigger", () => {
@@ -135,7 +135,7 @@ describe("triggers", () => {
       p,
       equalityTrigger.value
     );
-    expect(trigger).toMatchObject(equalityTrigger);
+    expect(trigger.toDescription()).toMatchObject(equalityTrigger);
   });
 
   it("should parse a MultiTrigger", () => {
@@ -151,7 +151,7 @@ describe("triggers", () => {
       )
     ];
     const trigger = new MultiTrigger(andTrigger.type, andTrigger.op, triggers);
-    expect(trigger).toMatchObject(andTrigger);
+    expect(trigger.toDescription()).toMatchObject(andTrigger);
   });
 
   it("should reject an unknown levelType", () => {

@@ -57,7 +57,12 @@ export default class LevelTrigger extends PropertyTrigger {
     if (!desc.hasOwnProperty("property")) {
       throw new Error("Property description missing from object.");
     }
-    return new this(desc.label, Property.fromDescription(desc.property), desc.value, desc.levelType);
+    return new this(
+      desc.label,
+      Property.fromDescription(desc.property),
+      desc.value,
+      desc.levelType
+    );
   }
 
   /**
@@ -65,13 +70,10 @@ export default class LevelTrigger extends PropertyTrigger {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(
-      super.toDescription(),
-      {
-        value: this.value,
-        levelType: this.levelType,
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value,
+      levelType: this.levelType
+    });
   }
 
   /**

@@ -1,9 +1,4 @@
-import {
-  AsyncMqttClient,
-  connect,
-  OnMessageCallback,
-  Packet
-} from "async-mqtt";
+import { AsyncMqttClient, connect, Packet, IPublishPacket } from "async-mqtt";
 
 export enum QoS {
   AtMostOnce = 0,
@@ -11,36 +6,48 @@ export enum QoS {
   ExactlyOnce = 2
 }
 
-export async function messageQueueBuilder(url: string): Promise<MessageQueue> {
-  const client = await connect(url);
+export async function messageQueueBuilder(
+  readUrl: string,
+  writeUrl: string
+): Promise<MessageQueue> {
+  const readClient = await connect(readUrl);
+  const writeClient = await connect(writeUrl);
 
-  return new MessageQueue(url, client);
+  return new MessageQueue(readClient, writeClient);
 }
+
+export type MessageCallback = (
+  topic: string,
+  payload: Buffer,
+  packet: IPublishPacket
+) => void;
 
 /**
  * Message Queue class that abstracts message queue internals.
+ * It reads and writes from different clients. The purpose of this
+ * is so that a proxy can be used between the different queues.
+ * If the read and write client are the same, then it will have the
+ * same effect as using just one client.
  */
 export class MessageQueue {
-  url: string;
-  client: AsyncMqttClient;
-  messageHandlers: { [topic: string]: OnMessageCallback[] } = {};
+  readClient: AsyncMqttClient;
+  writeClient: AsyncMqttClient;
+  messageHandlers: { [topic: string]: MessageCallback[] } = {};
 
-  constructor(url: string, client: AsyncMqttClient) {
-    this.url = url;
-    this.client = client;
+  constructor(readClient: AsyncMqttClient, writeClient: AsyncMqttClient) {
+    this.readClient = readClient;
+    this.writeClient = writeClient;
 
-    this.client.on("message", this.messageHandler.bind(this));
+    this.readClient.on("message", this.messageHandler.bind(this));
   }
 
-  private async messageHandler(
-    topic: string,
-    payload: Buffer,
-    packet: Packet
-  ): Promise<void> {
+  private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
     for (const [key, handlers] of Object.entries(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
       if (match) {
-        handlers.map(handler => handler(topic, payload, packet));
+        handlers.forEach(handler =>
+          handler(topic, payload, packet as IPublishPacket)
+        );
       }
     }
   }
@@ -52,9 +59,11 @@ export class MessageQueue {
       { regExp: new RegExp("#", "g"), rep: "([\\w|/|-]*)" }
     ];
     let p = pattern;
+
     rules.forEach(function(rule: { regExp: RegExp; rep: string }) {
       p = p.replace(rule.regExp, rule.rep);
     });
+
     return new RegExp("^" + p + "$").test(key);
   }
 
@@ -65,7 +74,7 @@ export class MessageQueue {
    * @param qos Quality of Service. Default value is at most once.
    */
   publish(topic: string, message: Buffer | string, qos: QoS = QoS.AtMostOnce) {
-    return this.client.publish(topic, message, {
+    return this.writeClient.publish(topic, message, {
       qos
     });
   }
@@ -78,13 +87,10 @@ export class MessageQueue {
    */
   async subscribe(
     topic: string,
-    onMessage: OnMessageCallback,
+    onMessage: MessageCallback,
     qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
   ) {
-    if (this.messageHandlers.hasOwnProperty(topic)) {
-      Promise.resolve();
-    }
-    await this.client.subscribe(topic, {
+    await this.readClient.subscribe(topic, {
       qos
     });
 
@@ -98,11 +104,11 @@ export class MessageQueue {
    */
   async unsubscribe(topic: string | string[]) {
     if (Array.isArray(topic)) {
-      if (topic.length > 0) await this.client.unsubscribe(topic);
+      if (topic.length > 0) await this.readClient.unsubscribe(topic);
       topic.forEach(t => delete this.messageHandlers[t]);
     } else {
       delete this.messageHandlers[topic];
-      await this.client.unsubscribe(topic);
+      await this.readClient.unsubscribe(topic);
     }
   }
 
@@ -110,6 +116,6 @@ export class MessageQueue {
    * Closes the connection gracefully. Promise resolves once all messages have been ACKed.
    */
   end() {
-    return this.client.end();
+    return Promise.all([this.readClient.end(), this.writeClient.end()]);
   }
 }

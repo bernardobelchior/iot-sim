@@ -1,5 +1,5 @@
-import { MessageQueue, QoS } from "../src/api/MessageQueue";
-import { OnMessageCallback, IPublishPacket, connect } from "async-mqtt";
+import { MessageCallback, MessageQueue, QoS } from "../src/api/MessageQueue";
+import { IPublishPacket, connect } from "async-mqtt";
 
 /**
  * MessageQueue mock that is always successful and does not rely on
@@ -7,12 +7,12 @@ import { OnMessageCallback, IPublishPacket, connect } from "async-mqtt";
  */
 export class MockMessageQueue extends MessageQueue {
   constructor() {
-    super("", connect(""));
+    super(connect(""), connect(""));
   }
 
   async subscribe(
     topic: string,
-    onMessage: OnMessageCallback,
+    onMessage: MessageCallback,
     qos: Exclude<QoS, QoS.ExactlyOnce> = QoS.AtMostOnce
   ): Promise<void> {
     return Promise.resolve();
@@ -35,7 +35,7 @@ export class MockMessageQueue extends MessageQueue {
     return Promise.resolve(ret);
   }
 
-  end(): Promise<void> {
-    return Promise.resolve();
+  end(): Promise<[void, void]> {
+    return Promise.all([Promise.resolve(), Promise.resolve()]);
   }
 }

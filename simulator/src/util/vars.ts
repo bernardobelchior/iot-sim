@@ -5,7 +5,8 @@ import fs from "fs";
 interface VarsDefinition {
   ENVIRONMENT: string;
   MONGODB_URI: string;
-  MQ_URI: string;
+  WRITE_MQ_URI: string;
+  READ_MQ_URI: string;
   PORT: number;
 }
 
@@ -36,13 +37,23 @@ if (MONGODB_URI === undefined) {
 
 const PORT = parseInt(process.env.PORT || "8080");
 
-const MQ_URI = prod ? process.env["MQ_URI"] : process.env["MQ_URI_LOCAL"];
-if (!MQ_URI) {
+const READ_MQ_URI = process.env["READ_MQ_URI"];
+if (!READ_MQ_URI) {
   logger.error(
-    "Invalid message config specified. Set MQ_URI environment variable."
+    "Invalid message config specified. Set READ_MQ_URI environment variable."
   );
   throw new Error(
-    "Invalid message queue config specified. Set MQ_URI environment variable."
+    "Invalid message queue config specified. Set READ_MQ_URI environment variable."
+  );
+}
+
+const WRITE_MQ_URI = process.env["WRITE_MQ_URI"];
+if (!WRITE_MQ_URI) {
+  logger.error(
+    "Invalid message config specified. Set WRITE_MQ_URI environment variable."
+  );
+  throw new Error(
+    "Invalid message queue config specified. Set WRITE_MQ_URI environment variable."
   );
 }
 
@@ -50,5 +61,6 @@ export const vars: VarsDefinition = {
   ENVIRONMENT,
   MONGODB_URI,
   PORT,
-  MQ_URI
+  READ_MQ_URI,
+  WRITE_MQ_URI
 };

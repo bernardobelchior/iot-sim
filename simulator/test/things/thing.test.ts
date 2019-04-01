@@ -2,7 +2,7 @@ import request from "supertest";
 import "jest";
 import app from "../../src/app";
 import { Thing } from "../../src/api/models/Thing";
-import { SimulatorSingleton } from "../../src/Simulator";
+import { Simulator } from "../../src/Simulator";
 
 const TEST_THING = {
   id: "test-1",
@@ -97,7 +97,7 @@ const piDescr = {
 };
 
 describe("Thing.isSimulated()", () => {
-  it("should return true if thing has 'Simulated' in '@type'", function() {
+  it("should return true if thingId has 'Simulated' in '@type'", function() {
     const thing = new Thing("Lamp", "Test", "/1", undefined, ["Simulated"]);
 
     expect(thing.isSimulated()).toBeTruthy();
@@ -115,12 +115,12 @@ describe("things/", function() {
     expect(res.status).toEqual(200);
   }
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     appInstance = await app();
   });
 
   afterAll(async () => {
-    await SimulatorSingleton.finalize();
+    await (await Simulator.getInstance()).finalize();
   });
 
   it("GET with no things", async () => {
@@ -134,7 +134,7 @@ describe("things/", function() {
     expect(res.body.length).toEqual(0);
   });
 
-  it("fail to create a new thing (empty body)", async () => {
+  it("fail to create a new thingId (empty body)", async () => {
     const err = await request(appInstance)
       .post(`/things`)
       .set("Accept", "application/json")
@@ -142,7 +142,7 @@ describe("things/", function() {
     expect(err.status).toEqual(400);
   });
 
-  it("fail to create a new thing (duplicate)", async () => {
+  it("fail to create a new thingId (duplicate)", async () => {
     await addDevice();
     const res = await request(appInstance)
       .post(`/things`)
@@ -151,7 +151,7 @@ describe("things/", function() {
     expect(res.status).toEqual(404);
   });
 
-  it("GET with 1 thing", async () => {
+  it("GET with 1 thingId", async () => {
     const res = await request(appInstance)
       .get(`/things`)
       .set("Accept", "application/json")
@@ -164,7 +164,7 @@ describe("things/", function() {
     expect(res.body[0].href).toEqual(`/things/test-1`);
   });
 
-  it("GET a thing", async () => {
+  it("GET a thingId", async () => {
     const thingDescr = JSON.parse(JSON.stringify(piDescr));
 
     await addDevice(thingDescr);
@@ -178,19 +178,25 @@ describe("things/", function() {
     expect(res.body.name).toEqual(thingDescr.name);
 
     // Fix up links
-    thingDescr.properties.power.links[0].href = `/things/${thingDescr.id}${thingDescr.properties.power.links[0].href}`;
+    thingDescr.properties.power.links[0].href = `/things/${thingDescr.id}${
+      thingDescr.properties.power.links[0].href
+    }`;
     thingDescr.properties.power.links.push({
       rel: "property",
       href: `/things/${thingDescr.id}/properties/power`
     });
 
-    thingDescr.actions.reboot.links[0].href = `/things/${thingDescr.id}${thingDescr.actions.reboot.links[0].href}`;
+    thingDescr.actions.reboot.links[0].href = `/things/${thingDescr.id}${
+      thingDescr.actions.reboot.links[0].href
+    }`;
     thingDescr.actions.reboot.links.push({
       rel: "action",
       href: `/things/${thingDescr.id}/actions/reboot`
     });
 
-    thingDescr.events.reboot.links[0].href = `/things/${thingDescr.id}${thingDescr.events.reboot.links[0].href}`;
+    thingDescr.events.reboot.links[0].href = `/things/${thingDescr.id}${
+      thingDescr.events.reboot.links[0].href
+    }`;
     thingDescr.events.reboot.links.push({
       rel: "event",
       href: `/things/${thingDescr.id}/events/reboot`
@@ -202,7 +208,7 @@ describe("things/", function() {
     expect(res.body).toMatchObject(thingDescr);
   });
 
-  it("fail to GET a nonexistent thing", async () => {
+  it("fail to GET a nonexistent thingId", async () => {
     const err = await request(appInstance)
       .get(`/things/test-2`)
       .set("Accept", "application/json")
@@ -211,7 +217,7 @@ describe("things/", function() {
     expect(err.status).toEqual(404);
   });
 
-  it("GET all properties of a thing", async () => {
+  it("GET all properties of a thingId", async () => {
     const res = await request(appInstance)
       .get(`/things/test-1/properties`)
       .set("Accept", "application/json")
@@ -224,7 +230,7 @@ describe("things/", function() {
     expect(res.body.percent).toEqual(20);
   });
 
-  it("GET a property of a thing", async () => {
+  it("GET a property of a thingId", async () => {
     const res = await request(appInstance)
       .get(`/things/test-1/properties/power`)
       .set("Accept", "application/json")
@@ -235,7 +241,7 @@ describe("things/", function() {
     expect(res.body.power).toEqual(false);
   });
 
-  it("fail to GET a nonexistent property of a thing", async () => {
+  it("fail to GET a nonexistent property of a thingId", async () => {
     const err = await request(appInstance)
       .get(`/things/test-1/properties/invalid-property`)
       .set("Accept", "application/json")
@@ -244,7 +250,7 @@ describe("things/", function() {
     expect(err.status).toEqual(404);
   });
 
-  it("fail to GET a property of a nonexistent thing", async () => {
+  it("fail to GET a property of a nonexistent thingId", async () => {
     const err = await request(appInstance)
       .get(`/things/invalid-thing/properties/power`)
       .set("Accept", "application/json")
@@ -253,7 +259,7 @@ describe("things/", function() {
     expect(err.status).toEqual(404);
   });
 
-  it("fail to set a property of a thing", async () => {
+  it("fail to set a property of a thingId", async () => {
     const err = await request(appInstance)
       .put(`/things/test-1/properties/power`)
       .set("Accept", "application/json")
@@ -261,7 +267,7 @@ describe("things/", function() {
     expect(err.status).toEqual(400);
   });
 
-  it("fail to set a property of a thing", async () => {
+  it("fail to set a property of a thingId", async () => {
     const err = await request(appInstance)
       .put(`/things/test-1/properties/power`)
       .set("Accept", "application/json")
@@ -269,7 +275,7 @@ describe("things/", function() {
     expect(err.status).toEqual(400);
   });
 
-  it("set a property of a thing", async () => {
+  it("set a property of a thingId", async () => {
     const on = await request(appInstance)
       .put(`/things/test-1/properties/power`)
       .set("Accept", "application/json")
@@ -400,25 +406,24 @@ describe("things/", function() {
 
   it("fail to set invalid enum property value", async () => {
     let res = await request(appInstance)
-    .get(`/things/validation-1/properties/enumProp`)
-    .set("Accept", "application/json")
-    .send();
+      .get(`/things/validation-1/properties/enumProp`)
+      .set("Accept", "application/json")
+      .send();
 
     expect(res.status).toEqual(200);
     expect(res.body).toHaveProperty("enumProp");
     expect(res.body.enumProp).toEqual("val2");
 
     const err = await request(appInstance)
-    .put(`/things/validation-1/properties/enumProp`)
-    .set("Accept", "application/json")
-    .send({enumProp: "val0"});
+      .put(`/things/validation-1/properties/enumProp`)
+      .set("Accept", "application/json")
+      .send({ enumProp: "val0" });
     expect(err.status).toEqual(400);
 
     res = await request(appInstance)
-    .get(`/things/validation-1/properties/enumProp`)
-    .set("Accept", "application/json")
-    .send();
-
+      .get(`/things/validation-1/properties/enumProp`)
+      .set("Accept", "application/json")
+      .send();
 
     expect(res.status).toEqual(200);
     expect(res.body).toHaveProperty("enumProp");

@@ -40,7 +40,9 @@ export default class MultiTrigger extends Trigger {
     if (!desc.hasOwnProperty("triggers")) {
       throw new Error("Triggers property missing from object.");
     }
-    const triggers: Trigger[] = desc.triggers.map((t: any) => Trigger.fromDescription(t));
+    const triggers: Trigger[] = desc.triggers.map((t: any) =>
+      Trigger.fromDescription(t)
+    );
     return new this(desc.label, desc.op, triggers);
   }
 

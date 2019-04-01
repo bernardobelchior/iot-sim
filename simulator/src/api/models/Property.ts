@@ -47,12 +47,7 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
    * @param {String} description Human friendly description
    * @param {String} type A primitive type
    */
-  constructor(
-    id: string,
-    description: string,
-    type: string,
-    title?: string,
-  ) {
+  constructor(id: string, description: string, type: string, title?: string) {
     super();
     this.id = id;
     this.title = title;
@@ -69,14 +64,14 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
     let data: any = {
       title: this.title,
       description: this.description,
-      type: this.type,
+      type: this.type
     };
 
     data = { ...data, ...this.metadata };
 
     if (data.hasOwnProperty("semanticType")) {
       data["@type"] = data.semanticType;
-      delete(data.semanticType);
+      delete data.semanticType;
     }
     data.links = this.links;
 

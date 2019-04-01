@@ -30,7 +30,11 @@ export default class EqualityTrigger extends PropertyTrigger {
     if (!desc.hasOwnProperty("property")) {
       throw new Error("Property description missing from object.");
     }
-    return new this(desc.label, Property.fromDescription(desc.property), desc.value);
+    return new this(
+      desc.label,
+      Property.fromDescription(desc.property),
+      desc.value
+    );
   }
 
   /**
@@ -38,12 +42,9 @@ export default class EqualityTrigger extends PropertyTrigger {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(
-      super.toDescription(),
-      {
-        value: this.value,
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value
+    });
   }
 
   /**

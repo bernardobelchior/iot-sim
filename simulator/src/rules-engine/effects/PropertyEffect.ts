@@ -28,7 +28,13 @@ export default class PropertyEffect extends Effect {
     if (!desc.hasOwnProperty("property")) {
       throw new Error("Property missing from object.");
     }
-    const p = new Property(desc.property.type, desc.property.id, desc.property.thing, desc.property.unit, desc.property.description);
+    const p = new Property(
+      desc.property.type,
+      desc.property.id,
+      desc.property.thingId,
+      desc.property.unit,
+      desc.property.description
+    );
     return new this(desc.label, p);
   }
 

@@ -33,7 +33,11 @@ export default class BooleanTrigger extends PropertyTrigger {
     if (!desc.hasOwnProperty("property")) {
       throw new Error("Property description missing from object.");
     }
-    return new this(desc.label, Property.fromDescription(desc.property), desc.onValue);
+    return new this(
+      desc.label,
+      Property.fromDescription(desc.property),
+      desc.onValue
+    );
   }
 
   /**

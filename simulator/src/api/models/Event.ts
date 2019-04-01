@@ -28,11 +28,7 @@ export class Event {
    * @param {String} description Human friendly description
    * @param {String} semanticType String identifying a type from the linked context
    */
-  constructor(
-    description: string,
-    title?: string,
-    semanticType?: string
-  ) {
+  constructor(description: string, title?: string, semanticType?: string) {
     this.description = description;
     this.title = title;
     this.semanticType = semanticType;

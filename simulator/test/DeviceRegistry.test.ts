@@ -1,7 +1,8 @@
 import waitForExpect from "wait-for-expect";
-import { MessageQueue } from "../src/api/MessageQueue";
+import { MessageQueue, messageQueueBuilder } from "../src/api/MessageQueue";
 import { DeviceRegistry, REGISTER_TOPIC } from "../src/api/DeviceRegistry";
 import { Thing } from "../src/api/models/Thing";
+import { vars } from "../src/util/vars";
 
 const thingsDescription = [
   {
@@ -32,7 +33,9 @@ const thingsDescription = [
   }
 ];
 
-const things: Thing[] = thingsDescription.map(desc => Thing.fromDescription(desc));
+const things: Thing[] = thingsDescription.map(desc =>
+  Thing.fromDescription(desc)
+);
 
 const simulatedThing: Thing = Thing.fromDescription({
   "@type": ["Simulated"],
@@ -51,21 +54,23 @@ const simulatedThing: Thing = Thing.fromDescription({
 });
 
 describe("DeviceRegistry", () => {
-  let deviceRegistry: DeviceRegistry;
   let messageQueue: MessageQueue;
+  let deviceRegistry: DeviceRegistry;
 
   beforeEach(async () => {
-    deviceRegistry = new DeviceRegistry();
+    messageQueue = await messageQueueBuilder(
+      vars.READ_MQ_URI,
+      vars.READ_MQ_URI
+    );
+    deviceRegistry = new DeviceRegistry(messageQueue);
     await deviceRegistry.init();
-    messageQueue = deviceRegistry.getMessageQueue() as MessageQueue;
   });
 
-  afterAll(async () => {
-    deviceRegistry.finalize();
+  afterEach(async () => {
+    await messageQueue.end();
   });
 
-
-  it("registers devices correctly", async () => {
+  it("should register devices", async () => {
     expect(Object.values(deviceRegistry.getThings())).toHaveLength(0);
 
     things.forEach(
@@ -85,10 +90,8 @@ describe("DeviceRegistry", () => {
     );
   });
 
-   it("sets device property correctly", async () => {
+  it("should set device property", async () => {
     const thing = things[0];
-    await deviceRegistry.addThing(thing);
-
     const message = {
       messageType: "setProperty",
       data: {
@@ -96,34 +99,40 @@ describe("DeviceRegistry", () => {
       }
     };
 
+    await deviceRegistry.addThing(thing);
+
     expect(thing.getPropertyValue("on")).toBeUndefined();
 
-    await messageQueue.publish(`/things/${thing.id}`, JSON.stringify(message));
+    await messageQueue.publish(thing.href, JSON.stringify(message));
 
     await waitForExpect(() =>
-      expect(deviceRegistry.getThing(thing.id).getPropertyValue("on")).toBe(message.data.on)
+      expect(deviceRegistry.getThing(thing.id)!.getPropertyValue("on")).toBe(
+        message.data.on
+      )
     );
   });
 
-  it("correctly overrides physical thing with a simulated one", async () => {
+  it("should override physical thingId with a simulated one", async () => {
     const thing = things[0];
     await deviceRegistry.addThing(thing);
     expect(deviceRegistry.getThing(thing.id)!.type).not.toContain("Simulated");
 
     await deviceRegistry.addThing(simulatedThing);
 
-    expect(deviceRegistry.getThing(thing.id).asThingDescription()).toEqual(simulatedThing.asThingDescription());
+    expect(deviceRegistry.getThing(thing.id)!.asThingDescription()).toEqual(
+      simulatedThing.asThingDescription()
+    );
     expect(deviceRegistry.getThing(simulatedThing.id)!.type).toContain(
       "Simulated"
     );
   });
 
-  it("correctly retrieves property of simulated device over the physical one", async () => {
+  it("should retrieve property of simulated device over the physical one", async () => {
     const thing = things[0];
     await deviceRegistry.addThing(thing);
 
     await messageQueue.publish(
-      `/things/${thing.id}`,
+      thing.href,
       JSON.stringify({
         messageType: "setProperty",
         data: {
@@ -136,7 +145,7 @@ describe("DeviceRegistry", () => {
 
     await deviceRegistry.addThing(simulatedThing);
     await messageQueue.publish(
-      `/things/${simulatedThing.id}`,
+      simulatedThing.href,
       JSON.stringify({
         messageType: "setProperty",
         data: {

@@ -34,7 +34,9 @@ export default class PropertyTrigger extends Trigger {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(super.toDescription(), { property: this.property.toDescription() });
+    return Object.assign(super.toDescription(), {
+      property: this.property.toDescription()
+    });
   }
 
   async start() {
@@ -49,10 +51,10 @@ export default class PropertyTrigger extends Trigger {
 
   /**
    * Get the subscriptions necessary for the trigger to activate when the condition is met
-   * When the trigger uses a property, the subscription is made to the respective thing property
+   * When the trigger uses a property, the subscription is made to the respective thingId property
    */
   getSubscriptions(): string | string[] {
-    return `things/${this.property.thing}/properties/${this.property.id}`;
+    return `things/${this.property.thingId}/properties/${this.property.id}`;
   }
 
   /**

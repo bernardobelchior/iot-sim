@@ -21,23 +21,21 @@ export class SimpleSensor extends ThingModel {
     super(messageQueue);
   }
 
+  getHref(): string {
+    return this.description.href;
+  }
+
   measure() {
     let tmp = 20;
 
     setInterval(async () => {
       tmp -= 0.1;
-      const msg = {
-        messageType: "propertyStatus",
-        data: {
-          temperature: tmp
-        }
-      };
 
-      await this.mq.publish("/things/thermometer", JSON.stringify(msg));
+      await this.sendMessage("propertyStatus", { temperature: tmp });
     }, 1000);
   }
 
-  getDescription(): string {
-    return JSON.stringify(this.description);
+  getDescription(): object {
+    return this.description;
   }
 }

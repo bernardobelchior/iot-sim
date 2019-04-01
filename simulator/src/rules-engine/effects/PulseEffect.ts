@@ -40,7 +40,13 @@ export default class PulseEffect extends PropertyEffect {
     if (!desc.hasOwnProperty("value")) {
       throw new Error("Value missing from object.");
     }
-    const p = new Property(desc.property.type, desc.property.id, desc.property.thing, desc.property.unit, desc.property.description);
+    const p = new Property(
+      desc.property.type,
+      desc.property.id,
+      desc.property.thingId,
+      desc.property.unit,
+      desc.property.description
+    );
     return new this(desc.label, p, desc.value);
   }
 
@@ -49,10 +55,10 @@ export default class PulseEffect extends PropertyEffect {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(
-      super.toDescription(),
-      { value: this.value, on: this.on }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value,
+      on: this.on
+    });
   }
 
   /**
@@ -75,7 +81,6 @@ export default class PulseEffect extends PropertyEffect {
       }
       this.on = true;
       return this.property.set(this.value);
-
     } else if (this.on) {
       // Revert to our original value if we pulsed to a new value
       this.on = false;

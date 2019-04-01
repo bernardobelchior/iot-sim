@@ -36,12 +36,9 @@ export default class NotificationEffect extends Effect {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(
-      super.toDescription(),
-      {
-        message: this.message,
-      }
-    );
+    return Object.assign(super.toDescription(), {
+      message: this.message
+    });
   }
 
   /**

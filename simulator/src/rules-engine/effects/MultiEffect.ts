@@ -23,7 +23,9 @@ export default class MultiEffect extends Effect {
     if (!desc.hasOwnProperty("effects")) {
       throw new Error("Effects property missing from object.");
     }
-    const effects: Effect[] = desc.effects.map((e: any) => Effect.fromDescription(e));
+    const effects: Effect[] = desc.effects.map((e: any) =>
+      Effect.fromDescription(e)
+    );
     return new this(desc.label, effects);
   }
 

@@ -33,7 +33,13 @@ export default class SetEffect extends PropertyEffect {
     if (!desc.hasOwnProperty("value")) {
       throw new Error("Value missing from object.");
     }
-    const p = new Property(desc.property.type, desc.property.id, desc.property.thing, desc.property.unit, desc.property.description);
+    const p = new Property(
+      desc.property.type,
+      desc.property.id,
+      desc.property.thingId,
+      desc.property.unit,
+      desc.property.description
+    );
     return new this(desc.label, p, desc.value);
   }
 
@@ -42,10 +48,10 @@ export default class SetEffect extends PropertyEffect {
    * @return {Object}
    */
   toDescription(): Object {
-    return Object.assign(
-      super.toDescription(),
-      { value: this.value, on: this.on }
-    );
+    return Object.assign(super.toDescription(), {
+      value: this.value,
+      on: this.on
+    });
   }
 
   /**

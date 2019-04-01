@@ -12,9 +12,19 @@ export const list = (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     res.json(thing.getProperties());
   } catch (e) {
-    res.status(404).send(new APIError("Failed to get thing properties", e).toString());
+    res
+      .status(404)
+      .send(new APIError("Failed to get thingId properties", e).toString());
   }
 };
 
@@ -28,11 +38,21 @@ export const get = (req: IRequest, res: Response) => {
   try {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
+
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     const propertyName = req.params.propertyName;
     const propertyValue = thing.getPropertyValue(propertyName);
     res.json({ [propertyName]: propertyValue });
   } catch (e) {
-    res.status(404).send(new APIError("Failed to get thing property", e).toString());
+    res
+      .status(404)
+      .send(new APIError("Failed to get thingId property", e).toString());
   }
 };
 
@@ -47,20 +67,38 @@ export const put = (req: IRequest, res: Response) => {
     const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
 
+    if (thing === undefined) {
+      res
+        .status(404)
+        .send(new APIError(`Thing with ID '${thingId}' not found.`).toString());
+      return;
+    }
+
     const propertyName = req.params.propertyName;
     if (!req.body.hasOwnProperty(propertyName)) {
-      res.status(400).send(new APIError("Failed to set thing property", "Property identifier missing").toString());
+      res
+        .status(400)
+        .send(
+          new APIError(
+            "Failed to set thingId property",
+            "Property identifier missing"
+          ).toString()
+        );
       return;
     }
 
     try {
       thing.setProperty(propertyName, req.body[propertyName]);
     } catch (error) {
-      res.status(400).send(new APIError("Failed to set thing property", error).toString());
+      res
+        .status(400)
+        .send(new APIError("Failed to set thingId property", error).toString());
       return;
     }
     res.json({ [propertyName]: thing.getPropertyValue(propertyName) });
   } catch (e) {
-    res.status(404).send(new APIError("Failed to set thing property", e).toString());
+    res
+      .status(404)
+      .send(new APIError("Failed to set thingId property", e).toString());
   }
 };

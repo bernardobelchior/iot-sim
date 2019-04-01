@@ -1,7 +1,7 @@
 import { start } from "../src/server";
 import { MessageQueue } from "../src/api/MessageQueue";
 import { DeviceRegistry } from "../src/api/DeviceRegistry";
-import { parseWebThing } from "../src/api/builder";
+import { Thing } from "../src/api/models/Thing";
 
 const things = [
   {
@@ -58,8 +58,8 @@ start().then(async ({ app }) => {
   const messageQueue: MessageQueue = app.get("messageQueue");
   const registry: DeviceRegistry = app.get("registry");
 
-  await registry.addThing(parseWebThing(things[0]));
-  await registry.addThing(parseWebThing(things[2]));
+  await registry.addThing(Thing.fromDescription(things[0]));
+  await registry.addThing(Thing.fromDescription(things[2]));
 
   await messageQueue.publish(
     things[0].href,
@@ -72,7 +72,7 @@ start().then(async ({ app }) => {
   );
 
   setTimeout(async () => {
-    await registry.addThing(parseWebThing(things[1]));
+    await registry.addThing(Thing.fromDescription(things[1]));
 
     await messageQueue.publish(
       things[1].href,

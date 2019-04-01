@@ -1,7 +1,7 @@
 import request from "supertest";
 import "jest";
 import app from "../../src/app";
-import { SimulatorSingleton } from "../../src/Simulator";
+import { Simulator } from "../../src/Simulator";
 
 const thingLight1 = {
   id: "light1",
@@ -62,7 +62,7 @@ const testRule = {
     property: {
       type: "boolean",
       id: "on",
-      thing: "light1"
+      thingId: "light1"
     },
     type: "BooleanTrigger",
     onValue: true,
@@ -71,7 +71,7 @@ const testRule = {
   effect: {
     property: {
       type: "boolean",
-      thing: "light2",
+      thingId: "light2",
       id: "on"
     },
     type: "PulseEffect",
@@ -86,7 +86,7 @@ const numberTestRule = {
   trigger: {
     property: {
       type: "number",
-      thing: "light2",
+      thingId: "light2",
       id: "hue"
     },
     type: "LevelTrigger",
@@ -97,7 +97,7 @@ const numberTestRule = {
   effect: {
     property: {
       type: "number",
-      thing: "light3",
+      thingId: "light3",
       id: "bri"
     },
     type: "PulseEffect",
@@ -150,7 +150,7 @@ describe("rules engine", () => {
   });
 
   afterAll(async () => {
-    await SimulatorSingleton.finalize();
+    await (await Simulator.getInstance()).finalize();
   });
 
   it("gets a list of 0 rules", async () => {
@@ -191,10 +191,10 @@ describe("rules engine", () => {
       .get(`/rules`)
       .set("Accept", "application/json")
       .send();
+    expect(res.body[0]).toMatchObject(testRule);
     expect(res.status).toEqual(200);
     expect(Array.isArray(res.body)).toBeTruthy();
     expect(res.body.length).toEqual(1);
-    expect(res.body[0]).toMatchObject(testRule);
   });
 
   it("gets this rule specifically", async () => {

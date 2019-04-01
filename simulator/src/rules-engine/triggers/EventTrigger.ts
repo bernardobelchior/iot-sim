@@ -59,7 +59,7 @@ export default class EventTrigger extends Trigger {
 
   /**
    * Get the subscriptions necessary for the trigger to activate when the condition is met
-   * When the trigger uses an event, the subscription is made to the respective thing event
+   * When the trigger uses an event, the subscription is made to the respective thingId event
    */
   getSubscriptions(): string | string[] {
     return `things/${this.thingId}/events/${this.event}`;

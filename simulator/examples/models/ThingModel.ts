@@ -1,6 +1,8 @@
 import { MessageQueue } from "../../src/api/MessageQueue";
 import { REGISTER_TOPIC } from "../../src/api/DeviceRegistry";
 
+export type MessageType = "propertyStatus";
+
 export abstract class ThingModel {
   mq: MessageQueue;
 
@@ -8,9 +10,23 @@ export abstract class ThingModel {
     this.mq = mq;
   }
 
-  public abstract getDescription(): string;
+  public abstract getHref(): string;
+
+  public abstract getDescription(): object;
 
   public async register() {
-    return this.mq.publish(REGISTER_TOPIC, this.getDescription());
+    return this.mq.publish(
+      REGISTER_TOPIC,
+      JSON.stringify(this.getDescription())
+    );
+  }
+
+  protected sendMessage(type: MessageType, data: object) {
+    const msg = {
+      messageType: type,
+      data
+    };
+
+    return this.mq.publish(this.getHref(), JSON.stringify(msg));
   }
 }

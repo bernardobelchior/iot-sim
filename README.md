@@ -58,3 +58,25 @@ Before running, make sure you have a RabbitMQ instance running. Running multiple
 In order to run them, run `npm run example -- <example-name>`. When trying to run the example named `twoThings.ts`, the following commmand would have to be executed `npm run example -- twoThings`.
 
 Note: in some cases, TypeScript compilation may be slower than running the example. If this happens, you should try again.
+
+
+# Changes to the Web Thing API Spec
+
+## Web Thing Description 
+
+* Added a special "Simulated" `@type` that represents a simulated device. 
+* Added `id` field to Web Thing description.
+
+## WebSocket API
+
+### `setProperty` message
+
+* Added `"simulated": true` field to the `setProperty` message to signal that is comes from a simulated device.
+
+
+# Simulator
+
+## RabbitMQ Setup
+
+In order for the simulator proxying to work, there must be two different virtual hosts. Once vhost will host the reading of messages by the devices, while the other will host the writing. 
+The simulator's proxy will take care of routing between both. 
