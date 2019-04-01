@@ -111,7 +111,7 @@ export class Property extends (EventEmitter as { new (): TriggerEmitter }) {
    * @param {any} value
    * @return {any} resolves when set is done
    */
-  set(value: any): any {
+  async set(value: any): Promise<any> {
     try {
       const registry = (await Simulator.getInstance()).getRegistry();
       return registry.setThingProperty(this.thingId, this.id, value);
