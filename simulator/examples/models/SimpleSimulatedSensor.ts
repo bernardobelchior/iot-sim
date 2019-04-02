@@ -1,5 +1,6 @@
 import { MessageQueue } from "../../src/api/MessageQueue";
 import { SimulatedThingModel } from "./SimulatedThingModel";
+import { Thing } from "../../src/api/models/Thing";
 
 export class SimpleSimulatedSensor extends SimulatedThingModel {
   description = {
@@ -15,7 +16,7 @@ export class SimpleSimulatedSensor extends SimulatedThingModel {
         links: [{ href: "/things/thermometer/properties/temperature" }]
       }
     },
-    href: "/things/thermometer"
+    id: "thermometer"
   };
 
   constructor(messageQueue: MessageQueue) {
@@ -23,7 +24,7 @@ export class SimpleSimulatedSensor extends SimulatedThingModel {
   }
 
   getHref(): string {
-    return this.description.href;
+    return Thing.generateHrefFromId(this.description.id);
   }
 
   measure() {

@@ -101,7 +101,7 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
       metadata[key] === undefined ? delete metadata[key] : ""
     );
     this.metadata = metadata;
-    this.valueGenerator = new ValueGenerator(this.type, this.metadata);
+    // this.valueGenerator = new ValueGenerator(this.type, this.metadata);
   }
 
   /**

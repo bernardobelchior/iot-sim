@@ -1,5 +1,6 @@
 import { ThingModel } from "./ThingModel";
 import { MessageQueue, QoS } from "../../src/api/MessageQueue";
+import { Thing } from "../../src/api/models/Thing";
 
 export class SimpleActuator extends ThingModel {
   description = {
@@ -17,13 +18,10 @@ export class SimpleActuator extends ThingModel {
       close: {
         title: "Close",
         description: "Close window",
-        input: {
-          type: "null"
-        },
         links: [{ href: "/things/window/actions/close" }]
       }
     },
-    href: "/things/window"
+    id: "window"
   };
 
   constructor(messageQueue: MessageQueue) {
@@ -31,7 +29,7 @@ export class SimpleActuator extends ThingModel {
   }
 
   getHref(): string {
-    return this.description.href;
+    return Thing.generateHrefFromId(this.description.id);
   }
 
   getDescription(): object {
