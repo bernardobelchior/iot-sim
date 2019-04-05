@@ -9,6 +9,7 @@ import { DeviceRegistry } from "./api/DeviceRegistry";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { Simulator } from "./Simulator";
 import * as routes from "./routes";
+import { proxyBuilder } from "./api/Proxy";
 
 type Settings = {
   messageQueue: MessageQueue;
@@ -51,6 +52,9 @@ async function app(): Promise<IApp> {
     "/rules",
     routes.rulesRouter((await Simulator.getInstance()).getRulesEngine())
   );
+
+  const proxy = await proxyBuilder(registry, messageQueue);
+  await proxy.start();
 
   return app;
 }
