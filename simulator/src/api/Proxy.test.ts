@@ -1,12 +1,12 @@
 import toml from "toml";
 import fs from "fs";
-import { ProxyConfig } from "../src/api/ProxyConfig";
-import { FakeProxy } from "../src/api/FakeProxy";
+import { ProxyConfig } from "./ProxyConfig";
+import { Proxy } from "./Proxy";
 import { IPublishPacket } from "async-mqtt";
-import { createMessage } from "../src/util/WebThingMessageUtils";
-import { MessageCallback, MessageQueue } from "../src/api/MessageQueue";
+import { createMessage } from "../util/WebThingMessageUtils";
+import { MessageCallback, MessageQueue } from "./MessageQueue";
 
-describe("FakeProxy", () => {
+describe("IProxy", () => {
   it("should generate handler that replaces property value", async () => {
     const result = toml.parse(
       fs.readFileSync("./test/simpleReplacer.toml").toString()
@@ -16,7 +16,7 @@ describe("FakeProxy", () => {
     const proxy = config.proxies[0];
 
     const publish = jest.fn();
-    const handler = FakeProxy.generateHandlerFromConfig(proxy);
+    const handler = Proxy.generateHandlerFromConfig(proxy);
 
     handler(
       {
@@ -62,7 +62,7 @@ describe("FakeProxy", () => {
 
     const publish = jest.spyOn(messageQueue, "publish");
 
-    const proxy = new FakeProxy(new ProxyConfig({ proxies: [] }), messageQueue);
+    const proxy = new Proxy(new ProxyConfig({ proxies: [] }), messageQueue);
 
     await proxy.start();
 

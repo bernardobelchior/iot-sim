@@ -5,7 +5,7 @@ import * as toml from "toml";
 describe("ProxyConfig", () => {
   it("should parse `simpleReplacer.toml` configuration", () => {
     const result = toml.parse(
-      fs.readFileSync("./test/simpleReplacer.toml").toString()
+      fs.readFileSync("./examples/configs/simpleReplacer.toml").toString()
     );
 
     expect(() => {

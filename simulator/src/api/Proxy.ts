@@ -1,54 +1,83 @@
 import { MessageQueue } from "./MessageQueue";
-import { DeviceRegistry, REGISTER_TOPIC } from "./DeviceRegistry";
 import { IPublishPacket } from "async-mqtt";
-import { Thing } from "./models/Thing";
-import assert = require("assert");
+import { IProxy, ProxyConfig } from "./ProxyConfig";
+import { createMessage } from "../util/WebThingMessageUtils";
 
-export function proxyBuilder(
-  deviceRegistry: DeviceRegistry,
-  messageQueue: MessageQueue
-): Proxy {
-  const reverseMessageQueue = new MessageQueue(
-    messageQueue.writeClient,
-    messageQueue.readClient
-  );
-
-  return new Proxy(deviceRegistry, reverseMessageQueue);
+interface HandlerParam {
+  topic: string;
+  content: object;
+  suppress: boolean;
+  packet: IPublishPacket;
 }
 
+export type MessageHandler = (
+  args: HandlerParam,
+  publish: MessageQueue["publish"]
+) => HandlerParam;
+
 /**
- * Proxy class that joins a 'read' and a 'write' queue together.
- * This class, along with the DeviceRegistry makes sure that
- * messages from simulated devices "overwrite" messages from
- * non-simulated ones.
- * Must call `start` before the Proxy starts redirecting messages.
+ * Class responsible for proxying messages from the write to the read queue.
+ * It uses a "Chain of Responsibility" pattern to decide how to handle messages.
+ * Every message goes through every handler and the final value will defined
+ * how the message will ultimately be handled.
  */
-class Proxy {
-  /** This message queue writes to the read queue, and reads from the write
-   * queue, basically reversing the job of the normal `messageQueue`.
-   * It is used to redirect messages from the read to the write queue.
-   */
-  private reverseMessageQueue: MessageQueue;
-  private registry: DeviceRegistry;
+export class Proxy {
+  private readonly config: ProxyConfig;
+  private readonly handlers: Array<MessageHandler>;
+  private readonly reverseMessageQueue: MessageQueue;
 
-  constructor(
-    deviceRegistry: DeviceRegistry,
-    reverseMessageQueue: MessageQueue
-  ) {
+  constructor(config: ProxyConfig, reverseMessageQueue: MessageQueue) {
+    this.config = config;
+    this.handlers = [];
     this.reverseMessageQueue = reverseMessageQueue;
-    this.registry = deviceRegistry;
   }
 
-  async start() {
-    await this.reverseMessageQueue.subscribe("#", this.proxyMessage.bind(this));
+  public start() {
+    this.generateHandlersFromConfig();
+
+    return this.reverseMessageQueue.subscribe(
+      "#",
+      this.proxyMessage.bind(this)
+    );
   }
 
-  static removeSimulatedProperty(message: Buffer) {
-    const msg = JSON.parse(message.toString());
+  static generateHandlerFromConfig(proxy: IProxy): MessageHandler {
+    return (args, publish) => {
+      /* Skip handler if the topic doesn't match the input href */
+      if (args.topic !== proxy.input.href) {
+        return args;
+      }
 
-    delete msg["simulated"];
+      proxy.outputs.forEach(output => {
+        publish(
+          args.topic,
+          JSON.stringify(
+            createMessage("setProperty", {
+              [proxy.input.property]: output.value
+            })
+          )
+        );
+      });
 
-    return JSON.stringify(msg);
+      return {
+        ...args,
+        suppress: proxy.input.suppress
+      };
+    };
+  }
+
+  private generateHandlersFromConfig() {
+    this.config.proxies.forEach(p => {
+      this.addHandler(Proxy.generateHandlerFromConfig(p));
+    });
+  }
+
+  /**
+   * Adds handler to the end of the list
+   * @param handler
+   */
+  addHandler(handler: MessageHandler) {
+    this.handlers.push(handler);
   }
 
   private async proxyMessage(
@@ -56,51 +85,22 @@ class Proxy {
     message: Buffer,
     packet: IPublishPacket
   ) {
-    /* Register message is forwarded as-is */
-    if (topic === REGISTER_TOPIC) {
-      await this.reverseMessageQueue.publish(topic, message, packet.qos);
-      return;
+    const initialValue = {
+      content: JSON.parse(message.toString()),
+      topic,
+      suppress: false,
+      packet
+    };
+
+    const { suppress, content }: HandlerParam = this.handlers.reduce(
+      (param, handler) => handler(param, this.reverseMessageQueue.publish),
+      initialValue
+    );
+
+    if (suppress) {
+      return Promise.resolve();
     }
 
-    const id = Thing.getIdFromHref(topic);
-
-    /* Proxying of messages:
-     * If a physical thingId with the given id exists, then one of the following
-     * must happen:
-     * - If there is also a simulated thingId with the given id:
-     *   - AND the message came from a simulated thingId (i.e., contains the
-     *     `simulated` property), then the `simulated` property is removed and
-     *     the message is forwarded to the read queue
-     *   - AND the message came from a physical thingId (i.e., does not contain
-     *     the `simulated` property), then the message should be discarded since
-     *     a simulated device has higher priority
-     * - Otherwise, forward the message as-is, since there are no simulated
-     *   devices with the same id.
-     */
-
-    if (!this.registry.existsPhysicalThingWithId(id)) {
-      /* This should never happen, since the id is generated from the topic. */
-      assert.fail(
-        `Received message with topic '${topic}', but no thing with id '${id}' exists.`
-      );
-      return;
-    }
-
-    if (!this.registry.isThingSimulated(id)) {
-      await this.reverseMessageQueue.publish(topic, message, packet.qos);
-      return;
-    }
-
-    const msg = JSON.parse(message.toString());
-
-    if (typeof msg === "object" && msg["simulated"]) {
-      await this.reverseMessageQueue.publish(
-        topic,
-        Proxy.removeSimulatedProperty(message),
-        packet.qos
-      );
-    } else {
-      /* Discard message */
-    }
+    return this.reverseMessageQueue.publish(topic, JSON.stringify(content));
   }
 }

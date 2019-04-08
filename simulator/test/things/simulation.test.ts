@@ -1,9 +1,11 @@
 import * as controller from "../../src/api/controllers/simulation";
 import { DeviceRegistry } from "../../src/api/DeviceRegistry";
-import { MockMessageQueue } from "../MockMessageQueue";
 import { IRequest } from "../../src/api/registryMiddleware";
 import express = require("express");
 import { Thing } from "../../src/api/models/Thing";
+import { MessageQueue } from "../../src/api/MessageQueue";
+
+jest.mock("../../src/api/MessageQueue");
 
 const thing = {
   name: "Lamp",
@@ -21,7 +23,9 @@ const thing = {
 
 describe("controllers/simulation", () => {
   it("adds simulated thingId when called", async () => {
-    const deviceRegistry = new DeviceRegistry(new MockMessageQueue());
+    const deviceRegistry = new DeviceRegistry(
+      await MessageQueue.create("", "")
+    );
     const sendStatus = jest.fn();
 
     await deviceRegistry.addThing(Thing.fromDescription(thing));

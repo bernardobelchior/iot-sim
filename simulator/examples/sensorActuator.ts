@@ -2,12 +2,12 @@ import { start } from "../src/server";
 import { MessageQueue } from "../src/api/MessageQueue";
 import { SimpleActuator } from "./models/SimpleActuator";
 import { SimpleSensor } from "./models/SimpleSensor";
-import { FakeProxy } from "../src/api/FakeProxy";
+import { Proxy } from "../src/api/Proxy";
 
 start().then(async ({ app }) => {
   const messageQueue: MessageQueue = app.get("messageQueue");
 
-  const proxy = new FakeProxy(
+  const proxy = new Proxy(
     { proxies: [] },
     new MessageQueue(messageQueue.writeClient, messageQueue.readClient)
   );

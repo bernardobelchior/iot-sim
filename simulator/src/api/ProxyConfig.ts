@@ -12,13 +12,13 @@ interface Output {
   delay: number;
 }
 
-export interface Proxy {
+export interface IProxy {
   input: Input;
   outputs: Output[];
 }
 
 interface IProxyConfig {
-  proxies: Proxy[];
+  proxies: IProxy[];
 }
 
 export const schema = yup.object().shape({
@@ -52,7 +52,7 @@ export const schema = yup.object().shape({
 });
 
 export class ProxyConfig {
-  proxies: Proxy[];
+  proxies: IProxy[];
 
   /**
    * @throws {ValidationError} if config is invalid
