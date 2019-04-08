@@ -58,11 +58,9 @@ export class ProxyConfig {
    * @throws {ValidationError} if config is invalid
    * @throws {Error} if schema has async validation rules
    */
-  constructor(config: unknown) {
-    ProxyConfig.validateConfig(config);
-
+  constructor(config: unknown = {}) {
     /* Cast is safe since `validateConfig` throws if config is not valid. */
-    const validConfig = config as IProxyConfig;
+    const validConfig = ProxyConfig.validateConfig(config) as IProxyConfig;
 
     this.proxies = validConfig.proxies;
   }

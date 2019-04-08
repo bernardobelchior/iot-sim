@@ -3,13 +3,14 @@ import { MessageQueue } from "../src/api/MessageQueue";
 import { SimpleActuator } from "./models/SimpleActuator";
 import { SimpleSensor } from "./models/SimpleSensor";
 import { Proxy } from "../src/api/Proxy";
+import { ProxyConfig } from "../src/api/ProxyConfig";
 
 start().then(async ({ app }) => {
   const messageQueue: MessageQueue = app.get("messageQueue");
 
   const proxy = new Proxy(
-    { proxies: [] },
-    new MessageQueue(messageQueue.writeClient, messageQueue.readClient)
+    new MessageQueue(messageQueue.writeClient, messageQueue.readClient),
+    new ProxyConfig()
   );
 
   const actuator = new SimpleActuator(messageQueue);

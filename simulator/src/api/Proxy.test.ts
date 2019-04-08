@@ -9,7 +9,7 @@ import { MessageCallback, MessageQueue } from "./MessageQueue";
 describe("IProxy", () => {
   it("should generate handler that replaces property value", async () => {
     const result = toml.parse(
-      fs.readFileSync("./test/simpleReplacer.toml").toString()
+      fs.readFileSync("./examples/configs/simpleReplacer.toml").toString()
     );
 
     const config = new ProxyConfig(result);
@@ -62,7 +62,7 @@ describe("IProxy", () => {
 
     const publish = jest.spyOn(messageQueue, "publish");
 
-    const proxy = new Proxy(new ProxyConfig({ proxies: [] }), messageQueue);
+    const proxy = new Proxy(messageQueue, new ProxyConfig());
 
     await proxy.start();
 

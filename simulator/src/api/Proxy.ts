@@ -26,7 +26,7 @@ export class Proxy {
   private readonly handlers: Array<MessageHandler>;
   private readonly reverseMessageQueue: MessageQueue;
 
-  constructor(config: ProxyConfig, reverseMessageQueue: MessageQueue) {
+  constructor(reverseMessageQueue: MessageQueue, config: ProxyConfig) {
     this.config = config;
     this.handlers = [];
     this.reverseMessageQueue = reverseMessageQueue;
