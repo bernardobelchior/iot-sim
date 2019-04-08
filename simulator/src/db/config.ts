@@ -19,8 +19,8 @@ export default () => {
   mongoose.connect(vars.MONGODB_URI, {
     useNewUrlParser: true,
     keepAlive: true,
-    user: "admin",
-    pass: "admin123"
+    user: "dev",
+    pass: "dev12345"
   });
   return mongoose.connection;
 };

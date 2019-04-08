@@ -18,9 +18,6 @@ export class SimpleActuator extends ThingModel {
       close: {
         title: "Close",
         description: "Close window",
-        input: {
-          type: "null"
-        },
         links: [{ href: "/things/window/actions/close" }]
       }
     },

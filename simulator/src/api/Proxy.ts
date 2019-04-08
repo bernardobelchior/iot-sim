@@ -56,13 +56,13 @@ class Proxy {
     message: Buffer,
     packet: IPublishPacket
   ) {
-    const id = Thing.getIdFromHref(topic);
-
     /* Register message is forwarded as-is */
     if (topic === REGISTER_TOPIC) {
       await this.reverseMessageQueue.publish(topic, message, packet.qos);
       return;
     }
+
+    const id = Thing.getIdFromHref(topic);
 
     /* Proxying of messages:
      * If a physical thingId with the given id exists, then one of the following
