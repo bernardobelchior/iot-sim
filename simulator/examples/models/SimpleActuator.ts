@@ -27,6 +27,8 @@ export class SimpleActuator extends ThingModel {
     id: "window"
   };
 
+  open = true;
+
   constructor(messageQueue: MessageQueue) {
     super(messageQueue);
   }
@@ -39,11 +41,23 @@ export class SimpleActuator extends ThingModel {
     return this.description;
   }
 
+  publishState() {
+    return this.sendMessage("propertyStatus", {
+      open: this.open
+    });
+  }
+
   onMessage(topic: string, msg: Buffer) {
     const data = JSON.parse(msg.toString()).data;
 
-    if (data.temperature > 21) {
-      console.log("too high!");
+    if (this.open && data.temperature < 21) {
+      this.open = false;
+      this.publishState();
+    }
+
+    if (!this.open && data.temperature > 25) {
+      this.open = true;
+      this.publishState();
     }
   }
 
@@ -53,5 +67,7 @@ export class SimpleActuator extends ThingModel {
       this.onMessage.bind(this),
       QoS.AtLeastOnce
     );
+
+    await this.publishState();
   }
 }

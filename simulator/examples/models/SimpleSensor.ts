@@ -30,7 +30,7 @@ export class SimpleSensor extends ThingModel {
     let tmp = 20;
 
     setInterval(async () => {
-      tmp -= 0.1;
+      tmp += 0.1;
 
       await this.sendMessage("propertyStatus", { temperature: tmp });
     }, 1000);

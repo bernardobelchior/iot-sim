@@ -19,6 +19,6 @@ start().then(async ({ app }) => {
   await actuator.register();
   await sensor.register();
 
-  await actuator.run();
   sensor.measure();
+  actuator.run();
 });

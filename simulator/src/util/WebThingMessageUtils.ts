@@ -1,4 +1,4 @@
-type MessageType = "setProperty";
+type MessageType = "setProperty" | "propertyStatus";
 
 interface Message {
   type: MessageType;
