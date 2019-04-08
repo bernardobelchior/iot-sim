@@ -9,6 +9,7 @@ import { DeviceRegistry } from "./api/DeviceRegistry";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { Simulator } from "./Simulator";
 import * as routes from "./routes";
+import logger from "./util/logger";
 
 type Settings = {
   messageQueue: MessageQueue;
@@ -28,7 +29,11 @@ async function app(): Promise<IApp> {
   await registry.init();
 
   if (vars.ENVIRONMENT !== "test") {
-    mongo();
+    if (vars.MONGODB_URI !== "") {
+      mongo();
+    } else {
+      logger.warn("MONGODB_URI not set. MongoDB initialization skipped");
+    }
   }
 
   // Create Express server

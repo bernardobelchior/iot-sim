@@ -67,12 +67,6 @@ Note: in some cases, TypeScript compilation may be slower than running the examp
 * Added a special "Simulated" `@type` that represents a simulated device. 
 * Added `id` field to Web Thing description.
 
-## WebSocket API
-
-### `setProperty` message
-
-* Added `"simulated": true` field to the `setProperty` message to signal that is comes from a simulated device.
-
 
 # Simulator
 

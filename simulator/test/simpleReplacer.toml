@@ -1,0 +1,5 @@
+[[proxies]]
+input = { href = "/things/thermometer", property = "temperature", suppress = true }
+
+[[proxies.outputs]]
+value = 20

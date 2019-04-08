@@ -22,11 +22,8 @@ if (fs.existsSync(".env")) {
 }
 
 const ENVIRONMENT: string = process.env.NODE_ENV || "development";
-const prod = ENVIRONMENT === "production";
 
-const MONGODB_URI = prod
-  ? process.env["MONGODB_URI"]
-  : process.env["MONGODB_URI_LOCAL"];
+const MONGODB_URI = process.env["MONGODB_URI"];
 
 if (MONGODB_URI === undefined) {
   logger.error("No mongo client string. Set MONGODB_URI environment variable.");

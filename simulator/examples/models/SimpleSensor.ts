@@ -1,5 +1,6 @@
 import { ThingModel } from "./ThingModel";
 import { MessageQueue } from "../../src/api/MessageQueue";
+import { Thing } from "../../src/api/models/Thing";
 
 export class SimpleSensor extends ThingModel {
   description = {
@@ -14,7 +15,7 @@ export class SimpleSensor extends ThingModel {
         links: [{ href: "/things/thermometer/properties/temperature" }]
       }
     },
-    href: "/things/thermometer"
+    id: "thermometer"
   };
 
   constructor(messageQueue: MessageQueue) {
@@ -22,7 +23,7 @@ export class SimpleSensor extends ThingModel {
   }
 
   getHref(): string {
-    return this.description.href;
+    return Thing.generateHrefFromId(this.description.id);
   }
 
   measure() {

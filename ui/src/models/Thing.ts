@@ -36,7 +36,6 @@ export interface Thing {
   "@type"?: string | string[];
   name: string;
   description: string;
-  href: string;
   properties: ThingProperty[];
   actions: ThingAction[];
   events: ThingEvent[];

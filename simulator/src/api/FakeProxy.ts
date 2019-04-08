@@ -1,54 +1,106 @@
-import * as yup from 'yup';
+import { MessageQueue } from "./MessageQueue";
+import { IPublishPacket } from "async-mqtt";
+import { Proxy, ProxyConfig } from "./ProxyConfig";
+import { createMessage } from "../util/WebThingMessageUtils";
 
-export const schema = yup.object().shape({
-    proxies: yup.array().of(yup.object().shape({
-        input: yup.object().shape({
-            href: yup.string().required(),
-            suppress: yup.boolean().default(true),
-        }).required(),
-        outputs: yup.array().of(yup.object().shape({
-            value: yup.mixed().required(),
-            href: yup.string(),
-            delay: yup.number().min(0).default(0)
-        })).required(),
-    })).required()
-})
-
-interface Input {
-            href: string;
-            suppress: boolean;
+interface HandlerParam {
+  topic: string;
+  content: object;
+  suppress: boolean;
+  packet: IPublishPacket;
 }
 
-interface Output {
-            value: unknown;
-            href?: string;
-            delay: number;
-}
+export type MessageHandler = (
+  args: HandlerParam,
+  publish: MessageQueue["publish"]
+) => HandlerParam;
 
-interface Proxy {
-        input: Input,
-        outputs: Output[]
-}
-
-interface ProxyConfig {
-    proxies: Proxy[]
-}
-
-export function validateProxyConfig(config: unknown): config is ProxyConfig {
-    try {
-        schema.validateSync(config);
-        return true;
-    } catch (e) {
-        console.error(e);
-        return false;
-    }
-}
-
-
+/**
+ * Class responsible for proxying messages from the write to the read queue.
+ * It uses a "Chain of Responsibility" pattern to decide how to handle messages.
+ * Every message goes through every handler and the final value will defined
+ * how the message will ultimately be handled.
+ */
 export class FakeProxy {
-    config: ProxyConfig;
+  private readonly config: ProxyConfig;
+  private readonly handlers: Array<MessageHandler>;
+  private readonly reverseMessageQueue: MessageQueue;
 
-    constructor(config: ProxyConfig) {
-        this.config = config;
+  constructor(config: ProxyConfig, reverseMessageQueue: MessageQueue) {
+    this.config = config;
+    this.handlers = [];
+    this.reverseMessageQueue = reverseMessageQueue;
+  }
+
+  public start() {
+    this.generateHandlersFromConfig();
+
+    return this.reverseMessageQueue.subscribe(
+      "#",
+      this.proxyMessage.bind(this)
+    );
+  }
+
+  static generateHandlerFromConfig(proxy: Proxy): MessageHandler {
+    return (args, publish) => {
+      /* Skip handler if the topic doesn't match the input href */
+      if (args.topic !== proxy.input.href) {
+        return args;
+      }
+
+      proxy.outputs.forEach(output => {
+        publish(
+          args.topic,
+          JSON.stringify(
+            createMessage("setProperty", {
+              [proxy.input.property]: output.value
+            })
+          )
+        );
+      });
+
+      return {
+        ...args,
+        suppress: proxy.input.suppress
+      };
+    };
+  }
+
+  private generateHandlersFromConfig() {
+    this.config.proxies.forEach(p => {
+      this.addHandler(FakeProxy.generateHandlerFromConfig(p));
+    });
+  }
+
+  /**
+   * Adds handler to the end of the list
+   * @param handler
+   */
+  addHandler(handler: MessageHandler) {
+    this.handlers.push(handler);
+  }
+
+  private async proxyMessage(
+    topic: string,
+    message: Buffer,
+    packet: IPublishPacket
+  ) {
+    const initialValue = {
+      content: JSON.parse(message.toString()),
+      topic,
+      suppress: false,
+      packet
+    };
+
+    const { suppress, content }: HandlerParam = this.handlers.reduce(
+      (param, handler) => handler(param, this.reverseMessageQueue.publish),
+      initialValue
+    );
+
+    if (suppress) {
+      return Promise.resolve();
     }
+
+    return this.reverseMessageQueue.publish(topic, JSON.stringify(content));
+  }
 }

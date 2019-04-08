@@ -41,6 +41,18 @@ export class MessageQueue {
     this.readClient.on("message", this.messageHandler.bind(this));
   }
 
+  static async create(
+    readUrl: string,
+    writeUrl: string
+  ): Promise<MessageQueue> {
+    const [readClient, writeClient] = await Promise.all([
+      connect(readUrl),
+      connect(writeUrl)
+    ]);
+
+    return new MessageQueue(readClient, writeClient);
+  }
+
   private messageHandler(topic: string, payload: Buffer, packet: Packet): void {
     for (const [key, handlers] of Object.entries(this.messageHandlers)) {
       const match = this.testTopic(key, topic);
