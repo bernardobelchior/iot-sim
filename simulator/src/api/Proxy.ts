@@ -62,14 +62,21 @@ export class Proxy {
         const topic = output.href || proxy.input.href;
         const property = output.property || proxy.input.property;
 
-        publish(
-          topic,
-          JSON.stringify(
-            createMessage("setProperty", {
-              [property]: output.value
-            })
-          )
-        );
+        const publishMsg = () =>
+          publish(
+            topic,
+            JSON.stringify(
+              createMessage("setProperty", {
+                [property]: output.value
+              })
+            )
+          );
+
+        if (output.delay) {
+          setTimeout(publishMsg, output.delay);
+        } else {
+          publishMsg();
+        }
       });
 
       return {

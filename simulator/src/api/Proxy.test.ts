@@ -28,6 +28,7 @@ describe("Proxy", () => {
 
     beforeAll(async () => {
       messageQueue = await MessageQueue.create("", "");
+      jest.useFakeTimers();
 
       jest
         .spyOn(messageQueue, "subscribe")
@@ -116,6 +117,43 @@ describe("Proxy", () => {
         2,
         message.topic,
         JSON.stringify(createMessage("setProperty", { temperature: 40 }))
+      );
+    });
+
+    it("should delay message when delay property is set", async () => {
+      const delay = 5;
+      const proxyConfig: IProxyConfig = {
+        proxies: [
+          {
+            input: {
+              property: "temperature",
+              href: "/things/thermometer",
+              suppress: true
+            },
+            outputs: [
+              {
+                value: 23,
+                delay
+              }
+            ]
+          }
+        ]
+      };
+
+      const config = new ProxyConfig(proxyConfig);
+      proxy.injectConfig(config);
+
+      await proxy.start();
+
+      expect(publish).not.toHaveBeenCalled();
+
+      expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), delay);
+
+      jest.advanceTimersByTime(delay);
+
+      expect(publish).toHaveBeenCalledWith(
+        "/things/thermometer",
+        JSON.stringify(createMessage("setProperty", { temperature: 23 }))
       );
     });
   });
