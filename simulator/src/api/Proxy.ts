@@ -59,11 +59,14 @@ export class Proxy {
       }
 
       proxy.outputs.forEach(output => {
+        const topic = output.href || proxy.input.href;
+        const property = output.property || proxy.input.property;
+
         publish(
-          args.topic,
+          topic,
           JSON.stringify(
             createMessage("setProperty", {
-              [proxy.input.property]: output.value
+              [property]: output.value
             })
           )
         );

@@ -9,6 +9,7 @@ interface Input {
 interface Output {
   value: unknown;
   href?: string;
+  property?: string;
   delay: number;
 }
 

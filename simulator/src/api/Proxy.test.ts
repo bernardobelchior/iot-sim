@@ -80,6 +80,44 @@ describe("Proxy", () => {
         JSON.stringify(createMessage("setProperty", { temperature: 23 }))
       );
     });
+
+    it("should duplicate value to another thing when href is set", async () => {
+      const proxyConfig: IProxyConfig = {
+        proxies: [
+          {
+            input: {
+              property: "temperature",
+              href: "/things/thermometer",
+              suppress: false
+            },
+            outputs: [
+              {
+                value: 23,
+                delay: 0,
+                href: "/things/room-thermometer",
+                property: "temp"
+              }
+            ]
+          }
+        ]
+      };
+
+      const config = new ProxyConfig(proxyConfig);
+      proxy.injectConfig(config);
+
+      await proxy.start();
+
+      expect(publish).toHaveBeenNthCalledWith(
+        1,
+        "/things/room-thermometer",
+        JSON.stringify(createMessage("setProperty", { temp: 23 }))
+      );
+      expect(publish).toHaveBeenNthCalledWith(
+        2,
+        message.topic,
+        JSON.stringify(createMessage("setProperty", { temperature: 40 }))
+      );
+    });
   });
 
   describe("handlers", () => {
