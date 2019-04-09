@@ -17,7 +17,7 @@ export interface IProxy {
   outputs: Output[];
 }
 
-interface IProxyConfig {
+export interface IProxyConfig {
   proxies: IProxy[];
 }
 
@@ -63,6 +63,10 @@ export class ProxyConfig {
     const validConfig = ProxyConfig.validateConfig(config) as IProxyConfig;
 
     this.proxies = validConfig.proxies;
+  }
+
+  merge(config: ProxyConfig) {
+    this.proxies = [...this.proxies, ...config.proxies];
   }
 
   /**

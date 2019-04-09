@@ -85,7 +85,12 @@ export class MessageQueue {
    * @param message Message to send.
    * @param qos Quality of Service. Default value is at most once.
    */
-  publish(topic: string, message: Buffer | string, qos: QoS = QoS.AtMostOnce) {
+  publish(
+    topic: string,
+    message: Buffer | string,
+    qos: QoS = QoS.AtMostOnce
+  ): Promise<IPublishPacket> {
+    console.log("publishing topic " + topic + " message: " + message);
     return this.writeClient.publish(topic, message, {
       qos
     });

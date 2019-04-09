@@ -26,15 +26,25 @@ export class Proxy {
   private readonly handlers: Array<MessageHandler>;
   private readonly reverseMessageQueue: MessageQueue;
 
-  constructor(reverseMessageQueue: MessageQueue, config: ProxyConfig) {
-    this.config = config;
+  constructor(reverseMessageQueue: MessageQueue) {
+    this.config = new ProxyConfig();
     this.handlers = [];
     this.reverseMessageQueue = reverseMessageQueue;
   }
 
-  public start() {
-    this.generateHandlersFromConfig();
+  /**
+   * Merges config with the current configuration and
+   * adds handlers to the proxy.
+   */
+  public injectConfig(config: ProxyConfig) {
+    this.config.merge(config);
+    this.handlers.push(...Proxy.generateHandlersFromConfig(config));
+  }
 
+  /**
+   * Subscribes to all topics.
+   */
+  public start() {
     return this.reverseMessageQueue.subscribe(
       "#",
       this.proxyMessage.bind(this)
@@ -66,18 +76,8 @@ export class Proxy {
     };
   }
 
-  private generateHandlersFromConfig() {
-    this.config.proxies.forEach(p => {
-      this.addHandler(Proxy.generateHandlerFromConfig(p));
-    });
-  }
-
-  /**
-   * Adds handler to the end of the list
-   * @param handler
-   */
-  addHandler(handler: MessageHandler) {
-    this.handlers.push(handler);
+  static generateHandlersFromConfig(config: ProxyConfig) {
+    return config.proxies.map(Proxy.generateHandlerFromConfig);
   }
 
   private async proxyMessage(
