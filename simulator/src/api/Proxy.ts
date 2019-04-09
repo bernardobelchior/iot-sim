@@ -1,11 +1,14 @@
 import { MessageQueue } from "./MessageQueue";
 import { IPublishPacket } from "async-mqtt";
 import { IProxy, ProxyConfig } from "./ProxyConfig";
-import { createMessage } from "../util/WebThingMessageUtils";
+import { createMessage, MessageType } from "../util/WebThingMessageUtils";
 
 interface HandlerParam {
   topic: string;
-  content: object;
+  content: {
+    messageType: MessageType;
+    data: object;
+  };
   suppress: boolean;
   packet: IPublishPacket;
 }
@@ -62,20 +65,20 @@ export class Proxy {
         const topic = output.href || proxy.input.href;
         const property = output.property || proxy.input.property;
 
-        const publishMsg = () =>
-          publish(
-            topic,
-            JSON.stringify(
-              createMessage("setProperty", {
-                [property]: output.value
-              })
-            )
-          );
+        const baseContent: any = { ...args.content.data };
+        delete baseContent[proxy.input.property];
+
+        const content = createMessage(args.content.messageType, {
+          ...baseContent,
+          [property]: output.value
+        });
+
+        const publishMsg = () => publish(topic, JSON.stringify(content));
 
         if (output.delay) {
-          setTimeout(publishMsg, output.delay);
+          setTimeout(publishMsg, output.delay * 1000);
         } else {
-          publishMsg();
+          publish(topic, JSON.stringify(content));
         }
       });
 
@@ -103,7 +106,11 @@ export class Proxy {
     };
 
     const { suppress, content }: HandlerParam = this.handlers.reduce(
-      (param, handler) => handler(param, this.reverseMessageQueue.publish),
+      (param, handler) =>
+        handler(
+          param,
+          this.reverseMessageQueue.publish.bind(this.reverseMessageQueue)
+        ),
       initialValue
     );
 

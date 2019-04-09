@@ -1,7 +1,6 @@
 import { MessageQueue } from "../../src/api/MessageQueue";
 import { REGISTER_TOPIC } from "../../src/api/DeviceRegistry";
-
-export type MessageType = "propertyStatus";
+import { MessageType } from "../../src/util/WebThingMessageUtils";
 
 export abstract class ThingModel {
   mq: MessageQueue;

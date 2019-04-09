@@ -10,10 +10,12 @@ import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { Simulator } from "./Simulator";
 import * as routes from "./routes";
 import logger from "./util/logger";
+import { Proxy } from "./api/Proxy";
 
 type Settings = {
   messageQueue: MessageQueue;
   registry: DeviceRegistry;
+  proxy: Proxy;
 };
 
 export interface IApp extends Express {
@@ -27,6 +29,10 @@ async function app(): Promise<IApp> {
   );
   const registry = new DeviceRegistry(messageQueue);
   await registry.init();
+  const proxy = new Proxy(
+    await messageQueueBuilder(vars.WRITE_MQ_URI, vars.READ_MQ_URI)
+  );
+  await proxy.start();
 
   if (vars.ENVIRONMENT !== "test") {
     if (vars.MONGODB_URI !== "") {
@@ -43,6 +49,7 @@ async function app(): Promise<IApp> {
   app.set("port", vars.PORT || 8080);
   app.set("messageQueue", messageQueue);
   app.set("registry", registry);
+  app.set("proxy", proxy);
 
   app.use(compression());
   app.use(cors({ origin: "*" }));

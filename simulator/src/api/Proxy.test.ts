@@ -1,5 +1,3 @@
-import toml from "toml";
-import fs from "fs";
 import { IProxyConfig, ProxyConfig } from "./ProxyConfig";
 import { Proxy } from "./Proxy";
 import { IPublishPacket } from "async-mqtt";
@@ -147,9 +145,12 @@ describe("Proxy", () => {
 
       expect(publish).not.toHaveBeenCalled();
 
-      expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), delay);
+      expect(setTimeout).toHaveBeenCalledWith(
+        expect.any(Function),
+        delay * 1000
+      );
 
-      jest.advanceTimersByTime(delay);
+      jest.advanceTimersByTime(delay * 1000);
 
       expect(publish).toHaveBeenCalledWith(
         "/things/thermometer",
@@ -160,13 +161,25 @@ describe("Proxy", () => {
 
   describe("handlers", () => {
     it("should generate handler that replaces property value", async () => {
-      const result = toml.parse(
-        fs.readFileSync("./examples/configs/simpleReplacer.toml").toString()
-      );
+      const config: IProxyConfig = {
+        proxies: [
+          {
+            input: {
+              href: "/things/thermometer",
+              property: "temperature",
+              suppress: true
+            },
+            outputs: [
+              {
+                value: 40,
+                delay: 0
+              }
+            ]
+          }
+        ]
+      };
 
-      const config = new ProxyConfig(result);
       const proxy = config.proxies[0];
-
       const publish = jest.fn();
       const handler = Proxy.generateHandlerFromConfig(proxy);
 
@@ -175,7 +188,7 @@ describe("Proxy", () => {
           topic: proxy.input.href,
           suppress: false,
           content: createMessage("setProperty", {
-            [proxy.input.property]: 40
+            [proxy.input.property]: 20
           }),
           packet: {} as IPublishPacket
         },
@@ -186,7 +199,7 @@ describe("Proxy", () => {
         proxy.input.href,
         JSON.stringify(
           createMessage("setProperty", {
-            [proxy.input.property]: 20
+            [proxy.input.property]: 40
           })
         )
       );

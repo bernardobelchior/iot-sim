@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 /**
- * Message Schema
+ * WSMessage Schema
  * @private
  */
 

@@ -25,7 +25,7 @@ export default class NotificationEffect extends Effect {
       throw new Error("Label property missing from object.");
     }
     if (!desc.hasOwnProperty("message")) {
-      throw new Error("Message missing from object.");
+      throw new Error("WSMessage missing from object.");
     }
 
     return new this(desc.label, desc.message);

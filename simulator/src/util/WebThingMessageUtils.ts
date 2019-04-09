@@ -1,16 +1,22 @@
-type MessageType = "setProperty" | "propertyStatus";
+export type MessageType = "setProperty" | "propertyStatus";
 
-interface Message {
-  type: MessageType;
+/**
+ * WebSockets Message for Web Thing API
+ */
+export interface WSMessage {
+  messageType: MessageType;
   data: object;
 }
 
 /**
  * Creates a Web Thing API message for use with Websockets
  */
-export function createMessage(type: MessageType, data: object): Message {
+export function createMessage(
+  messageType: MessageType,
+  data: object
+): WSMessage {
   return {
-    type,
+    messageType,
     data
   };
 }

@@ -23,7 +23,7 @@ export type MessageCallback = (
 ) => void;
 
 /**
- * Message Queue class that abstracts message queue internals.
+ * WSMessage Queue class that abstracts message queue internals.
  * It reads and writes from different clients. The purpose of this
  * is so that a proxy can be used between the different queues.
  * If the read and write client are the same, then it will have the
@@ -82,7 +82,7 @@ export class MessageQueue {
   /**
    * Publishes to a topic
    * @param topic Topic to publish.
-   * @param message Message to send.
+   * @param message WSMessage to send.
    * @param qos Quality of Service. Default value is at most once.
    */
   publish(
@@ -90,7 +90,6 @@ export class MessageQueue {
     message: Buffer | string,
     qos: QoS = QoS.AtMostOnce
   ): Promise<IPublishPacket> {
-    console.log("publishing topic " + topic + " message: " + message);
     return this.writeClient.publish(topic, message, {
       qos
     });
