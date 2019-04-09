@@ -74,3 +74,8 @@ Note: in some cases, TypeScript compilation may be slower than running the examp
 
 In order for the simulator proxying to work, there must be two different virtual hosts. Once vhost will host the reading of messages by the devices, while the other will host the writing. 
 The simulator's proxy will take care of routing between both. 
+
+
+# YAML API
+
+The YAML API is defined [here](simulator/src/api/Proxy/Config.ts). The mathematical operations use [mathjs](https://mathjs.org/) for evaluating and parsing. This may pose some security issues. To obtain more information, read the [security implications](https://mathjs.org/docs/expressions/security.html).

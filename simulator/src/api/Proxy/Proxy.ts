@@ -1,7 +1,8 @@
-import { MessageQueue } from "./MessageQueue";
+import * as math from "mathjs";
+import { MessageQueue } from "../MessageQueue";
 import { IPublishPacket } from "async-mqtt";
-import { IProxy, ProxyConfig } from "./ProxyConfig";
-import { createMessage, MessageType } from "../util/WebThingMessageUtils";
+import { Config, IProxy } from "./Config";
+import { createMessage, MessageType } from "../../util/WebThingMessageUtils";
 
 interface HandlerParam {
   topic: string;
@@ -25,12 +26,12 @@ export type MessageHandler = (
  * how the message will ultimately be handled.
  */
 export class Proxy {
-  private readonly config: ProxyConfig;
+  private readonly config: Config;
   private readonly handlers: Array<MessageHandler>;
   private readonly reverseMessageQueue: MessageQueue;
 
   constructor(reverseMessageQueue: MessageQueue) {
-    this.config = new ProxyConfig();
+    this.config = new Config();
     this.handlers = [];
     this.reverseMessageQueue = reverseMessageQueue;
   }
@@ -39,7 +40,7 @@ export class Proxy {
    * Merges config with the current configuration and
    * adds handlers to the proxy.
    */
-  public injectConfig(config: ProxyConfig) {
+  public injectConfig(config: Config) {
     this.config.merge(config);
     this.handlers.push(...Proxy.generateHandlersFromConfig(config));
   }
@@ -64,13 +65,18 @@ export class Proxy {
       proxy.outputs.forEach(output => {
         const topic = output.href || proxy.input.href;
         const property = output.property || proxy.input.property;
+        const inputValue: any = (args.content.data as any)[property];
 
         const baseContent: any = { ...args.content.data };
         delete baseContent[proxy.input.property];
 
+        const { value, expr } = output;
+        const calculatedValue =
+          value === undefined ? math.eval(expr!, { value: inputValue }) : value;
+
         const content = createMessage(args.content.messageType, {
           ...baseContent,
-          [property]: output.value
+          [property]: calculatedValue
         });
 
         const publishMsg = () => publish(topic, JSON.stringify(content));
@@ -89,7 +95,7 @@ export class Proxy {
     };
   }
 
-  static generateHandlersFromConfig(config: ProxyConfig) {
+  static generateHandlersFromConfig(config: Config) {
     return config.proxies.map(Proxy.generateHandlerFromConfig);
   }
 

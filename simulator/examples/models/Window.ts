@@ -2,7 +2,7 @@ import { ThingModel } from "./ThingModel";
 import { MessageQueue, QoS } from "../../src/api/MessageQueue";
 import { Thing } from "../../src/api/models/Thing";
 
-export class SimpleActuator extends ThingModel {
+export class Window extends ThingModel {
   description = {
     name: "Window",
     description: "A web connected window",

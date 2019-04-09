@@ -2,7 +2,7 @@ import { ThingModel } from "./ThingModel";
 import { MessageQueue } from "../../src/api/MessageQueue";
 import { Thing } from "../../src/api/models/Thing";
 
-export class SimpleSensor extends ThingModel {
+export class Thermometer extends ThingModel {
   description = {
     name: "Thermometer",
     description: "A web connected thermometer",

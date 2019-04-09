@@ -1,8 +1,8 @@
-import { IProxyConfig, ProxyConfig } from "./ProxyConfig";
+import { IProxyConfig, Config } from "./Config";
 import { Proxy } from "./Proxy";
 import { IPublishPacket } from "async-mqtt";
-import { createMessage } from "../util/WebThingMessageUtils";
-import { MessageCallback, MessageQueue } from "./MessageQueue";
+import { createMessage } from "../../util/WebThingMessageUtils";
+import { MessageCallback, MessageQueue } from "../MessageQueue";
 import SpyInstance = jest.SpyInstance;
 import ArgsType = jest.ArgsType;
 
@@ -69,7 +69,7 @@ describe("Proxy", () => {
         ]
       };
 
-      const config = new ProxyConfig(proxyConfig);
+      const config = new Config(proxyConfig);
       proxy.injectConfig(config);
 
       await proxy.start();
@@ -101,7 +101,7 @@ describe("Proxy", () => {
         ]
       };
 
-      const config = new ProxyConfig(proxyConfig);
+      const config = new Config(proxyConfig);
       proxy.injectConfig(config);
 
       await proxy.start();
@@ -138,7 +138,7 @@ describe("Proxy", () => {
         ]
       };
 
-      const config = new ProxyConfig(proxyConfig);
+      const config = new Config(proxyConfig);
       proxy.injectConfig(config);
 
       await proxy.start();
@@ -155,6 +155,36 @@ describe("Proxy", () => {
       expect(publish).toHaveBeenCalledWith(
         "/things/thermometer",
         JSON.stringify(createMessage("setProperty", { temperature: 23 }))
+      );
+    });
+
+    it("should return value equal to twice the one received", async () => {
+      const proxyConfig: IProxyConfig = {
+        proxies: [
+          {
+            input: {
+              property: "temperature",
+              href: "/things/thermometer",
+              suppress: true
+            },
+            outputs: [
+              {
+                expr: "value * 2",
+                delay: 0
+              }
+            ]
+          }
+        ]
+      };
+
+      const config = new Config(proxyConfig);
+      proxy.injectConfig(config);
+
+      await proxy.start();
+
+      expect(publish).toHaveBeenCalledWith(
+        "/things/thermometer",
+        JSON.stringify(createMessage("setProperty", { temperature: 80 }))
       );
     });
   });

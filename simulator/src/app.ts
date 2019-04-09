@@ -10,7 +10,7 @@ import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
 import { Simulator } from "./Simulator";
 import * as routes from "./routes";
 import logger from "./util/logger";
-import { Proxy } from "./api/Proxy";
+import { Proxy } from "./api/Proxy/Proxy";
 
 type Settings = {
   messageQueue: MessageQueue;

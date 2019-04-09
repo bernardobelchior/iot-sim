@@ -12,7 +12,9 @@ start().then(async ({ app }) => {
 
   const config = new Config(
     toml.parse(
-      fs.readFileSync("./examples/configs/simpleReplacer.toml").toString()
+      fs
+        .readFileSync("./examples/configs/replaceWithExpression.toml")
+        .toString()
     )
   );
 
