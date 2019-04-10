@@ -79,3 +79,8 @@ The simulator's proxy will take care of routing between both.
 # YAML API
 
 The YAML API is defined [here](simulator/src/api/Proxy/Config.ts). The mathematical operations use [mathjs](https://mathjs.org/) for evaluating and parsing. This may pose some security issues. To obtain more information, read the [security implications](https://mathjs.org/docs/expressions/security.html).
+
+To build a generator, it's possible to use a cron expression. The specific parser is [this one](https://bunkat.github.io/later/parsers.html#cron). You can read more about cron expressions in the [Wikipedia page](https://en.wikipedia.org/wiki/Cron#Overview). However, you should note that a `seconds` field was prepended to the expression explained in the Wikipedia page.
+
+### Caveats:
+* When using a generator, the `value` variable in the mathematical expression of the output is set to `undefined`.

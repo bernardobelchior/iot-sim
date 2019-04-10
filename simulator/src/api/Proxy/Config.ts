@@ -1,11 +1,17 @@
 import * as yup from "yup";
 import * as math from "mathjs";
 
-interface Input {
+interface ReplacerInput {
   href: string;
   property: string;
   suppress: boolean;
 }
+
+interface GeneratorInput {
+  cron: string;
+}
+
+type Input = GeneratorInput | ReplacerInput;
 
 interface Output {
   value?: any;
@@ -61,11 +67,17 @@ export const schema = yup.object().shape({
         input: yup
           .object()
           .shape({
-            href: yup.string().required(),
-            property: yup.string().required(),
+            cron: yup.string(),
+            href: yup.string(),
+            property: yup.string(),
             suppress: yup.boolean().default(true)
           })
-          .required(),
+          .required()
+          .test(
+            "generator-or-replacer",
+            "Generator and Replacer properties are mutually exclusive. Use either `cron` or `property`, `href` and `suppress`",
+            testReplacerOrGenerator
+          ),
         outputs: yup
           .array()
           .of(
@@ -129,4 +141,25 @@ function isExpressionValid(expression: string): boolean {
   } catch (e) {
     return false;
   }
+}
+
+/**
+ * Makes sure the Input is either a generator (only has cron property)
+ * or a replacer (has the other 3). They are mutually exclusive.
+ */
+function testReplacerOrGenerator(input: Input): boolean {
+  const { cron, href, property, suppress } = input as any;
+
+  if (cron) {
+    return href === undefined && property == undefined && suppress == undefined;
+  }
+
+  return yup
+    .object()
+    .shape({
+      href: yup.string().required(),
+      property: yup.string().required(),
+      suppress: yup.boolean().required()
+    })
+    .isValidSync({ href, property, suppress });
 }

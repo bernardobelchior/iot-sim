@@ -1,0 +1,5 @@
+[[proxies]]
+input = { cron = "0/5 * * * * *" }
+
+[[proxies.outputs]]
+value = 45
