@@ -48,6 +48,18 @@ describe("Config", () => {
     ).toThrow();
   });
 
+  it("should throw when config proxy `outputs` length is not greater than or equal to 1", () => {
+    expect(() =>
+      Config.validateConfig({
+        proxies: [
+          {
+            outputs: []
+          }
+        ]
+      })
+    ).toThrow();
+  });
+
   it("should throw when config with cron and href is passed", () => {
     expect(() =>
       Config.validateConfig({

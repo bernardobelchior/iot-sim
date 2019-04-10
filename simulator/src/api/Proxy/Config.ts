@@ -96,6 +96,7 @@ export const schema = yup.object().shape({
                 testValueOrExpression
               )
           )
+          .min(1)
           .required()
       })
     )
