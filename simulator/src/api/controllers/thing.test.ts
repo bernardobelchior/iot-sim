@@ -1,7 +1,7 @@
 import request from "supertest";
-import "jest";
-import app from "../../src/app";
-import { Thing } from "../../src/api/models/Thing";
+import "@types/jest";
+import app from "../../app";
+import { Thing } from "../models/Thing";
 
 const TEST_THING = {
   id: "test-1",
