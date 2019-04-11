@@ -3,13 +3,10 @@ import compression from "compression";
 import bodyParser from "body-parser";
 import expressValidator from "express-validator";
 import cors from "cors";
-import mongo from "./db/config";
 import { vars } from "./util/vars";
 import { DeviceRegistry } from "./api/DeviceRegistry";
 import { MessageQueue, messageQueueBuilder } from "./api/MessageQueue";
-import { Simulator } from "./Simulator";
 import * as routes from "./routes";
-import logger from "./util/logger";
 import { Proxy } from "./api/Proxy/Proxy";
 
 type Settings = {
@@ -34,14 +31,6 @@ async function app(): Promise<IApp> {
   );
   await proxy.start();
 
-  if (vars.ENVIRONMENT !== "test") {
-    if (vars.MONGODB_URI !== "") {
-      mongo();
-    } else {
-      logger.warn("MONGODB_URI not set. MongoDB initialization skipped");
-    }
-  }
-
   // Create Express server
   const app = express();
 
@@ -57,12 +46,7 @@ async function app(): Promise<IApp> {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(expressValidator());
 
-  (await Simulator.getInstance()).setRegistry(registry);
   app.use("/things", routes.thingsRouter(registry));
-  app.use(
-    "/rules",
-    routes.rulesRouter((await Simulator.getInstance()).getRulesEngine())
-  );
 
   return app;
 }

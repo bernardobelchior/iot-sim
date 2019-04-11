@@ -4,7 +4,6 @@ import fs from "fs";
 
 interface VarsDefinition {
   ENVIRONMENT: string;
-  MONGODB_URI: string;
   WRITE_MQ_URI: string;
   READ_MQ_URI: string;
   PORT: number;
@@ -22,15 +21,6 @@ if (fs.existsSync(".env")) {
 }
 
 const ENVIRONMENT: string = process.env.NODE_ENV || "development";
-
-const MONGODB_URI = process.env["MONGODB_URI"];
-
-if (MONGODB_URI === undefined) {
-  logger.error("No mongo client string. Set MONGODB_URI environment variable.");
-  throw new Error(
-    "No mongo client string. Set MONGODB_URI environment variable."
-  );
-}
 
 const PORT = parseInt(process.env.PORT || "8080");
 
@@ -56,7 +46,6 @@ if (!WRITE_MQ_URI) {
 
 export const vars: VarsDefinition = {
   ENVIRONMENT,
-  MONGODB_URI,
   PORT,
   READ_MQ_URI,
   WRITE_MQ_URI

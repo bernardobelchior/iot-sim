@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { IRequest } from "../registryMiddleware";
 import APIError from "../../util/APIError";
-import { Thing } from "../models/Thing";
 
 /**
  * Handle a GET request to /<thingId>/properties.
@@ -37,7 +36,7 @@ export const list = (req: IRequest, res: Response) => {
  */
 export const get = (req: IRequest, res: Response) => {
   try {
-    const thingId = Thing.getIdFromHref(req.params.thingId);
+    const thingId = req.params.thingId;
     const thing = req.registry.getThing(thingId);
 
     if (thing === undefined) {

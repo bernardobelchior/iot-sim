@@ -7,7 +7,6 @@ export interface Events {
 }
 
 import Ajv from "ajv";
-import { ValueGenerator } from "./ValueGenerator";
 
 const ajv = new Ajv();
 
@@ -35,7 +34,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
   type: string;
 
   metadata?: IPropertyMetadata;
-  valueGenerator?: ValueGenerator;
   value: any = undefined;
 
   links: Link[] = [];
@@ -101,7 +99,6 @@ export class Property extends (EventEmitter as { new (): PropertyEmitter }) {
       metadata[key] === undefined ? delete metadata[key] : ""
     );
     this.metadata = metadata;
-    // this.valueGenerator = new ValueGenerator(this.type, this.metadata);
   }
 
   /**

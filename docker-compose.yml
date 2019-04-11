@@ -15,7 +15,6 @@ services:
     ports:
       - 8080:8080
     networks:
-      - backend
       - middleware
 
   ui:
@@ -30,8 +29,6 @@ services:
       NODE_ENV: development
     ports:
       - 3000:3000
-    networks:
-      - backend
 
   middleware:
     image: iot-sim.middleware
@@ -56,24 +53,6 @@ services:
     networks:
       - middleware
 
-  mongo:
-    container_name: iot-sim.mongo
-    image: vepo/mongo
-    restart: always
-    environment:
-      - AUTH=yes
-      - ADMIN_USER=admin
-      - ADMIN_PASS=admin123
-      - APPLICATION_DATABASE=simulator
-      - APPLICATION_USER=dev
-      - APPLICATION_PASS=dev12345
-    ports:
-      - 27017:27017
-    networks:
-      - backend
-
 networks:
   middleware:
-    driver: bridge
-  backend:
     driver: bridge

@@ -8,17 +8,11 @@ The simulator requires the following software to be previously installed:
 * RabbitMQ with the following plugins:
     * `rabbitmq_mqtt`
     * `rabbitmq_management`
-* MongoDB
 * NodeJS
 
 To enable the RabbitMQ plugins, run: 
 ```bash
 rabbitmq-plugins enable rabbitmq_mqtt rabbitmq_management rabbitmq_web_stomp
-```
-
-To run mongoDB, in the simulator directory, execute:
-```bash
-mongod --dbpath=./data
 ```
 
 After installing its dependencies, the simulator can be run:
@@ -76,11 +70,8 @@ In order for the simulator proxying to work, there must be two different virtual
 The simulator's proxy will take care of routing between both. 
 
 
-# YAML API
+# TOML API
 
-The YAML API is defined [here](simulator/src/api/Proxy/Config.ts). The mathematical operations use [mathjs](https://mathjs.org/) for evaluating and parsing. This may pose some security issues. To obtain more information, read the [security implications](https://mathjs.org/docs/expressions/security.html).
+The TOML API is defined [here](simulator/src/api/Proxy/Config.ts). The mathematical operations use [mathjs](https://mathjs.org/) for evaluating and parsing. This may pose some security issues. To obtain more information, read the [security implications](https://mathjs.org/docs/expressions/security.html).
 
-To build a generator, it's possible to use a cron expression. The specific parser is [this one](https://bunkat.github.io/later/parsers.html#cron). You can read more about cron expressions in the [Wikipedia page](https://en.wikipedia.org/wiki/Cron#Overview). However, you should note that a `seconds` field was prepended to the expression explained in the Wikipedia page.
-
-### Caveats:
-* When using a generator, the `value` variable in the mathematical expression of the output is set to `undefined`.
+To build a generator, it's possible to use a cron expression. The specific parser is [this one](https://github.com/kelektiv/node-cron). You can read more about cron expressions in the [Wikipedia page](https://en.wikipedia.org/wiki/Cron#Overview). However, you should note that a `seconds` field was prepended to the expression explained in the Wikipedia page.
