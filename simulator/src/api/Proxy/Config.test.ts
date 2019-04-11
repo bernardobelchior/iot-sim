@@ -19,20 +19,7 @@ describe("Config", () => {
     expect(new Config({}).proxies).toEqual([]);
   });
 
-  it("should throw when config proxy does not have both an `input` and at least one `output`", () => {
-    expect(() =>
-      Config.validateConfig({
-        proxies: [
-          {
-            input: {
-              href: "/things/thermometer",
-              property: "/things/thermometer"
-            }
-          }
-        ]
-      })
-    ).toThrow();
-
+  it("should throw when config proxy has an `output` but does not have an `input`", () => {
     expect(() =>
       Config.validateConfig({
         proxies: [
@@ -111,6 +98,20 @@ describe("Config", () => {
             output: {
               expr: "value * 2",
               value: 3
+            }
+          }
+        ]
+      })
+    ).toThrow();
+  });
+
+  it("should throw when config with cron expression is invalid", () => {
+    expect(() =>
+      Config.validateConfig({
+        proxies: [
+          {
+            input: {
+              cron: "* 0 0/5 14 * salkdj ?"
             }
           }
         ]

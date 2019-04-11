@@ -1,17 +1,18 @@
 import * as yup from "yup";
 import * as math from "mathjs";
+import { CronTime } from "cron";
 
-interface ReplacerInput {
+export interface ReplacerInput {
   href: string;
   property: string;
   suppress: boolean;
 }
 
-interface GeneratorInput {
+export interface GeneratorInput {
   cron: string;
 }
 
-type Input = GeneratorInput | ReplacerInput;
+export type Input = GeneratorInput | ReplacerInput;
 
 interface Output {
   value?: any;
@@ -21,17 +22,17 @@ interface Output {
   delay: number;
 }
 
-export interface IProxy {
-  input: Input;
+export interface IProxy<T extends Input> {
+  input: T;
   outputs: Output[];
 }
 
 export interface IProxyConfig {
-  proxies: IProxy[];
+  proxies: IProxy<any>[];
 }
 
 export class Config {
-  proxies: IProxy[];
+  proxies: IProxy<any>[];
 
   /**
    * @throws {ValidationError} if config is invalid
@@ -67,7 +68,13 @@ export const schema = yup.object().shape({
         input: yup
           .object()
           .shape({
-            cron: yup.string(),
+            cron: yup
+              .string()
+              .test(
+                "parse-cron",
+                "Cron expression is not valid",
+                testCronExpression
+              ),
             href: yup.string(),
             property: yup.string(),
             suppress: yup.boolean().default(true)
@@ -96,8 +103,7 @@ export const schema = yup.object().shape({
                 testValueOrExpression
               )
           )
-          .min(1)
-          .required()
+          .default([])
       })
     )
     .default([])
@@ -146,13 +152,13 @@ function isExpressionValid(expression: string): boolean {
 
 /**
  * Makes sure the Input is either a generator (only has cron property)
- * or a replacer (has the other 3). They are mutually exclusive.
+ * or a replacer (has the other 2). They are mutually exclusive.
  */
 function testReplacerOrGenerator(input: Input): boolean {
   const { cron, href, property, suppress } = input as any;
 
   if (cron) {
-    return href === undefined && property == undefined && suppress == undefined;
+    return href === undefined && property === undefined;
   }
 
   return yup
@@ -163,4 +169,17 @@ function testReplacerOrGenerator(input: Input): boolean {
       suppress: yup.boolean().required()
     })
     .isValidSync({ href, property, suppress });
+}
+
+/**
+ * Tries to parse the cron expression.
+ * @param cron
+ */
+function testCronExpression(cron: string): boolean {
+  try {
+    new CronTime(cron);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }

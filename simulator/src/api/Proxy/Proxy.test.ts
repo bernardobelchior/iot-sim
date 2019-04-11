@@ -1,4 +1,10 @@
-import { IProxyConfig, Config } from "./Config";
+import {
+  IProxyConfig,
+  Config,
+  ReplacerInput,
+  GeneratorInput,
+  IProxy
+} from "./Config";
 import { Proxy } from "./Proxy";
 import { IPublishPacket } from "async-mqtt";
 import { createMessage } from "../../util/WebThingMessageUtils";
@@ -191,34 +197,30 @@ describe("Proxy", () => {
 
   describe("handlers", () => {
     it("should generate handler that replaces property value", async () => {
-      const config: IProxyConfig = {
-        proxies: [
+      const proxy = {
+        input: {
+          href: "/things/thermometer",
+          property: "temperature",
+          suppress: true
+        },
+        outputs: [
           {
-            input: {
-              href: "/things/thermometer",
-              property: "temperature",
-              suppress: true
-            },
-            outputs: [
-              {
-                value: 40,
-                delay: 0
-              }
-            ]
+            value: 40,
+            delay: 0
           }
         ]
       };
 
-      const proxy = config.proxies[0];
       const publish = jest.fn();
-      const handler = Proxy.generateHandlerFromConfig(proxy);
+      const handler = Proxy.generateHandlerFromConfig(proxy)!;
+      const input = proxy.input as ReplacerInput;
 
       handler(
         {
-          topic: proxy.input.href,
+          topic: input.href,
           suppress: false,
           content: createMessage("setProperty", {
-            [proxy.input.property]: 20
+            [input.property]: 20
           }),
           packet: {} as IPublishPacket
         },
@@ -226,10 +228,51 @@ describe("Proxy", () => {
       );
 
       expect(publish).toHaveBeenCalledWith(
-        proxy.input.href,
+        input.href,
         JSON.stringify(
           createMessage("setProperty", {
-            [proxy.input.property]: 40
+            [input.property]: 40
+          })
+        )
+      );
+    });
+
+    it("should generate handler that generates values", async () => {
+      const proxy: IProxy<GeneratorInput> = {
+        input: {
+          cron: "0/5 * * * * *"
+        },
+        outputs: [
+          {
+            href: "/things/thermometer",
+            property: "temperature",
+            value: 40,
+            delay: 0
+          }
+        ]
+      };
+
+      const publish = jest.fn();
+      const handler = Proxy.generateGeneratorHandler(proxy);
+      const input = proxy.input;
+
+      handler(
+        {
+          topic: input.href,
+          suppress: false,
+          content: createMessage("setProperty", {
+            [input.property]: 20
+          }),
+          packet: {} as IPublishPacket
+        },
+        publish
+      );
+
+      expect(publish).toHaveBeenCalledWith(
+        input.href,
+        JSON.stringify(
+          createMessage("setProperty", {
+            [input.property]: 40
           })
         )
       );

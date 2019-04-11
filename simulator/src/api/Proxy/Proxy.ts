@@ -1,8 +1,9 @@
 import * as math from "mathjs";
 import { MessageQueue } from "../MessageQueue";
 import { IPublishPacket } from "async-mqtt";
-import { Config, IProxy } from "./Config";
+import { Config, GeneratorInput, Input, IProxy, ReplacerInput } from "./Config";
 import { createMessage, MessageType } from "../../util/WebThingMessageUtils";
+import { CronJob } from "cron";
 
 interface HandlerParam {
   topic: string;
@@ -55,7 +56,33 @@ export class Proxy {
     );
   }
 
-  static generateHandlerFromConfig(proxy: IProxy): MessageHandler {
+  static isReplacerInput(proxy: IProxy<Input>): proxy is IProxy<ReplacerInput> {
+    const input = proxy.input as any;
+
+    return (
+      input.href !== undefined &&
+      input.property !== undefined &&
+      input.suppress !== undefined
+    );
+  }
+
+  static generateGeneratorHandler(proxy: IProxy<GeneratorInput>): CronJob {
+    const handlers = proxy.outputs.map(output => {
+        return (publish: MessageQueue["publish"]) => {
+          const { href, property, value } = output;
+
+          publish(href, JSON.stringify(createMessage("setProperty", {
+            [property]: value
+          })));
+        };
+    });
+
+    return new CronJob(proxy.input.cron, function() {
+      this.
+    });
+  }
+
+  static generateReplacerHandler(proxy: IProxy<ReplacerInput>): MessageHandler {
     return (args, publish) => {
       /* Skip handler if the topic doesn't match the input href */
       if (args.topic !== proxy.input.href) {
@@ -95,8 +122,23 @@ export class Proxy {
     };
   }
 
-  static generateHandlersFromConfig(config: Config) {
-    return config.proxies.map(Proxy.generateHandlerFromConfig);
+  static generateHandlerFromConfig(
+    proxy: IProxy<Input>
+  ): MessageHandler | undefined {
+    /* If input is not replacer, then it is a generator and is skipped. */
+    if (Proxy.isReplacerInput(proxy)) {
+      return Proxy.generateReplacerHandler(proxy);
+    } else {
+      Proxy.generateGeneratorHandler(proxy as IProxy<GeneratorInput>);
+    }
+
+    return;
+  }
+
+  static generateHandlersFromConfig(config: Config): MessageHandler[] {
+    return config.proxies
+      .map(Proxy.generateHandlerFromConfig)
+      .filter(f => f !== undefined) as MessageHandler[];
   }
 
   private async proxyMessage(
