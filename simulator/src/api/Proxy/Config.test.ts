@@ -16,7 +16,7 @@ describe("Config", () => {
   it("should parse an empty config as valid", () => {
     expect(() => Config.validateConfig({})).not.toThrow();
 
-    expect(new Config({}).proxies).toEqual([]);
+    expect(new Config({}).replacers).toEqual([]);
   });
 
   it("should throw when config proxy has an `output` but does not have an `input`", () => {
@@ -50,7 +50,7 @@ describe("Config", () => {
   it("should throw when config with cron and href is passed", () => {
     expect(() =>
       Config.validateConfig({
-        proxies: [
+        generators: [
           {
             input: {
               cron: "* 0 0/5 14 * * ?",
@@ -66,11 +66,18 @@ describe("Config", () => {
   it("should not throw when config with cron or href is passed", () => {
     expect(() =>
       Config.validateConfig({
-        proxies: [
+        generators: [
           {
             input: {
-              cron: "* 0 0/5 14 * * ?"
-            }
+              cron: "* 0 0/5 14 * * *"
+            },
+            outputs: [
+              {
+                value: 40,
+                property: "temperature",
+                href: "/things/thermometer"
+              }
+            ]
           }
         ]
       })
@@ -78,7 +85,7 @@ describe("Config", () => {
 
     expect(() =>
       Config.validateConfig({
-        proxies: [
+        replacers: [
           {
             input: {
               href: "/things/thermometer",
@@ -108,7 +115,7 @@ describe("Config", () => {
   it("should throw when config with cron expression is invalid", () => {
     expect(() =>
       Config.validateConfig({
-        proxies: [
+        generators: [
           {
             input: {
               cron: "* 0 0/5 14 * salkdj ?"

@@ -1,5 +1,5 @@
-[[proxies]]
+[[replacers]]
 input = { href = "/things/thermometer", property = "temperature", suppress = true }
 
-[[proxies.outputs]]
+[[replacers.outputs]]
 value = 40

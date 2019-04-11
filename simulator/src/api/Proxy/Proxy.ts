@@ -1,7 +1,7 @@
 import * as math from "mathjs";
 import { MessageQueue } from "../MessageQueue";
 import { IPublishPacket } from "async-mqtt";
-import { Config, GeneratorInput, Input, IProxy, ReplacerInput } from "./Config";
+import { Config, Generator, Replacer } from "./Config";
 import { createMessage, MessageType } from "../../util/WebThingMessageUtils";
 import { CronJob } from "cron";
 
@@ -29,11 +29,13 @@ export type MessageHandler = (
 export class Proxy {
   private readonly config: Config;
   private readonly handlers: Array<MessageHandler>;
+  private readonly crons: Array<CronJob>;
   private readonly reverseMessageQueue: MessageQueue;
 
   constructor(reverseMessageQueue: MessageQueue) {
     this.config = new Config();
     this.handlers = [];
+    this.crons = [];
     this.reverseMessageQueue = reverseMessageQueue;
   }
 
@@ -43,7 +45,17 @@ export class Proxy {
    */
   public injectConfig(config: Config) {
     this.config.merge(config);
-    this.handlers.push(...Proxy.generateHandlersFromConfig(config));
+    this.handlers.push(...config.replacers.map(Proxy.generateReplacerHandler));
+
+    const crons = config.generators.map(g =>
+      Proxy.generateGeneratorHandler(
+        g,
+        this.reverseMessageQueue.publish.bind(this.reverseMessageQueue)
+      )
+    );
+
+    this.crons.push(...crons);
+    crons.forEach(c => c.start());
   }
 
   /**
@@ -56,46 +68,44 @@ export class Proxy {
     );
   }
 
-  static isReplacerInput(proxy: IProxy<Input>): proxy is IProxy<ReplacerInput> {
-    const input = proxy.input as any;
+  static generateGeneratorHandler(
+    generator: Generator,
+    publish: MessageQueue["publish"]
+  ): CronJob {
+    const handlers = generator.outputs.map(output => {
+      return () => {
+        const { href, property, value } = output;
 
-    return (
-      input.href !== undefined &&
-      input.property !== undefined &&
-      input.suppress !== undefined
-    );
-  }
-
-  static generateGeneratorHandler(proxy: IProxy<GeneratorInput>): CronJob {
-    const handlers = proxy.outputs.map(output => {
-        return (publish: MessageQueue["publish"]) => {
-          const { href, property, value } = output;
-
-          publish(href, JSON.stringify(createMessage("setProperty", {
-            [property]: value
-          })));
-        };
+        publish(
+          href,
+          JSON.stringify(
+            createMessage("propertyStatus", {
+              [property]: value
+            })
+          )
+        );
+      };
     });
 
-    return new CronJob(proxy.input.cron, function() {
-      this.
+    return new CronJob(generator.input.cron, () => {
+      handlers.forEach(h => h());
     });
   }
 
-  static generateReplacerHandler(proxy: IProxy<ReplacerInput>): MessageHandler {
+  static generateReplacerHandler(replacer: Replacer): MessageHandler {
     return (args, publish) => {
       /* Skip handler if the topic doesn't match the input href */
-      if (args.topic !== proxy.input.href) {
+      if (args.topic !== replacer.input.href) {
         return args;
       }
 
-      proxy.outputs.forEach(output => {
-        const topic = output.href || proxy.input.href;
-        const property = output.property || proxy.input.property;
+      replacer.outputs.forEach(output => {
+        const topic = output.href || replacer.input.href;
+        const property = output.property || replacer.input.property;
         const inputValue: any = (args.content.data as any)[property];
 
         const baseContent: any = { ...args.content.data };
-        delete baseContent[proxy.input.property];
+        delete baseContent[replacer.input.property];
 
         const { value, expr } = output;
         const calculatedValue =
@@ -117,28 +127,9 @@ export class Proxy {
 
       return {
         ...args,
-        suppress: proxy.input.suppress
+        suppress: replacer.input.suppress
       };
     };
-  }
-
-  static generateHandlerFromConfig(
-    proxy: IProxy<Input>
-  ): MessageHandler | undefined {
-    /* If input is not replacer, then it is a generator and is skipped. */
-    if (Proxy.isReplacerInput(proxy)) {
-      return Proxy.generateReplacerHandler(proxy);
-    } else {
-      Proxy.generateGeneratorHandler(proxy as IProxy<GeneratorInput>);
-    }
-
-    return;
-  }
-
-  static generateHandlersFromConfig(config: Config): MessageHandler[] {
-    return config.proxies
-      .map(Proxy.generateHandlerFromConfig)
-      .filter(f => f !== undefined) as MessageHandler[];
   }
 
   private async proxyMessage(

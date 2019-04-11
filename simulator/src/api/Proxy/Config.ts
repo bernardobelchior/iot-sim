@@ -2,37 +2,51 @@ import * as yup from "yup";
 import * as math from "mathjs";
 import { CronTime } from "cron";
 
-export interface ReplacerInput {
+interface Input {}
+
+export interface ReplacerInput extends Input {
   href: string;
   property: string;
   suppress: boolean;
 }
 
-export interface GeneratorInput {
+export interface GeneratorInput extends Input {
   cron: string;
 }
 
-export type Input = GeneratorInput | ReplacerInput;
-
 interface Output {
+  delay: number;
+}
+
+interface GeneratorOutput extends Output {
+  value: any;
+  href: string;
+  property: string;
+}
+
+interface ReplacerOutput extends Output {
   value?: any;
   expr?: string;
   href?: string;
   property?: string;
-  delay: number;
 }
 
-export interface IProxy<T extends Input> {
+interface IProxy<T extends Input, U extends Output> {
   input: T;
-  outputs: Output[];
+  outputs: U[];
 }
+
+export type Generator = IProxy<GeneratorInput, GeneratorOutput>;
+export type Replacer = IProxy<ReplacerInput, ReplacerOutput>;
 
 export interface IProxyConfig {
-  proxies: IProxy<any>[];
+  generators: IProxy<GeneratorInput, GeneratorOutput>[];
+  replacers: IProxy<ReplacerInput, ReplacerOutput>[];
 }
 
 export class Config {
-  proxies: IProxy<any>[];
+  generators: Generator[];
+  replacers: Replacer[];
 
   /**
    * @throws {ValidationError} if config is invalid
@@ -42,11 +56,13 @@ export class Config {
     /* Cast is safe since `validateConfig` throws if config is not valid. */
     const validConfig = Config.validateConfig(config) as IProxyConfig;
 
-    this.proxies = validConfig.proxies;
+    this.replacers = validConfig.replacers;
+    this.generators = validConfig.generators;
   }
 
   merge(config: Config) {
-    this.proxies = [...this.proxies, ...config.proxies];
+    this.replacers = [...this.replacers, ...config.replacers];
+    this.generators = [...this.generators, ...config.generators];
   }
 
   /**
@@ -56,64 +72,95 @@ export class Config {
    * @return {IProxyConfig} (possibly) modified config
    */
   static validateConfig(config: unknown): IProxyConfig {
-    return schema.validateSync(config) as IProxyConfig;
+    return schema.validateSync(config, { stripUnknown: false }) as IProxyConfig;
   }
 }
 
-export const schema = yup.object().shape({
-  proxies: yup
-    .array()
-    .of(
-      yup.object().shape({
-        input: yup
-          .object()
-          .shape({
-            cron: yup
-              .string()
-              .test(
-                "parse-cron",
-                "Cron expression is not valid",
-                testCronExpression
-              ),
-            href: yup.string(),
-            property: yup.string(),
-            suppress: yup.boolean().default(true)
-          })
-          .required()
-          .test(
-            "generator-or-replacer",
-            "Generator and Replacer properties are mutually exclusive. Use either `cron` or `property`, `href` and `suppress`",
-            testReplacerOrGenerator
-          ),
-        outputs: yup
-          .array()
-          .of(
-            yup
-              .object()
-              .shape({
-                href: yup.string(),
-                delay: yup
-                  .number()
-                  .min(0)
-                  .default(0)
-              })
-              .test(
-                "value-or-expr",
-                "An output can only have a value OR an expression; not both nor neither.",
-                testValueOrExpression
-              )
-          )
-          .default([])
-      })
-    )
-    .default([])
-});
+export const schema = yup
+  .object()
+  .shape({
+    generators: yup
+      .array()
+      .of(
+        yup.object().shape({
+          input: yup
+            .object()
+            .shape({
+              cron: yup
+                .string()
+                .test(
+                  "parse-cron",
+                  "Cron expression is not valid",
+                  testCronExpression
+                )
+            })
+            .noUnknown(true)
+            .required(),
+          outputs: yup
+            .array()
+            .of(
+              yup
+                .object()
+                .shape({
+                  href: yup.string().required(),
+                  property: yup.string().required(),
+                  value: yup.mixed().required()
+                })
+                .noUnknown(true)
+            )
+            .min(1)
+            .required()
+        })
+      )
+      .default([]),
+    replacers: yup
+      .array()
+      .of(
+        yup.object().shape({
+          input: yup
+            .object()
+            .shape({
+              href: yup.string().required(),
+              property: yup.string().required(),
+              suppress: yup.boolean().default(true)
+            })
+            .required()
+            .noUnknown(true),
+          outputs: yup
+            .array()
+            .of(
+              yup
+                .object()
+                .shape({
+                  value: yup.mixed(),
+                  expr: yup.string(),
+                  href: yup.string(),
+                  property: yup.string(),
+                  delay: yup
+                    .number()
+                    .min(0)
+                    .default(0)
+                })
+                .noUnknown(true)
+                .test(
+                  "value-or-expr",
+                  "An output can only have a value OR an expression; not both nor neither.",
+                  testValueOrExpression
+                )
+            )
+            .default([])
+        })
+      )
+      .default([])
+  })
+  .noUnknown(true)
+  .required();
 
 /**
  * Tests if an output has value XOR expr defined and then validates the
  * existing one.
  */
-function testValueOrExpression({ value, expr }: Output): boolean {
+function testValueOrExpression({ value, expr }: ReplacerOutput): boolean {
   /* value === undefined XOR expr === undefined */
   if (
     (value === undefined && expr === undefined) ||
@@ -148,27 +195,6 @@ function isExpressionValid(expression: string): boolean {
   } catch (e) {
     return false;
   }
-}
-
-/**
- * Makes sure the Input is either a generator (only has cron property)
- * or a replacer (has the other 2). They are mutually exclusive.
- */
-function testReplacerOrGenerator(input: Input): boolean {
-  const { cron, href, property, suppress } = input as any;
-
-  if (cron) {
-    return href === undefined && property === undefined;
-  }
-
-  return yup
-    .object()
-    .shape({
-      href: yup.string().required(),
-      property: yup.string().required(),
-      suppress: yup.boolean().required()
-    })
-    .isValidSync({ href, property, suppress });
 }
 
 /**

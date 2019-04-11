@@ -1,10 +1,4 @@
-import {
-  IProxyConfig,
-  Config,
-  ReplacerInput,
-  GeneratorInput,
-  IProxy
-} from "./Config";
+import { IProxyConfig, Config, ReplacerInput, Generator } from "./Config";
 import { Proxy } from "./Proxy";
 import { IPublishPacket } from "async-mqtt";
 import { createMessage } from "../../util/WebThingMessageUtils";
@@ -61,9 +55,9 @@ describe("Proxy", () => {
       expect(publish).toHaveBeenCalledWith(message.topic, message.payload);
     });
 
-    it("should replace message when has proxy in config", async () => {
+    it("should replace message when has replacer in config", async () => {
       const proxyConfig: IProxyConfig = {
-        proxies: [
+        replacers: [
           {
             input: {
               property: "temperature",
@@ -72,7 +66,8 @@ describe("Proxy", () => {
             },
             outputs: [{ value: 23, delay: 0 }]
           }
-        ]
+        ],
+        generators: []
       };
 
       const config = new Config(proxyConfig);
@@ -88,7 +83,7 @@ describe("Proxy", () => {
 
     it("should duplicate value to another thing when href is set", async () => {
       const proxyConfig: IProxyConfig = {
-        proxies: [
+        replacers: [
           {
             input: {
               property: "temperature",
@@ -104,7 +99,8 @@ describe("Proxy", () => {
               }
             ]
           }
-        ]
+        ],
+        generators: []
       };
 
       const config = new Config(proxyConfig);
@@ -127,7 +123,7 @@ describe("Proxy", () => {
     it("should delay message when delay property is set", async () => {
       const delay = 5;
       const proxyConfig: IProxyConfig = {
-        proxies: [
+        replacers: [
           {
             input: {
               property: "temperature",
@@ -141,7 +137,8 @@ describe("Proxy", () => {
               }
             ]
           }
-        ]
+        ],
+        generators: []
       };
 
       const config = new Config(proxyConfig);
@@ -166,7 +163,7 @@ describe("Proxy", () => {
 
     it("should return value equal to twice the one received", async () => {
       const proxyConfig: IProxyConfig = {
-        proxies: [
+        replacers: [
           {
             input: {
               property: "temperature",
@@ -180,7 +177,8 @@ describe("Proxy", () => {
               }
             ]
           }
-        ]
+        ],
+        generators: []
       };
 
       const config = new Config(proxyConfig);
@@ -212,7 +210,7 @@ describe("Proxy", () => {
       };
 
       const publish = jest.fn();
-      const handler = Proxy.generateHandlerFromConfig(proxy)!;
+      const handler = Proxy.generateReplacerHandler(proxy)!;
       const input = proxy.input as ReplacerInput;
 
       handler(
@@ -238,9 +236,9 @@ describe("Proxy", () => {
     });
 
     it("should generate handler that generates values", async () => {
-      const proxy: IProxy<GeneratorInput> = {
+      const proxy: Generator = {
         input: {
-          cron: "0/5 * * * * *"
+          cron: "0 1 * * * *"
         },
         outputs: [
           {
@@ -253,26 +251,18 @@ describe("Proxy", () => {
       };
 
       const publish = jest.fn();
-      const handler = Proxy.generateGeneratorHandler(proxy);
-      const input = proxy.input;
+      const cron = Proxy.generateGeneratorHandler(proxy, publish);
+      cron.start();
 
-      handler(
-        {
-          topic: input.href,
-          suppress: false,
-          content: createMessage("setProperty", {
-            [input.property]: 20
-          }),
-          packet: {} as IPublishPacket
-        },
-        publish
-      );
+      expect(publish).not.toHaveBeenCalled();
+
+      cron.fireOnTick();
 
       expect(publish).toHaveBeenCalledWith(
-        input.href,
+        "/things/thermometer",
         JSON.stringify(
-          createMessage("setProperty", {
-            [input.property]: 40
+          createMessage("propertyStatus", {
+            temperature: 40
           })
         )
       );

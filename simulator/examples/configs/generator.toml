@@ -1,5 +1,7 @@
-[[proxies]]
-input = { cron = "0/5 * * * * *" }
+[[generators]]
+input = { cron = "10/5 * * * * *" }
 
-[[proxies.outputs]]
+[[generators.outputs]]
 value = 45
+href = "/things/humiditysensor"
+property = "humidity"
