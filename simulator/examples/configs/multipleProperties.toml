@@ -1,9 +1,10 @@
 [[replacers]]
-input = { href = "/things/thermometer/properties/temperature", suppress = false }
+input = { href = "/things/thermometer", property="temperature", suppress = false }
 
 [[replacers.outputs]]
 value = 90
-href = "/things/thermometer/properties/humidity"
+href = "/things/thermometer"
+property = "humidity"
 delay = 2
 
 [[replacers.outputs]]

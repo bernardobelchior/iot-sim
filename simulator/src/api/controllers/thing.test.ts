@@ -1,5 +1,4 @@
 import request from "supertest";
-import "@types/jest";
 import app from "../../app";
 import { Thing } from "../models/Thing";
 
