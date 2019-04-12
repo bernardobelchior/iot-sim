@@ -143,6 +143,7 @@ export class Proxy {
       suppress: false,
       packet
     };
+    console.log(JSON.parse(message.toString()));
 
     const { suppress, content }: HandlerParam = this.handlers.reduce(
       (param, handler) =>

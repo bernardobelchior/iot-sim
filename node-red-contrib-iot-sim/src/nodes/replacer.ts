@@ -1,5 +1,5 @@
 import { NodeProperties, Red } from "node-red";
-import { NRNode } from "./node-red-register";
+import { NRNode } from "../node-red-register";
 
 module.exports = function(RED: Red) {
   class Replacer extends NRNode {

@@ -1,3 +1,4 @@
-import { start } from "./server";
+import { Proxy } from "./api/Proxy/Proxy";
+import { MessageQueue } from "./api/MessageQueue";
 
-start();
+export { Proxy, MessageQueue };

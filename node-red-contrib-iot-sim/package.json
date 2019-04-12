@@ -20,6 +20,7 @@
     "@types/node": "^11.13.4",
     "@types/shelljs": "^0.8.4",
     "concurrently": "^4.1.0",
+    "iot-simulator": "file:../simulator",
     "jest": "^24.7.1",
     "node-red": "^0.20.5",
     "nodemon": "^1.18.0",
@@ -34,9 +35,12 @@
   ],
   "node-red": {
     "nodes": {
-      "iot-sim-config": "dist/iot-sim-config.js",
-      "generator": "dist/generator.js",
-      "replacer": "dist/replacer.js"
+      "proxy": "dist/nodes/proxy.js",
+      "generator": "dist/nodes/generator.js",
+      "replacer": "dist/nodes/replacer.js"
     }
+  },
+  "dependencies": {
+    "async-mqtt": "^2.2.1"
   }
 }
