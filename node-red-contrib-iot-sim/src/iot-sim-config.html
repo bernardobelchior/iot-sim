@@ -1,0 +1,31 @@
+<script type="text/javascript">
+  RED.nodes.registerType("iot-sim-config", {
+    category: "IoT Simulator",
+    color: "#a6bbcf",
+    defaults: {
+      readServer: { value: "", type: "mqtt-broker" },
+      writeServer: { value: "", type: "mqtt-broker" }
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "bridge.png",
+    label: function() {
+      return this.name || "MQTT Broker";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="iot-sim-config">
+    <div class="form-row">
+        <label for="node-input-readServer"><i class="icon-world"></i>Read Server</label>
+        <input type="text" id="node-input-readServer" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-writeServer"><i class="icon-world"></i>Write Server</label>
+        <input type="text" id="node-input-writeServer" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="iot-sim-config">
+    <p>A node that replaces a Web Thing API message payload with another, according to the configuration</p>
+</script>
