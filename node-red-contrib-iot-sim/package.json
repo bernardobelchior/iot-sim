@@ -8,7 +8,7 @@
     "start": "npm run watch",
     "build": "npm run build-ts && npm run tslint && npm run copy-static-assets",
     "watch-node": "nodemon --watch dist/ --exec \"node-red\"",
-    "watch": "npm run copy-static-assets && concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "watch": "npm run copy-static-assets && concurrently --killOthersOnFail -p \"[{name}]\" -n \"Assets,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run copy-static-assets\" \"npm run watch-ts\" \"npm run watch-node\"",
     "test": "jest --forceExit --verbose -- --watchAll",
     "coverage": "jest --forceExit --coverage --verbose",
     "build-ts": "tsc",
@@ -18,11 +18,13 @@
   },
   "devDependencies": {
     "@types/node": "^11.13.4",
+    "@types/node-red": "^0.17.3",
     "@types/shelljs": "^0.8.4",
     "concurrently": "^4.1.0",
     "iot-simulator": "file:../simulator",
     "jest": "^24.7.1",
     "node-red": "^0.20.5",
+    "node-red-contrib-typescript-node": "file:../../../../nodered-typescript-node",
     "nodemon": "^1.18.0",
     "shelljs": "^0.8.3",
     "ts-jest": "^24.0.2",
@@ -35,9 +37,10 @@
   ],
   "node-red": {
     "nodes": {
-      "proxy": "dist/nodes/proxy.js",
-      "generator": "dist/nodes/generator.js",
-      "replacer": "dist/nodes/replacer.js"
+      "iot-sim-proxy": "dist/proxy.js",
+      "iot-sim-proxy-config": "dist/proxy-config.js",
+      "generator": "dist/generator.js",
+      "replacer": "dist/replacer.js"
     }
   },
   "dependencies": {

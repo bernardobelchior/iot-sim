@@ -1,59 +1,25 @@
-import { Node, NodeProperties, Red } from "node-red";
-import { NRNode } from "../node-red-register";
-import { MessageQueue, Proxy as SimulatorProxy } from "iot-simulator/dist/src";
-import { AsyncClient, connect } from "async-mqtt";
+import { NodeProperties, Red } from "node-red";
+import { Node } from "node-red-contrib-typescript-node";
+import { ProxyConfig } from "./proxy-config";
 
-interface ProxyConfig extends NodeProperties {
-  readServer: string;
-  writeServer: string;
-}
-
-interface MqttNode extends Node {
-  brokerurl: string;
-  options: {
-    username: string;
-    password: string;
-  };
-}
-
-function connectToNode(node: MqttNode): AsyncClient {
-  return connect(
-    node.brokerurl,
-    {
-      username: node.options.username,
-      password: node.options.password
-    }
-  );
+interface Config extends NodeProperties {
+  proxyConfig: string;
 }
 
 module.exports = function(RED: Red) {
-  class Proxy extends NRNode {
-    proxy: SimulatorProxy;
+  class Proxy extends Node {
+    constructor(config: Config) {
+      super(RED);
 
-    constructor(config: ProxyConfig) {
-      super(RED, config);
+      this.createNode(config);
 
-      const readNode = RED.nodes.getNode(config.readServer) as MqttNode;
-      const writeNode = RED.nodes.getNode(config.writeServer) as MqttNode;
+      const proxyConfigNode = RED.nodes.getNode(
+        config.proxyConfig
+      ) as ProxyConfig;
 
-      const readClient = connectToNode(readNode);
-      const writeClient = connectToNode(writeNode);
-
-      this.proxy = new SimulatorProxy(
-        new MessageQueue(writeClient, readClient)
-      );
-
-      this.proxy.start();
-
-      this.on("input", (msg: unknown) => {
-        writeClient.publish(msg.topic, JSON.stringify(msg.payload));
-      });
-    }
-
-    updateWires(wires: any) {
-      console.log(wires);
+      proxyConfigNode.start();
     }
   }
 
-  Proxy.registerType(RED, "proxy");
+  Proxy.registerType(RED, "iot-sim-proxy");
 };

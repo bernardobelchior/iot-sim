@@ -1,0 +1,25 @@
+<script type="text/javascript">
+  RED.nodes.registerType("iot-sim-proxy-config", {
+    category: "config",
+    color: "#a6bbcf",
+    defaults: {
+      readServer: { value: "", type: "mqtt-broker" },
+      writeServer: { value: "", type: "mqtt-broker" }
+    },
+  });
+</script>
+
+<script type="text/x-red" data-template-name="iot-sim-proxy-config">
+    <div class="form-row">
+        <label for="node-config-input-readServer"><i class="icon-world"></i>Read Server</label>
+        <input type="text" id="node-config-input-readServer" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-writeServer"><i class="icon-world"></i>Write Server</label>
+        <input type="text" id="node-config-input-writeServer" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="iot-sim-proxy-config">
+    <p>A node that provides the configuration for a IoT Simulator proxy.</p>
+</script>

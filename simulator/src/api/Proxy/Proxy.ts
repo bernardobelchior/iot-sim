@@ -143,7 +143,6 @@ export class Proxy {
       suppress: false,
       packet
     };
-    console.log(JSON.parse(message.toString()));
 
     const { suppress, content }: HandlerParam = this.handlers.reduce(
       (param, handler) =>
@@ -159,5 +158,9 @@ export class Proxy {
     }
 
     return this.reverseMessageQueue.publish(topic, JSON.stringify(content));
+  }
+
+  public end() {
+    return this.reverseMessageQueue.end();
   }
 }

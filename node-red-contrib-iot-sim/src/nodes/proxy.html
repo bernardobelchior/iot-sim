@@ -1,31 +1,26 @@
 <script type="text/javascript">
-  RED.nodes.registerType("proxy", {
+  RED.nodes.registerType("iot-sim-proxy", {
     category: "IoT Simulator",
     color: "#a6bbcf",
     defaults: {
-      readServer: { value: "", type: "mqtt-broker" },
-      writeServer: { value: "", type: "mqtt-broker" }
+      proxyConfig: { value: "", type: "iot-sim-proxy-config" }
     },
-    inputs: 1,
-    outputs: 1,
+    inputs: 0,
+    outputs: 0,
     icon: "bridge.png",
     label: function() {
-      return this.name || "proxy";
+      return this.name || "iot-sim-proxy";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="proxy">
+<script type="text/x-red" data-template-name="iot-sim-proxy">
     <div class="form-row">
-        <label for="node-input-readServer"><i class="icon-world"></i>Read Server</label>
-        <input type="text" id="node-input-readServer" placeholder="">
-    </div>
-    <div class="form-row">
-        <label for="node-input-writeServer"><i class="icon-world"></i>Write Server</label>
-        <input type="text" id="node-input-writeServer" placeholder="">
+        <label for="node-input-proxyConfig"><i class="icon-world"></i>Proxy</label>
+        <input type="text" id="node-input-proxyConfig" placeholder="">
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="proxy">
-    <p>A node that proxies the messages from the write to the read queue.</p>
+<script type="text/x-red" data-help-name="iot-sim-proxy">
+    <p>A node that proxies the messages from the write to the read queue, based on the configuration defined in a `iot-sim-proxy-config` node.</p>
 </script>

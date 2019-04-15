@@ -49,7 +49,7 @@ The `simulator` directory has example scenarios that can be used to quickly setu
 
 Before running, make sure you have a RabbitMQ instance running. Running multiple scenarios at the same time may create inconsistencies.
 
-In order to run them, run `npm run example -- <example-name>`. When trying to run the example named `twoThings.ts`, the following commmand would have to be executed `npm run example -- twoThings`.
+In order to run them, run `npm run example <path-to-example>`. When trying to run the example named `twoThings.ts`, the following commmand would have to be executed `npm run example examples/twoThings.ts`.
 
 Note: in some cases, TypeScript compilation may be slower than running the example. If this happens, you should try again.
 

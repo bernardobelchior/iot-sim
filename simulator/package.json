@@ -5,9 +5,9 @@
   "author": "#####",
   "license": "MIT",
   "scripts": {
-    "example": "node examples/run.js",
+    "example": "ts-node",
     "start": "npm run serve",
-    "build": "npm run build-ts && npm run tslint",
+    "build": "npm run build-ts",
     "serve": "node dist/src/start.js",
     "watch-node": "nodemon dist/src/start.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
@@ -18,6 +18,7 @@
     "test": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles --watchAll",
     "coverage": "NODE_ENV=test jest --forceExit --verbose --detectOpenHandles --coverage"
   },
+  "main": "./dist/index.js",
   "dependencies": {
     "ajv": "^6.10.0",
     "async-mqtt": "^2.2.1",
@@ -60,6 +61,7 @@
     "prettier": "1.16.4",
     "supertest": "^4.0.2",
     "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
     "tslint": "^5.15.0",
     "typescript": "^3.4.3",
     "wait-for-expect": "^1.1.1"
