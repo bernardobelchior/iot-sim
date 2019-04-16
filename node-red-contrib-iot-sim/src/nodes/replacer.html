@@ -4,10 +4,12 @@
     color: "#a6bbcf",
     defaults: {
       name: { value: "replacer" },
-      proxy: { value: "", type: "iot-sim-proxy-config"}
+      proxy: { value: "", type: "iot-sim-proxy-config", required: true },
+      inputConfig: { value: "", type: "replacer-input", required: true },
+      outputConfig: { value: "", type: "replacer-output", required: true }
     },
-    inputs: 0,
-    outputs: 0,
+    inputs: 1,
+    outputs: 1,
     icon: "file.png",
     label: function() {
       return this.name || "replacer";
@@ -23,6 +25,14 @@
     <div class="form-row">
         <label for="node-input-proxy"><i class="icon-tag"></i> Proxy</label>
         <input type="text" id="node-input-proxy" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inputConfig"><i class="icon-tag"></i> Input Config</label>
+        <input type="text" id="node-input-inputConfig" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputConfig"><i class="icon-tag"></i> Output Config</label>
+        <input type="text" id="node-input-outputConfig" placeholder="">
     </div>
 </script>
 

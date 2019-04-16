@@ -18,13 +18,13 @@ interface Output {
   delay: number;
 }
 
-interface GeneratorOutput extends Output {
+export interface GeneratorOutput extends Output {
   value: any;
   href: string;
   property: string;
 }
 
-interface ReplacerOutput extends Output {
+export interface ReplacerOutput extends Output {
   value?: any;
   expr?: string;
   href?: string;

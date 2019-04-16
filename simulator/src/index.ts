@@ -1,5 +1,19 @@
 import { Proxy } from "./api/Proxy/Proxy";
 import { MessageQueue } from "./api/MessageQueue";
-import { Config } from "./api/Proxy/Config";
+import {
+  Config,
+  GeneratorInput,
+  GeneratorOutput,
+  ReplacerInput,
+  ReplacerOutput
+} from "./api/Proxy/Config";
 
-export { Proxy, MessageQueue, Config };
+export {
+  Config,
+  GeneratorInput,
+  GeneratorOutput,
+  MessageQueue,
+  Proxy,
+  ReplacerInput,
+  ReplacerOutput
+};

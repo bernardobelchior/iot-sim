@@ -1,0 +1,37 @@
+<script type="text/javascript">
+  RED.nodes.registerType("replacer-input", {
+    category: "config",
+    defaults: {
+      name: { value: "" },
+      href: { value: "", required: true },
+      property: { value: "", required: true },
+      suppress: { value: true, required: true, type: "boolean" }
+    },
+    label: function() {
+      return this.name || "replacer input";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="replacer-input">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-href"><i class="icon-tag"></i> Href</label>
+        <input type="text" id="node-config-input-href" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-property"><i class="icon-tag"></i> Property</label>
+        <input type="text" id="node-config-input-property" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-suppress"><i class="icon-tag"></i> Suppress</label>
+        <input type="checkbox" id="node-config-input-suppress" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="replacer-input">
+    <p>A node that configures the input for a replacer node.</p>
+</script>

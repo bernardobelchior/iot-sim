@@ -24,7 +24,7 @@
     "iot-simulator": "file:../simulator",
     "jest": "^24.7.1",
     "node-red": "^0.20.5",
-    "node-red-contrib-typescript-node": "file:../../../../nodered-typescript-node",
+    "node-red-contrib-typescript-node": "^0.1.0",
     "nodemon": "^1.18.0",
     "shelljs": "^0.8.3",
     "ts-jest": "^24.0.2",
@@ -40,7 +40,9 @@
       "iot-sim-proxy": "dist/proxy.js",
       "iot-sim-proxy-config": "dist/proxy-config.js",
       "generator": "dist/generator.js",
-      "replacer": "dist/replacer.js"
+      "replacer": "dist/replacer.js",
+      "replacer-input": "dist/replacer-input.js",
+      "replacer-output": "dist/replacer-output.js"
     }
   },
   "dependencies": {
