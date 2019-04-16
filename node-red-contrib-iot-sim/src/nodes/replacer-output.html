@@ -3,11 +3,11 @@
     category: "config",
     defaults: {
       name: { value: "" },
-      delay: { value: "", type: "number" },
-      href: { value: "" },
-      property: { value: "" },
-      value: { value: "" },
-      expr: { value: "" },
+      delay: { value: 0, type: "number" },
+      href: { value: undefined },
+      property: { value: undefined },
+      value: { value: undefined },
+      expr: { value: undefined },
     },
     label: function() {
       return this.name || "replacer output";

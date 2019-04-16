@@ -4,7 +4,9 @@ import { AsyncClient, connect } from "async-mqtt";
 import {
   Config as ReplaceConfig,
   MessageQueue,
-  Proxy as SimulatorProxy
+  Proxy as SimulatorProxy,
+  ReplacerInput,
+  ReplacerOutput
 } from "iot-simulator";
 
 interface Config extends NodeProperties {
@@ -63,8 +65,17 @@ module.exports = function(RED: Red) {
       return this.proxy.start();
     }
 
-    injectConfig(config: ReplaceConfig) {
-      this.proxy.injectConfig(config);
+    addReplacer(input: ReplacerInput, output: ReplacerOutput) {
+      this.proxy.injectConfig(
+        new ReplaceConfig({
+          replacers: [
+            {
+              input,
+              outputs: [output]
+            }
+          ]
+        })
+      );
     }
   }
 
@@ -73,5 +84,5 @@ module.exports = function(RED: Red) {
 
 export interface ProxyConfig extends Node {
   start: () => void;
-  injectConfig: (config: ReplaceConfig) => void;
+  addReplacer: (input: ReplacerInput, output: ReplacerOutput) => void;
 }

@@ -17,6 +17,7 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.123",
     "@types/node": "^11.13.4",
     "@types/node-red": "^0.17.3",
     "@types/shelljs": "^0.8.4",
@@ -37,15 +38,16 @@
   ],
   "node-red": {
     "nodes": {
-      "iot-sim-proxy": "dist/proxy.js",
-      "iot-sim-proxy-config": "dist/proxy-config.js",
-      "generator": "dist/generator.js",
-      "replacer": "dist/replacer.js",
-      "replacer-input": "dist/replacer-input.js",
-      "replacer-output": "dist/replacer-output.js"
+      "iot-sim-proxy": "dist/nodes/proxy.js",
+      "iot-sim-proxy-config": "dist/nodes/proxy-config.js",
+      "generator": "dist/nodes/generator.js",
+      "replacer": "dist/nodes/replacer.js",
+      "replacer-input": "dist/nodes/replacer-input.js",
+      "replacer-output": "dist/nodes/replacer-output.js"
     }
   },
   "dependencies": {
-    "async-mqtt": "^2.2.1"
+    "async-mqtt": "^2.2.1",
+    "lodash": "^4.17.11"
   }
 }

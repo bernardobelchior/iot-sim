@@ -1,30 +1,35 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
 import { ProxyConfig } from "./proxy-config";
-import { ReplacerInput } from "iot-simulator";
+import { ReplacerOutputNode } from "./replacer-output";
+import { ReplacerInputNode } from "./replacer-input";
 
 interface Config extends NodeProperties {
   proxy: string;
+  inputConfig: string;
+  outputConfig: string;
 }
 
 module.exports = function(RED: Red) {
-  class Replacer extends Node {
-    inputConfig: ReplacerInput;
-
+  class ReplacerNode extends Node {
     constructor(config: Config) {
       super(RED);
 
       this.createNode(config);
 
       const proxy = RED.nodes.getNode(config.proxy) as ProxyConfig;
-    }
+      const inputNode = RED.nodes.getNode(
+        config.inputConfig
+      ) as ReplacerInputNode;
+      const outputNode = RED.nodes.getNode(
+        config.outputConfig
+      ) as ReplacerOutputNode;
 
-    addInput(inputConfig: ReplacerInput) {
-      this.inputConfig = inputConfig;
+      proxy.addReplacer(inputNode.config, outputNode.config);
     }
   }
 
-  Replacer.registerType(RED, "replacer");
+  ReplacerNode.registerType(RED, "replacer");
 };
 
-export interface Replacer extends Node {}
+export interface ReplacerNode extends Node {}

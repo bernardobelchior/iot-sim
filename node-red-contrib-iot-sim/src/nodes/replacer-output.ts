@@ -5,13 +5,27 @@ import { ReplacerOutput } from "iot-simulator";
 interface Config extends NodeProperties, ReplacerOutput {}
 
 module.exports = function(RED: Red) {
-  class ReplacerOutput extends Node {
+  class ReplacerOutputNode extends Node {
+    config: ReplacerOutput;
+
     constructor(config: Config) {
       super(RED);
+
+      this.config = {
+        delay: config.delay || 0,
+        expr: config.expr || undefined,
+        value: config.value || undefined,
+        href: config.href || undefined,
+        property: config.property || undefined
+      };
 
       this.createNode(config);
     }
   }
 
-  ReplacerOutput.registerType(RED, "replacer-output");
+  ReplacerOutputNode.registerType(RED, "replacer-output");
 };
+
+export interface ReplacerOutputNode extends Node {
+  config: Config;
+}
