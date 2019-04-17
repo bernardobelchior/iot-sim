@@ -1,0 +1,27 @@
+<script type="text/javascript">
+  RED.nodes.registerType("generator-input", {
+    category: "config",
+    defaults: {
+      name: { value: "" },
+      cron: { value: "", required: true },
+    },
+    label: function() {
+      return this.name || "generator input";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="generator-input">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-cron"><i class="icon-tag"></i> Cron</label>
+        <input type="text" id="node-config-input-cron" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="generator-input">
+    <p>A node that configures the input for a generator node.</p>
+</script>

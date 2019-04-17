@@ -1,6 +1,6 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
-import { ProxyConfig } from "./proxy-config";
+import { ProxyConfigNode } from "./proxy-config";
 
 interface Config extends NodeProperties {
   proxyConfig: string;
@@ -15,7 +15,7 @@ module.exports = function(RED: Red) {
 
       const proxyConfigNode = RED.nodes.getNode(
         config.proxyConfig
-      ) as ProxyConfig;
+      ) as ProxyConfigNode;
 
       proxyConfigNode.start();
     }

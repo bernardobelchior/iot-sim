@@ -104,7 +104,11 @@ export const schema = yup
                 .shape({
                   href: yup.string().required(),
                   property: yup.string().required(),
-                  value: yup.mixed().required()
+                  value: yup.mixed().required(),
+                  delay: yup
+                    .number()
+                    .min(0)
+                    .default(0)
                 })
                 .noUnknown(true)
             )

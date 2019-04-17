@@ -2,12 +2,13 @@ import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
 import { AsyncClient, connect } from "async-mqtt";
 import {
-  Config as ReplaceConfig,
+  Config as ProxyConfig,
   MessageQueue,
   Proxy as SimulatorProxy,
   ReplacerInput,
   ReplacerOutput
 } from "iot-simulator";
+import { GeneratorInput, GeneratorOutput } from "iot-simulator";
 
 interface Config extends NodeProperties {
   readServer: string;
@@ -33,7 +34,7 @@ function connectToNode(node: MqttNode): AsyncClient {
 }
 
 module.exports = function(RED: Red) {
-  class ProxyConfig extends Node {
+  class ProxyConfigNode extends Node {
     proxy: SimulatorProxy;
     started: boolean = false;
 
@@ -67,8 +68,21 @@ module.exports = function(RED: Red) {
 
     addReplacer(input: ReplacerInput, output: ReplacerOutput) {
       this.proxy.injectConfig(
-        new ReplaceConfig({
+        new ProxyConfig({
           replacers: [
+            {
+              input,
+              outputs: [output]
+            }
+          ]
+        })
+      );
+    }
+
+    addGenerator(input: GeneratorInput, output: GeneratorOutput) {
+      this.proxy.injectConfig(
+        new ProxyConfig({
+          generators: [
             {
               input,
               outputs: [output]
@@ -79,10 +93,11 @@ module.exports = function(RED: Red) {
     }
   }
 
-  ProxyConfig.registerType(RED, "iot-sim-proxy-config");
+  ProxyConfigNode.registerType(RED, "iot-sim-proxy-config");
 };
 
-export interface ProxyConfig extends Node {
+export interface ProxyConfigNode extends Node {
   start: () => void;
   addReplacer: (input: ReplacerInput, output: ReplacerOutput) => void;
+  addGenerator: (input: GeneratorInput, output: GeneratorOutput) => void;
 }

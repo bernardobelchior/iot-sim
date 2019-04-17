@@ -1,0 +1,44 @@
+<script type="text/javascript">
+  RED.nodes.registerType("generator-output", {
+    category: "config",
+    defaults: {
+      name: { value: "" },
+      delay: { value: 0, type: "number" },
+      href: { value: undefined },
+      property: { value: undefined },
+      value: { value: undefined },
+    },
+    label: function() {
+      return this.name || "generator output";
+    }
+  });
+
+  $("#node-config-input-delay").typedInput("num")
+</script>
+
+<script type="text/x-red" data-template-name="generator-output">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-value"><i class="icon-tag"></i> Value</label>
+        <input type="text" id="node-config-input-value" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-href"><i class="icon-tag"></i> Href</label>
+        <input type="text" id="node-config-input-href" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-property"><i class="icon-tag"></i> Property</label>
+        <input type="text" id="node-config-input-property" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-delay"><i class="icon-tag"></i> Delay (seconds)</label>
+        <input type="number" id="node-config-input-delay">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="generator-output">
+    <p>A node that configures the output for a generator node.</p>
+</script>

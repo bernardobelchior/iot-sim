@@ -1,0 +1,39 @@
+<script type="text/javascript">
+  RED.nodes.registerType("generator", {
+    category: "IoT Simulator",
+    color: "#a6bbcf",
+    defaults: {
+      name: { value: "generator" },
+      proxy: { value: "", type: "iot-sim-proxy-config", required: true },
+      inputConfig: { value: "", type: "generator-input", required: true },
+      outputConfig: { value: "", type: "generator-output", required: true }
+    },
+    icon: "file.png",
+    label: function() {
+      return this.name || "generator";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="generator">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-proxy"><i class="icon-tag"></i> Proxy</label>
+        <input type="text" id="node-input-proxy" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-inputConfig"><i class="icon-tag"></i> Input Config</label>
+        <input type="text" id="node-input-inputConfig" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-outputConfig"><i class="icon-tag"></i> Output Config</label>
+        <input type="text" id="node-input-outputConfig" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="generator">
+    <p>A node that generates a Web Thing API message payload, according to the configuration</p>
+</script>

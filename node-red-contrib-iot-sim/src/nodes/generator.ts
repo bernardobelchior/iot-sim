@@ -1,8 +1,8 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
 import { ProxyConfigNode } from "./proxy-config";
-import { ReplacerOutputNode } from "./replacer-output";
-import { ReplacerInputNode } from "./replacer-input";
+import { GeneratorInputNode } from "./generator-input";
+import { GeneratorOutputNode } from "./generator-output";
 
 interface Config extends NodeProperties {
   proxy: string;
@@ -11,7 +11,7 @@ interface Config extends NodeProperties {
 }
 
 module.exports = function(RED: Red) {
-  class ReplacerNode extends Node {
+  class GeneratorNode extends Node {
     constructor(config: Config) {
       super(RED);
 
@@ -20,16 +20,16 @@ module.exports = function(RED: Red) {
       const proxy = RED.nodes.getNode(config.proxy) as ProxyConfigNode;
       const inputNode = RED.nodes.getNode(
         config.inputConfig
-      ) as ReplacerInputNode;
+      ) as GeneratorInputNode;
       const outputNode = RED.nodes.getNode(
         config.outputConfig
-      ) as ReplacerOutputNode;
+      ) as GeneratorOutputNode;
 
-      proxy.addReplacer(inputNode.config, outputNode.config);
+      proxy.addGenerator(inputNode.config, outputNode.config);
     }
   }
 
-  ReplacerNode.registerType(RED, "replacer");
+  GeneratorNode.registerType(RED, "generator");
 };
 
-export interface ReplacerNode extends Node {}
+export interface GeneratorNode extends Node {}
