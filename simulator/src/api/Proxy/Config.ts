@@ -15,18 +15,18 @@ export interface GeneratorInput extends Input {
 }
 
 interface Output {
+  /** In seconds */
   delay: number;
+  value?: any;
+  expr?: string;
 }
 
 export interface GeneratorOutput extends Output {
-  value: any;
   href: string;
   property: string;
 }
 
 export interface ReplacerOutput extends Output {
-  value?: any;
-  expr?: string;
   href?: string;
   property?: string;
 }
@@ -102,15 +102,21 @@ export const schema = yup
               yup
                 .object()
                 .shape({
+                  value: yup.mixed(),
+                  expr: yup.string(),
                   href: yup.string().required(),
                   property: yup.string().required(),
-                  value: yup.mixed().required(),
                   delay: yup
                     .number()
                     .min(0)
                     .default(0)
                 })
                 .noUnknown(true)
+                .test(
+                  "value-or-expr",
+                  "An output can only have a value OR an expression; not both nor neither.",
+                  testValueOrExpression
+                )
             )
             .min(1)
             .required()

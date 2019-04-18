@@ -267,5 +267,49 @@ describe("Proxy", () => {
         )
       );
     });
+
+    it("should generate handler that generates values according to expression", async () => {
+      const proxy: Generator = {
+        input: {
+          cron: "0 1 * * * *"
+        },
+        outputs: [
+          {
+            href: "/things/thermometer",
+            property: "temperature",
+            expr: "24 + value * 0.5",
+            delay: 0
+          }
+        ]
+      };
+
+      const publish = jest.fn();
+      const cron = Proxy.generateGeneratorHandler(proxy, publish);
+      cron.start();
+
+      expect(publish).not.toHaveBeenCalled();
+
+      cron.fireOnTick();
+
+      expect(publish).toHaveBeenCalledWith(
+        "/things/thermometer",
+        JSON.stringify(
+          createMessage("propertyStatus", {
+            temperature: 24
+          })
+        )
+      );
+
+      cron.fireOnTick();
+
+      expect(publish).toHaveBeenCalledWith(
+        "/things/thermometer",
+        JSON.stringify(
+          createMessage("propertyStatus", {
+            temperature: 24 + 0.5
+          })
+        )
+      );
+    });
   });
 });

@@ -73,23 +73,52 @@ export class Proxy {
     publish: MessageQueue["publish"]
   ): CronJob {
     const handlers = generator.outputs.map(output => {
-      return () => {
-        const { href, property, value } = output;
+      return (tick: number) => {
+        const { href, property, value, expr, delay } = output;
 
-        publish(
-          href,
-          JSON.stringify(
-            createMessage("propertyStatus", {
-              [property]: value
-            })
-          )
+        const calculatedValue =
+          value === undefined ? math.eval(expr!, { value: tick }) : value;
+
+        const message = JSON.stringify(
+          createMessage("propertyStatus", {
+            [property]: calculatedValue
+          })
         );
+
+        this.delayPublish(publish, [href, message], delay);
       };
     });
 
-    return new CronJob(generator.input.cron, () => {
-      handlers.forEach(h => h());
+    return new CronJob({
+      cronTime: generator.input.cron,
+      onTick: function(this: any) {
+        handlers.forEach(h => h(this.ticks));
+        this.ticks++;
+      },
+      context: {
+        ticks: 0
+      }
     });
+  }
+
+  /**
+   * Publishes in delay (seconds). If 0, publishes immediately.
+   * @param publish Publish function
+   * @param args Args to the publish function
+   * @param delay Delay in seconds.
+   */
+  private static delayPublish(
+    publish: MessageQueue["publish"],
+    args: Parameters<MessageQueue["publish"]>,
+    delay: number
+  ) {
+    const publishMsg = () => publish(...args);
+
+    if (delay) {
+      setTimeout(publishMsg, delay * 1000);
+    } else {
+      publish(...args);
+    }
   }
 
   static generateReplacerHandler(replacer: Replacer): MessageHandler {
@@ -107,7 +136,7 @@ export class Proxy {
         const baseContent: any = { ...args.content.data };
         delete baseContent[replacer.input.property];
 
-        const { value, expr } = output;
+        const { value, expr, delay } = output;
         const calculatedValue =
           value === undefined ? math.eval(expr!, { value: inputValue }) : value;
 
@@ -116,13 +145,7 @@ export class Proxy {
           [property]: calculatedValue
         });
 
-        const publishMsg = () => publish(topic, JSON.stringify(content));
-
-        if (output.delay) {
-          setTimeout(publishMsg, output.delay * 1000);
-        } else {
-          publish(topic, JSON.stringify(content));
-        }
+        this.delayPublish(publish, [topic, JSON.stringify(content)], delay);
       });
 
       return {

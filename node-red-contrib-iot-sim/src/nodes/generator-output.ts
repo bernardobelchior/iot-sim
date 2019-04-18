@@ -14,6 +14,7 @@ module.exports = function(RED: Red) {
       super(RED);
 
       this.config = {
+        expr: config.expr || undefined,
         delay: parseFloat(config.delay) || 0,
         value: config.value || undefined,
         href: config.href || undefined,
