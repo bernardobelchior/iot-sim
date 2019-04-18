@@ -85,14 +85,22 @@ export class MessageQueue {
    * @param message WSMessage to send.
    * @param qos Quality of Service. Default value is at most once.
    */
-  publish(
+  async publish(
     topic: string,
     message: Buffer | string,
     qos: QoS = QoS.AtMostOnce
   ): Promise<IPublishPacket> {
-    return this.writeClient.publish(topic, message, {
-      qos
-    });
+    try {
+      return await this.writeClient.publish(topic, message, {
+        qos
+      });
+    } catch (e) {
+      return new Promise(resolve => {
+        this.writeClient.once("reconnect", async () => {
+          resolve(await this.publish(topic, message, qos));
+        });
+      });
+    }
   }
 
   /**
