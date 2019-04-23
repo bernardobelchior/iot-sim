@@ -11,8 +11,8 @@ import {
 import { GeneratorInput, GeneratorOutput } from "iot-simulator";
 
 interface Config extends NodeProperties {
-  readServer: string;
-  writeServer: string;
+  readQueue: string;
+  writeQueue: string;
 }
 
 interface MqttNode extends Node {
@@ -43,8 +43,8 @@ module.exports = function(RED: Red) {
 
       this.createNode(config);
 
-      const readNode = RED.nodes.getNode(config.readServer) as MqttNode;
-      const writeNode = RED.nodes.getNode(config.writeServer) as MqttNode;
+      const readNode = RED.nodes.getNode(config.readQueue) as MqttNode;
+      const writeNode = RED.nodes.getNode(config.writeQueue) as MqttNode;
 
       const readClient = connectToNode(readNode);
       const writeClient = connectToNode(writeNode);

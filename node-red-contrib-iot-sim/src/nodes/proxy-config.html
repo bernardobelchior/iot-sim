@@ -3,20 +3,20 @@
     category: "config",
     color: "#a6bbcf",
     defaults: {
-      readServer: { value: "", type: "mqtt-broker" },
-      writeServer: { value: "", type: "mqtt-broker" }
+      readQueue: { value: "", type: "mqtt-broker" },
+      writeQueue: { value: "", type: "mqtt-broker" }
     },
   });
 </script>
 
 <script type="text/x-red" data-template-name="iot-sim-proxy-config">
     <div class="form-row">
-        <label for="node-config-input-readServer"><i class="icon-world"></i>Read Server</label>
-        <input type="text" id="node-config-input-readServer" placeholder="">
+        <label for="node-config-input-readQueue"><i class="icon-world"></i>Read Queue</label>
+        <input type="text" id="node-config-input-readQueue" placeholder="">
     </div>
     <div class="form-row">
-        <label for="node-config-input-writeServer"><i class="icon-world"></i>Write Server</label>
-        <input type="text" id="node-config-input-writeServer" placeholder="">
+        <label for="node-config-input-writeQueue"><i class="icon-world"></i>Write Queue</label>
+        <input type="text" id="node-config-input-writeQueue" placeholder="">
     </div>
 </script>
 
