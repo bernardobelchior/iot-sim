@@ -1,0 +1,59 @@
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("test", {
+      category: "Testing",
+      color: "#ff0000",
+      defaults: {
+        name: { value: "test" },
+        flow: { value: "", required: true},
+        node: { value: "", required: true }
+      },
+      inputs: 1,
+      outputs: 1,
+      icon: "file.png",
+      label: function() {
+        return this.name || "test";
+      },
+      oneditprepare: function() {
+        const flows = new Set();
+        RED.nodes.eachNode(n => flows.add(n.z));
+
+        flows.forEach(flowId => {
+          $("#node-input-flow").append("<option value='" + flowId + "'>" + flowId + "</option>");
+        });
+
+        $("#node-input-flow").on("change", function(evt) {
+          $("#node-input-node").empty();
+          RED.nodes.eachNode(n => {
+            if (n.type !== "test" && n.z === evt.target.value) {
+              $("#node-input-node").append("<option value='" + n.id + "'>" + (n.name || n.label || n.type) + " (" + n.id + ") " + "</option>");
+            }
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+<script type="text/x-red" data-template-name="test">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-flow"><i class="icon-tag"></i> Flow</label>
+        <select id="node-input-flow" name="flow" placeholder="Flow">
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-node"><i class="icon-tag"></i> Node</label>
+        <select id="node-input-node" name="node" placeholder="Node">
+        </select>
+    </div>
+
+</script>
+
+<script type="text/x-red" data-help-name="test">
+    <p></p>
+
+</script>
