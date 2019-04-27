@@ -1,16 +1,18 @@
 <script type="text/javascript">
   (function() {
-    RED.nodes.registerType("test-runner", {
+    RED.nodes.registerType("mock", {
       category: "Testing",
       color: "#ff0000",
       defaults: {
-        name: { value: "test" },
+        name: { value: "mock" },
         flow: { value: "", required: true},
-        outputs: {value: 1, required: true},
+        node: { value: "", required: true }
       },
+      inputs: 1,
+      outputs: 1,
       icon: "file.png",
       label: function() {
-        return this.name || "test-runner";
+        return this.name || "mock";
       },
       oneditprepare: function() {
         const flows = new Set();
@@ -19,12 +21,21 @@
         flows.forEach(flowId => {
           $("#node-input-flow").append("<option value='" + flowId + "'>" + flowId + "</option>");
         });
+
+        $("#node-input-flow").on("change", function(evt) {
+          $("#node-input-node").empty();
+          RED.nodes.eachNode(n => {
+            if (n.type !== "test" && n.z === evt.target.value) {
+              $("#node-input-node").append("<option value='" + n.id + "'>" + (n.name || n.label || n.type) + " (" + n.id + ") " + "</option>");
+            }
+          });
+        });
       }
     });
   })();
 </script>
 
-<script type="text/x-red" data-template-name="test-runner">
+<script type="text/x-red" data-template-name="mock">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -35,11 +46,14 @@
         </select>
     </div>
     <div class="form-row">
-        <label for="node-input-outputs"><i class="icon-tag"></i> Outputs</label>
-        <input id="node-input-outputs" type="number" name="outputs" placeholder="Outputs" value="1"/>
+        <label for="node-input-node"><i class="icon-tag"></i> Node</label>
+        <select id="node-input-node" name="node" placeholder="Node">
+        </select>
     </div>
+
 </script>
 
-<script type="text/x-red" data-help-name="test-runner">
+<script type="text/x-red" data-help-name="mock">
     <p></p>
+
 </script>

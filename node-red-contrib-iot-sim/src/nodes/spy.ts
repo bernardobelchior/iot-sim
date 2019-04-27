@@ -4,22 +4,28 @@ import { ProxyConfigNode } from "./proxy-config";
 import { GeneratorInputNode } from "./generator-input";
 import { GeneratorOutputNode } from "./generator-output";
 
-interface Config extends NodeProperties {}
+interface Config extends NodeProperties {
+  flow: string;
+  node: string;
+}
 
 module.exports = function(RED: Red) {
-  class TestNode extends Node {
+  class SpyNode extends Node {
     constructor(config: Config) {
       super(RED);
 
       this.createNode(config);
 
-      this.on("input", msg => {
+      const node = RED.nodes.getNode(config.node);
+
+      node.on("input", msg => {
         console.log(msg);
+        this.send(msg);
       });
     }
   }
 
-  TestNode.registerType(RED, "test");
+  SpyNode.registerType(RED, "spy");
 };
 
-export interface TestNode extends Node {}
+export interface SpyNode extends Node {}

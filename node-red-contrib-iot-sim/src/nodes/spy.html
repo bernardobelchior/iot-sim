@@ -1,18 +1,18 @@
 <script type="text/javascript">
   (function() {
-    RED.nodes.registerType("test", {
+    RED.nodes.registerType("spy", {
       category: "Testing",
       color: "#ff0000",
       defaults: {
-        name: { value: "test" },
+        name: { value: "spy" },
         flow: { value: "", required: true},
         node: { value: "", required: true }
       },
-      inputs: 1,
+      inputs: 0,
       outputs: 1,
       icon: "file.png",
       label: function() {
-        return this.name || "test";
+        return this.name || "spy";
       },
       oneditprepare: function() {
         const flows = new Set();
@@ -35,7 +35,7 @@
   })();
 </script>
 
-<script type="text/x-red" data-template-name="test">
+<script type="text/x-red" data-template-name="spy">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
@@ -53,7 +53,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="test">
+<script type="text/x-red" data-help-name="spy">
     <p></p>
 
 </script>

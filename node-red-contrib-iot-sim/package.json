@@ -26,14 +26,12 @@
     "jest": "^24.7.1",
     "node-red": "^0.20.5",
     "node-red-contrib-typescript-node": "^0.1.0",
-    "node-red-node-test-helper": "^0.2.2",
     "nodemon": "^1.18.0",
     "shelljs": "^0.8.3",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.0.0",
     "tslint": "^5.15.0",
-    "typescript": "^3.4",
-    "node-red-test-helper": "latest"
+    "typescript": "^3.4"
   },
   "keywords": [
     "node-red"
@@ -49,7 +47,10 @@
       "replacer-input": "dist/nodes/replacer-input.js",
       "replacer-output": "dist/nodes/replacer-output.js",
       "test": "dist/nodes/test.js",
-      "test-runner": "dist/nodes/test-runner.js"
+      "test-runner": "dist/nodes/test-runner.js",
+      "spy": "dist/nodes/spy.js",
+      "assert": "dist/nodes/assert.js",
+      "mock": "dist/nodes/mock.js"
     }
   },
   "dependencies": {
