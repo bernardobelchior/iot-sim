@@ -18,8 +18,7 @@ module.exports = function(RED: Red) {
 
       const node = RED.nodes.getNode(config.node);
 
-      node.on("input", msg => {
-        console.log(msg);
+      node.once("input", msg => {
         this.send(msg);
       });
     }

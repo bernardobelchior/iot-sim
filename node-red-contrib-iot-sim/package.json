@@ -46,8 +46,9 @@
       "replacer": "dist/nodes/replacer.js",
       "replacer-input": "dist/nodes/replacer-input.js",
       "replacer-output": "dist/nodes/replacer-output.js",
-      "test": "dist/nodes/test.js",
       "test-runner": "dist/nodes/test-runner.js",
+      "test-end": "dist/nodes/test-end.js",
+      "test-start": "dist/nodes/test-start.js",
       "spy": "dist/nodes/spy.js",
       "assert": "dist/nodes/assert.js",
       "mock": "dist/nodes/mock.js"

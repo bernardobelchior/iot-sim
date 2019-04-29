@@ -1,0 +1,28 @@
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("test-end", {
+      category: "Testing",
+      color: "#ff0000",
+      defaults: {
+        name: { value: "test-end" },
+      },
+      icon: "file.png",
+      outputs: 0,
+      inputs: 1,
+      label: function() {
+        return this.name || "test-end";
+      }
+    });
+  })();
+</script>
+
+<script type="text/x-red" data-template-name="test-end">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="test-end">
+    <p></p>
+</script>

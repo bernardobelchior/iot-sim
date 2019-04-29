@@ -16,12 +16,14 @@ module.exports = function(RED: Red) {
 
       this.createNode(config);
 
-      this.on("input", msg => {
+      this.once("input", msg => {
         if (msg.payload.assert === true) {
           this.status({ fill: "green", shape: "ring", text: "passed" });
         } else {
-          this.status({ fill: "red", shape: "ring", text: "passed" });
+          this.status({ fill: "red", shape: "ring", text: "failed" });
         }
+
+        this.send({ payload: { cmd: "run" } });
       });
 
       this.status({ fill: "yellow", shape: "ring", text: "running" });

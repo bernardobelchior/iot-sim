@@ -1,12 +1,10 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
-import { ProxyConfigNode } from "./proxy-config";
-import { GeneratorInputNode } from "./generator-input";
-import { GeneratorOutputNode } from "./generator-output";
 
 interface Config extends NodeProperties {
   flow: string;
   node: string;
+  temperature: string;
 }
 
 module.exports = function(RED: Red) {
@@ -18,17 +16,18 @@ module.exports = function(RED: Red) {
 
       const node = RED.nodes.getNode(config.node);
 
-      this.on("input", msg => {
-        console.log(msg);
+      this.on("input", function(msg) {
         if (msg.payload.cmd === "run") {
           node.send({
-            payload: {
+            payload: JSON.stringify({
               messageType: "propertyStatus",
               data: {
-                temperature: 30
+                temperature: parseFloat(config.temperature)
               }
-            }
+            })
           });
+
+          this.send({ payload: { cmd: "run" } });
         }
       });
     }

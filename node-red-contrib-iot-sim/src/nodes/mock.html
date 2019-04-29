@@ -6,7 +6,8 @@
       defaults: {
         name: { value: "mock" },
         flow: { value: "", required: true},
-        node: { value: "", required: true }
+        node: { value: "", required: true },
+        temperature: { value: "", required: true }
       },
       inputs: 1,
       outputs: 1,
@@ -15,18 +16,23 @@
         return this.name || "mock";
       },
       oneditprepare: function() {
+        const flow = this.flow;
+        const nodeId = this.node;
+
         const flows = new Set();
         RED.nodes.eachNode(n => flows.add(n.z));
 
         flows.forEach(flowId => {
-          $("#node-input-flow").append("<option value='" + flowId + "'>" + flowId + "</option>");
+          const selected = flow === flowId ? "selected='selected'" : "";
+          $("#node-input-flow").append("<option value='" + flowId + "'"+ selected + ">" + flowId + "</option>");
         });
 
         $("#node-input-flow").on("change", function(evt) {
           $("#node-input-node").empty();
           RED.nodes.eachNode(n => {
             if (n.type !== "test" && n.z === evt.target.value) {
-              $("#node-input-node").append("<option value='" + n.id + "'>" + (n.name || n.label || n.type) + " (" + n.id + ") " + "</option>");
+              const selected = nodeId === n.id ? "selected='selected'" : "";
+              $("#node-input-node").append("<option value='" + n.id + "'" + selected + ">" + (n.name || n.label || n.type) + " (" + n.id + ") " + "</option>");
             }
           });
         });
@@ -49,6 +55,10 @@
         <label for="node-input-node"><i class="icon-tag"></i> Node</label>
         <select id="node-input-node" name="node" placeholder="Node">
         </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-temperature"><i class="icon-tag"></i> Temperature</label>
+        <input id="node-input-temperature" type="number" name="temperature" placeholder="Temperature" value="25"/>
     </div>
 
 </script>
