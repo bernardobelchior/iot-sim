@@ -2,15 +2,15 @@
   (function() {
     RED.nodes.registerType("test-end", {
       category: "Testing",
-      color: "#ff0000",
+      color: "#87a980",
       defaults: {
         name: { value: "test-end" },
       },
-      icon: "file.png",
+      icon: "link-out.png",
       outputs: 0,
       inputs: 1,
       label: function() {
-        return this.name || "test-end";
+        return this.name || "Test End";
       }
     });
   })();
@@ -24,5 +24,5 @@
 </script>
 
 <script type="text/x-red" data-help-name="test-end">
-    <p></p>
+    <p>Denotes the end of a test. It is required in order to signal the test has ended and the "test-runner" can execute the next sequential one.</p>
 </script>

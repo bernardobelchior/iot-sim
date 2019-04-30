@@ -2,7 +2,7 @@
   (function() {
     RED.nodes.registerType("mock", {
       category: "Testing",
-      color: "#ff0000",
+      color: "#87a980",
       defaults: {
         name: { value: "mock" },
         flow: { value: "", required: true},
@@ -11,7 +11,7 @@
       },
       inputs: 1,
       outputs: 1,
-      icon: "file.png",
+      icon: "inject.png",
       label: function() {
         return this.name || "mock";
       },

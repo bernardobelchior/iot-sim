@@ -18,8 +18,15 @@ module.exports = function(RED: Red) {
 
       const node = RED.nodes.getNode(config.node);
 
-      node.once("input", msg => {
-        this.send(msg);
+      this.on("input", msg => {
+        if (msg.payload.cmd === "run") {
+          node.once("input", msg => {
+            console.log(msg);
+            this.send([undefined, msg]);
+          });
+
+          this.send([{ payload: { cmd: "run" } }, undefined]);
+        }
       });
     }
   }

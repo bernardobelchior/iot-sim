@@ -2,11 +2,11 @@
   (function() {
     RED.nodes.registerType("test-start", {
       category: "Testing",
-      color: "#ff0000",
+      color: "#87a980",
       defaults: {
         name: { value: "test-start" },
       },
-      icon: "file.png",
+      icon: "comment.png",
       outputs: 1,
       inputs: 1,
       label: function() {
@@ -24,5 +24,5 @@
 </script>
 
 <script type="text/x-red" data-help-name="test-start">
-    <p></p>
+    <p>Denotes the start of a test. It is required for each test and must be placed between the "test-runner" and the first test node. </p>
 </script>
