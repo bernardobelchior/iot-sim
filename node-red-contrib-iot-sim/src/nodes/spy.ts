@@ -21,7 +21,6 @@ module.exports = function(RED: Red) {
       this.on("input", msg => {
         if (msg.payload.cmd === "run") {
           node.once("input", msg => {
-            console.log(msg);
             this.send([undefined, msg]);
           });
 
