@@ -1,8 +1,5 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
-import { ProxyConfigNode } from "./proxy-config";
-import { GeneratorInputNode } from "./generator-input";
-import { GeneratorOutputNode } from "./generator-output";
 
 interface Config extends NodeProperties {
   flow: string;
