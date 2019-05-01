@@ -42,5 +42,7 @@
 
 <script type="text/x-red" data-help-name="test-runner">
     <p>Runs tests sequentially. Every test starts with a "test-start" node and ends with a "test-end" node. If two tests can be run simultaneously,
-    connect the "test-start" to the same output, otherwise (to run them sequentially) hook each one up to a different output. </p>
+    connect the "test-start" to the same output, otherwise (to run them sequentially) hook each one up to a different output.
+    Only one "test-runner" can be present in a flow at a given time.
+    </p>
 </script>
