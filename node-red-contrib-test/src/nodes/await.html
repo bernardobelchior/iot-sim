@@ -1,0 +1,32 @@
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("await", {
+      category: "Testing",
+      color: "#87a980",
+      defaults: {
+        name: { value: "await" },
+        timeout: { value: "3000", required: true }
+      },
+      inputs: 1,
+      outputs: 1,
+      icon: "timer.png",
+      label: function() {
+        return this.name || "await";
+      }
+  })
+})();
+</script>
+
+<script type="text/x-red" data-template-name="await">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+        <label for="node-input-timeout"><i class="icon-tag"></i> Timeout (ms)</label>
+        <input type="number" id="node-input-timeout" placeholder="Timeout">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="await">
+    <p></p>
+
+</script>

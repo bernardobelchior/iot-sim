@@ -1,5 +1,6 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
+import { createRunTestMessage } from "../util";
 
 interface Config extends NodeProperties {
   outputs: number;
@@ -26,18 +27,14 @@ module.exports = function(RED: Red) {
           msgs.push(null);
         }
 
-        msgs[output] = {
-          payload: {
-            cmd: "run"
-          }
-        };
+        msgs[output] = createRunTestMessage();
 
         this.send(msgs);
       };
 
       this.context().flow.testDone = testDone;
 
-      testDone();
+      setTimeout(testDone, 0);
     }
   }
 

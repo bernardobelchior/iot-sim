@@ -3,6 +3,7 @@ import { Node } from "node-red-contrib-typescript-node";
 import * as util from "util";
 import * as vm from "vm";
 import { Context, Script } from "vm";
+import { createRunTestMessage, isRunTestMessage } from "../util";
 
 interface Config extends NodeProperties {
   func: string;
@@ -19,12 +20,14 @@ module.exports = function(RED: Red) {
 
       this.createNode(config);
 
+      this.status({ fill: "yellow", shape: "ring", text: "pending" });
+
       this.on("input", msg => {
         const script = this.createScript(config.func);
         const context = this.createContext();
         const result = this.runScript(script, context, msg);
 
-        if (msg.payload.cmd !== "run") {
+        if (!isRunTestMessage(msg)) {
           return;
         }
 
@@ -37,15 +40,13 @@ module.exports = function(RED: Red) {
           this.status({ fill: "red", shape: "ring", text: "failed" });
         }
 
-        this.send({ payload: { cmd: "run" } });
+        this.send(createRunTestMessage());
       });
 
       this.on("close", () => {
         this.outstandingIntervals.forEach(clearInterval);
         this.outstandingTimers.forEach(clearTimeout);
       });
-
-      this.status({ fill: "yellow", shape: "ring", text: "running" });
     }
 
     private runScript(script: Script, context: Context, msg: any): any {

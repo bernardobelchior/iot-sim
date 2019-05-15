@@ -1,5 +1,6 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
+import { createRunTestMessage, isRunTestMessage } from "../util";
 
 interface Config extends NodeProperties {}
 
@@ -13,9 +14,9 @@ module.exports = function(RED: Red) {
       this.status({ fill: "yellow", shape: "ring", text: "pending" });
 
       this.on("input", msg => {
-        if (msg.payload.cmd === "run") {
+        if (isRunTestMessage(msg)) {
           this.status({ fill: "green", shape: "ring", text: "started" });
-          this.send({ payload: { cmd: "run" } });
+          this.send(createRunTestMessage());
         }
       });
     }

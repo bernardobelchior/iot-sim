@@ -18,19 +18,19 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.123",
-    "@types/node": "^11.13.4",
-    "@types/node-red": "^0.17.3",
-    "@types/shelljs": "^0.8.4",
+    "@types/node": "^11.13.8",
+    "@types/node-red": "^0.20.0",
+    "@types/shelljs": "^0.8.5",
     "concurrently": "^4.1.0",
     "jest": "^24.7.1",
     "node-red": "^0.20.5",
     "node-red-contrib-typescript-node": "^0.1.0",
-    "nodemon": "^1.18.0",
+    "nodemon": "^1.19.0",
     "shelljs": "^0.8.3",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.0.0",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4"
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   },
   "keywords": [
     "node-red"
@@ -42,6 +42,7 @@
       "test-start": "dist/nodes/test-start.js",
       "spy": "dist/nodes/spy.js",
       "assert": "dist/nodes/assert.js",
+      "await": "dist/nodes/await.js",
       "mock": "dist/nodes/mock.js"
     }
   }

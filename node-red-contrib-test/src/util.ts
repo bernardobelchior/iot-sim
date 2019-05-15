@@ -1,6 +1,11 @@
-import { NodeProperties } from "node-red";
-import { omit } from "lodash";
+export function createRunTestMessage(): { payload: any } {
+  return {
+    payload: {
+      cmd: "run"
+    }
+  };
+}
 
-export function removePropsFromConfig<T extends NodeProperties>(config: T) {
-  return omit(config, ["id", "type", "name", "_users", "x", "y", "z"]);
+export function isRunTestMessage(msg: any): boolean {
+  return msg.payload && msg.payload.cmd === "run";
 }

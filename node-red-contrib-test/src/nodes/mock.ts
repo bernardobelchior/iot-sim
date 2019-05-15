@@ -1,5 +1,7 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
+import { createRunTestMessage, isRunTestMessage } from "../util";
+import assert = require("assert");
 
 interface Config extends NodeProperties {
   flow: string;
@@ -16,8 +18,10 @@ module.exports = function(RED: Red) {
 
       const node = RED.nodes.getNode(config.node);
 
-      this.on("input", function(msg) {
-        if (msg.payload.cmd === "run") {
+      this.on("input", msg => {
+        assert(node !== null);
+
+        if (isRunTestMessage(msg)) {
           node.send({
             payload: JSON.stringify({
               messageType: "propertyStatus",
@@ -27,7 +31,7 @@ module.exports = function(RED: Red) {
             })
           });
 
-          this.send({ payload: { cmd: "run" } });
+          this.send(createRunTestMessage());
         }
       });
     }
