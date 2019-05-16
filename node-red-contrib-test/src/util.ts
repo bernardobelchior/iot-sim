@@ -1,11 +1,27 @@
-export function createRunTestMessage(): { payload: any } {
+type Command = "run";
+
+interface RunTestMsg extends TestMsg {
+  test: {
+    cmd: "run";
+  };
+}
+
+interface TestMsg {
+  payload: any;
+  test: {
+    cmd: Command;
+  };
+}
+
+export function createRunTestMessage(payload?: any): TestMsg {
   return {
-    payload: {
+    payload,
+    test: {
       cmd: "run"
     }
   };
 }
 
-export function isRunTestMessage(msg: any): boolean {
-  return msg.payload && msg.payload.cmd === "run";
+export function isRunTestMessage(msg: any): msg is RunTestMsg {
+  return msg.test && msg.test.cmd === "run";
 }

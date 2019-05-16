@@ -31,15 +31,8 @@ module.exports = function(RED: Red) {
         }
 
         if (this.timeoutId && this.lastMsg) {
-          const merged = {
-            payload: {
-              ...this.lastMsg.payload,
-              ...createRunTestMessage().payload
-            }
-          };
-
           clearTimeout(this.timeoutId);
-          this.send(merged);
+          this.send(createRunTestMessage(this.lastMsg.payload));
           this.timeoutId = undefined;
           this.lastMsg = undefined;
         }
