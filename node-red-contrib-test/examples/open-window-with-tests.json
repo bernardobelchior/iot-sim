@@ -1,398 +1,303 @@
 [
   {
-    "id": "c1b88cb0.ed8a8",
-    "type": "tab",
-    "label": "Window w/ Generator",
-    "disabled": false,
-    "info": ""
+    "id": "279d4eca.e9a66a",
+    "type": "subflow",
+    "name": "[Test] Window w/ Generator",
+    "info": "",
+    "category": "",
+    "in": [
+      {
+        "x": 80,
+        "y": 360,
+        "wires": [
+          {
+            "id": "3bcd1aa0.361f16"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 1820,
+        "y": 360,
+        "wires": []
+      }
+    ],
+    "env": []
   },
   {
-    "id": "ce229d39.d0adc8",
-    "type": "tab",
-    "label": "[Test] Window w/ Generator",
-    "disabled": false,
-    "info": ""
-  },
-  {
-    "id": "4dea3a04.3282f4",
-    "type": "mqtt-broker",
-    "z": "",
-    "name": "Read Server",
-    "broker": "localhost",
-    "port": "1883",
-    "clientid": "",
-    "usetls": false,
-    "compatmode": true,
-    "keepalive": "60",
-    "cleansession": true,
-    "birthTopic": "",
-    "birthQos": "0",
-    "birthPayload": "",
-    "closeTopic": "",
-    "closeQos": "0",
-    "closePayload": "",
-    "willTopic": "",
-    "willQos": "0",
-    "willPayload": ""
-  },
-  {
-    "id": "649ac858.e42348",
-    "type": "mqtt-broker",
-    "z": "",
-    "name": "Write Server",
-    "broker": "localhost",
-    "port": "1883",
-    "clientid": "",
-    "usetls": false,
-    "compatmode": true,
-    "keepalive": "60",
-    "cleansession": true,
-    "birthTopic": "",
-    "birthQos": "0",
-    "birthPayload": "",
-    "closeTopic": "",
-    "closeQos": "0",
-    "closePayload": "",
-    "willTopic": "",
-    "willQos": "0",
-    "willPayload": ""
-  },
-  {
-    "id": "43b62fbb.87f1d8",
-    "type": "mqtt in",
-    "z": "c1b88cb0.ed8a8",
-    "name": "Thermometer",
-    "topic": "/things/thermometer",
-    "qos": "2",
-    "datatype": "auto",
-    "broker": "4dea3a04.3282f4",
-    "x": 70,
-    "y": 120,
-    "wires": [
-      [
-        "2724a6c2.abfac2"
-      ]
-    ]
-  },
-  {
-    "id": "d7baba46.bf3858",
-    "type": "debug",
-    "z": "c1b88cb0.ed8a8",
-    "name": "",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "false",
-    "x": 700,
-    "y": 120,
-    "wires": []
-  },
-  {
-    "id": "6bbab98f.48df18",
-    "type": "function",
-    "z": "c1b88cb0.ed8a8",
-    "name": "OpenWindow if temp > 25",
-    "func": "if (msg.payload.data.temperature > 25) {\n    return {\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                openWindow: {}\n            }\n        }\n    }    \n}",
-    "outputs": 1,
-    "noerr": 0,
-    "x": 440,
-    "y": 120,
-    "wires": [
-      [
-        "d7baba46.bf3858"
-      ]
-    ]
-  },
-  {
-    "id": "5a793f6c.c3b188",
+    "id": "f50a23.73a8fde",
     "type": "mock",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Send Temperature = 20",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
     "temperature": "20",
-    "x": 830,
-    "y": 180,
+    "x": 970,
+    "y": 260,
     "wires": [
       [
-        "b946bce5.712568"
+        "144c5754.a8e891"
       ]
     ]
   },
   {
-    "id": "37dbc452.c8959c",
+    "id": "ee02765a.032a6",
     "type": "assert",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "assert",
     "func": "return !msg.payload || !msg.payload.data ||\n  !msg.payload.data.openWindow;",
     "noerr": 0,
-    "x": 1330,
-    "y": 180,
+    "x": 1470,
+    "y": 260,
     "wires": [
       [
-        "e84291d1.97fc"
+        "6cc1062a.2141c"
       ]
     ]
   },
   {
-    "id": "1e01f275.85a0ae",
+    "id": "d7cfacc4.b84e3",
     "type": "spy",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Spy Has Received OpenWindow",
     "flow": "c1b88cb0.ed8a8",
     "node": "d7baba46.bf3858",
-    "x": 720,
-    "y": 100,
+    "x": 860,
+    "y": 180,
     "wires": [
       [
-        "5a793f6c.c3b188"
+        "f50a23.73a8fde"
       ],
       [
-        "b946bce5.712568"
+        "144c5754.a8e891"
       ]
     ]
   },
   {
-    "id": "4f2441b8.e8397",
+    "id": "1966765e.a239da",
     "type": "mock",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Send Temperature = 30",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
     "temperature": "30",
-    "x": 830,
-    "y": 460,
+    "x": 970,
+    "y": 540,
     "wires": [
       [
-        "ce735d1d.7cbfa"
+        "7ceffcaa.d183f4"
       ]
     ]
   },
   {
-    "id": "3d05282f.9894c8",
+    "id": "1b007cf8.b2ebc3",
     "type": "assert",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "assert",
     "func": "return !!msg.payload.data && \n  !!msg.payload.data.openWindow;",
     "noerr": 0,
-    "x": 1330,
-    "y": 460,
+    "x": 1470,
+    "y": 540,
     "wires": [
       [
-        "ae89b6d0.153df8"
+        "fff0d8ca.e6a3a"
       ]
     ]
   },
   {
-    "id": "4d0b8534.908fb4",
+    "id": "1384531a.91ced5",
     "type": "test-start",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Expect OpenWindow to fire when temperature > 25",
-    "x": 380,
-    "y": 460,
+    "x": 520,
+    "y": 540,
     "wires": [
       [
-        "9fcc2e5c.f80d58"
+        "cd35b7f3.1f7428"
       ]
     ]
   },
   {
-    "id": "8fe5feac.3d824",
+    "id": "76705de8.1c765c",
     "type": "test-start",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Expect OpenWindow not to fire when temperature < 25",
-    "x": 390,
-    "y": 180,
+    "x": 530,
+    "y": 260,
     "wires": [
       [
-        "1e01f275.85a0ae"
+        "d7cfacc4.b84e3"
       ]
     ]
   },
   {
-    "id": "9fcc2e5c.f80d58",
+    "id": "cd35b7f3.1f7428",
     "type": "spy",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Spy Has Received OpenWindow",
     "flow": "c1b88cb0.ed8a8",
     "node": "d7baba46.bf3858",
-    "x": 720,
-    "y": 520,
+    "x": 860,
+    "y": 600,
     "wires": [
       [
-        "4f2441b8.e8397"
+        "1966765e.a239da"
       ],
       [
-        "ce735d1d.7cbfa"
+        "7ceffcaa.d183f4"
       ]
     ]
   },
   {
-    "id": "761c2d4.b37f3d4",
+    "id": "3bcd1aa0.361f16",
     "type": "test-runner",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "",
     "flow": "c1b88cb0.ed8a8",
     "outputs": 3,
-    "x": 70,
-    "y": 280,
+    "x": 210,
+    "y": 360,
     "wires": [
       [
-        "8fe5feac.3d824"
+        "76705de8.1c765c"
       ],
       [
-        "4a9d3ac2.deed94"
+        "d4df9ba8.05f0b8"
       ],
       [
-        "4d0b8534.908fb4"
+        "1384531a.91ced5"
       ]
     ]
   },
   {
-    "id": "e84291d1.97fc",
+    "id": "6cc1062a.2141c",
     "type": "test-end",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "test-end",
-    "x": 1480,
-    "y": 180,
+    "x": 1620,
+    "y": 260,
     "wires": []
   },
   {
-    "id": "ae89b6d0.153df8",
+    "id": "fff0d8ca.e6a3a",
     "type": "test-end",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "test-end",
-    "x": 1480,
-    "y": 460,
+    "x": 1620,
+    "y": 540,
     "wires": []
   },
   {
-    "id": "ce735d1d.7cbfa",
+    "id": "7ceffcaa.d183f4",
     "type": "await",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
-    "y": 460,
+    "x": 1310,
+    "y": 540,
     "wires": [
       [
-        "3d05282f.9894c8"
+        "1b007cf8.b2ebc3"
       ]
     ]
   },
   {
-    "id": "b946bce5.712568",
+    "id": "144c5754.a8e891",
     "type": "await",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
-    "y": 180,
+    "x": 1310,
+    "y": 260,
     "wires": [
       [
-        "37dbc452.c8959c"
+        "ee02765a.032a6"
       ]
     ]
   },
   {
-    "id": "2724a6c2.abfac2",
-    "type": "json",
-    "z": "c1b88cb0.ed8a8",
-    "name": "",
-    "property": "payload",
-    "action": "obj",
-    "pretty": false,
-    "x": 230,
-    "y": 120,
-    "wires": [
-      [
-        "6bbab98f.48df18"
-      ]
-    ]
-  },
-  {
-    "id": "31c9a2d1.05aaa6",
+    "id": "edbb3d4e.58d6d8",
     "type": "mock",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Send Temperature = 25",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
     "temperature": "25",
-    "x": 830,
-    "y": 280,
+    "x": 970,
+    "y": 360,
     "wires": [
       [
-        "b18916b3.e351d8"
+        "b12c46b1.7dcb58"
       ]
     ]
   },
   {
-    "id": "157e5a16.1689e6",
+    "id": "beae504.01dd53",
     "type": "assert",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "assert",
     "func": "return !msg.payload || !msg.payload.data ||\n  !msg.payload.data.openWindow;",
     "noerr": 0,
-    "x": 1330,
-    "y": 280,
+    "x": 1470,
+    "y": 360,
     "wires": [
       [
-        "e03b0357.2c3018"
+        "1f181533.7b2363"
       ]
     ]
   },
   {
-    "id": "4a9d3ac2.deed94",
+    "id": "d4df9ba8.05f0b8",
     "type": "test-start",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Expect OpenWindow not to fire when temperature = 25",
-    "x": 390,
-    "y": 280,
+    "x": 530,
+    "y": 360,
     "wires": [
       [
-        "cb809446.ef47a"
+        "4980cbc2.a58f0c"
       ]
     ]
   },
   {
-    "id": "cb809446.ef47a",
+    "id": "4980cbc2.a58f0c",
     "type": "spy",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "Spy Has Received OpenWindow",
     "flow": "c1b88cb0.ed8a8",
     "node": "d7baba46.bf3858",
-    "x": 720,
-    "y": 340,
+    "x": 860,
+    "y": 420,
     "wires": [
       [
-        "31c9a2d1.05aaa6"
+        "edbb3d4e.58d6d8"
       ],
       [
-        "b18916b3.e351d8"
+        "b12c46b1.7dcb58"
       ]
     ]
   },
   {
-    "id": "e03b0357.2c3018",
+    "id": "1f181533.7b2363",
     "type": "test-end",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "test-end",
-    "x": 1480,
-    "y": 280,
+    "x": 1620,
+    "y": 360,
     "wires": []
   },
   {
-    "id": "b18916b3.e351d8",
+    "id": "b12c46b1.7dcb58",
     "type": "await",
-    "z": "ce229d39.d0adc8",
+    "z": "279d4eca.e9a66a",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
-    "y": 280,
+    "x": 1310,
+    "y": 360,
     "wires": [
       [
-        "157e5a16.1689e6"
+        "beae504.01dd53"
       ]
     ]
   }

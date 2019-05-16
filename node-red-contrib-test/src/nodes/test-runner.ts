@@ -35,6 +35,9 @@ module.exports = function(RED: Red) {
       this.context().flow.testDone = testDone;
 
       setTimeout(testDone, 0);
+
+      /* Wait until the parent flow has been initialized */
+      setTimeout(() => console.log(RED.nodes.getNode(config.z)), 0);
     }
   }
 
