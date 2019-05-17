@@ -8,74 +8,31 @@
 
 TODO: Introduction establishing we're using Node-RED. 
 
-### Use Case 1: Spy
+### Use Case 1: Create Mocks
 
-Read the message from another node. By itself, the use case on its own is not very useful, but helps building the next ones. In conjunction with another nodes, it can be used to debug, assert or modify messages without altering the flow under test. 
+Given a scenario where a room has a thermostat, window and heater, when the window is not open and the thermostat is reading a temperature below 18ºC, the heater should be turned on. It should be possible to mock the thermostat so that the temperature can be set for the purpose of testing. Achieving this will help test for various type of errors, e.g. when the temperature is 19ºC and the window is closed, the heater should remain turned off; when temperature is 17ºC and the window is closed, the heater should turn on, etc.
 
-Examples:
-* Spy *Function* node to debug the result without altering the initial flow.
+### Use Case 2: Create Spies
 
-### Use Case 2: Assert
+Reusing the scenario from Use Case 1, it should be possible to spy on the heater so that tests can verify the heater has been turned on/off. Using spies with mocks allows the create of unit and integration tests.
 
-Assert the received value matches a pre-computed result. This use case is the core of a testing framework and relies on the previous use case to obtain values from the flow under test. 
+### Use Case 3: Unit Testing
 
-Examples:
-* Assert that a *Change* node changes values such as `undefined` or `null` as expected.
+Utilizing once again the scenario from Use Case 1, it should be possible to write a test to detect a possible logic error by injecting fake values into a component and spying its response, e.g. mock the heater to receive the temperature as 17ºC and window to be closed, then spy on it to verify if it has turned on. This construct can automate the finding of logic errors such as `temperature < 18` being confused with `temperature > 18`. 
 
-### Use Case 3: Await
+### Use Case 4: Integration Testing
 
-Wait for a message to arrive. If it does, send the message; if a message does not arrive within a user specified timeout, send a message signaling the timeout has been reached. 
+Still using the same scenario, it should be possible to write a test to detect integration problems by injecting fake values into the some components and spying the response from others, e.g. mock both the thermostat to display the temperature as 17ºC and the window to be closed, then spy the heater to verify if it has turned on. This construct can automate the finding of integration problems such as information not being sent, problems with components, unexpected formats, etc. 
 
-Examples:
-* Wait 3s to make sure a message did not arrive.
-* Wait for an asynchronous computation to finish within a given timeout.
+### Use Case 5: Find Logic Errors
 
-### Use Case 4: Mock
+As mentioned briefly in Use Case 3, it should be possible to write a test to detect errors in the logic of the system, such as off-by-one (e.g., access past the end of an array) or the mixing of `>` with `<` in conditionals. 
 
-Send values as if they were sent by a specific node. It is useful to mock nodes that are not easy to set up for testing, like emails, databases, etc. It can also be used to inject values that may find faults in the system.
+### Use Case 6: Detect Physical Error
 
-Examples:
-* Mock email node to act as if an email was received
-* Insert an `undefined` where only numbers are expected.
+Given a scenario where a room has a switch connected to a lamp and a light sensor. It should be possible create a test to check if the switch or lamp are misbehaving by turning it on and asserting that the light level is the one expected when a light is turned on. This gives the user the ability to verify if physical devices are malfunctioning and, thus, fix the problem.
 
-### Use Case 5: Generate Test Report
+### Use Case 7: Generate Test Report
 
-Aggregate all assertions from all tests and generate a report detailing which tests failed, including the location and context of the failure. 
+On a complex system refactors are scary as they can touch many parts of the codebase and possibly create problems. As such, when a refactor is done, it is useful to run all tests and aggregate their results by generating a summary with all failing tests including the location, so that bugs that were introduced during said refactor can be found and eliminated.
 
-Examples:
-* Run a whole test suite after a big refactor and obtain a report explaining where and why the tests failed.  
-
-### Scenario 1
-
-Imagine a scenario where the user wants to automatically open or close window blinds, when it is day or night, respectively.  
-
-Sensors: 
-* Light
-
-Actuators:
-* Smart Window Blinds
-
-Let's say it is considered night, when light value <= 1 lux. The logic is simple:
-```
-If light <= 1 lux, then close blinds.
-If light > 1 lux, then open blinds.
-```
-
-
-### Scenario 2
-
-Imagine a scenario where the user wants to automatically open or close window blinds, when it is day or night, respectively. However, in a hot day, having blinds open will heat up the house, which is undesirable. The user places a temperature sensor outside the window.  
-
-Sensors: 
-* Light
-* Temperature
-
-Actuators:
-* Smart Window Blinds
-
-Like the scenario above, let's consider night, when light value <= 1 lux. Let's also say that the blinds should only open if the outside temperature is <= 25ºC. The logic is still simple:
-```
-If light <= 1 lux, then close blinds.
-If light > 1 lux AND temperature <= 25ºC, then open blinds.
-If light > 1 lux AND temperature > 25ºC, then close blinds.
-```
