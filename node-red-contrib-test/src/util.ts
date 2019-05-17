@@ -1,5 +1,10 @@
 type Command = "run";
 
+export interface TestFailure {
+  msg: any;
+  function: string;
+}
+
 interface RunTestMsg extends TestMsg {
   test: {
     cmd: "run";
@@ -7,7 +12,7 @@ interface RunTestMsg extends TestMsg {
 }
 
 interface TestMsg {
-  payload: any;
+  payload?: any;
   test: {
     cmd: Command;
   };

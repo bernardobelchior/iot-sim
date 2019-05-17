@@ -11,8 +11,6 @@ module.exports = function(RED: Red) {
 
       this.createNode(config);
 
-      this.status({ fill: "yellow", shape: "ring", text: "pending" });
-
       this.on("input", msg => {
         if (isRunTestMessage(msg)) {
           this.status({ fill: "green", shape: "ring", text: "finished" });
@@ -23,6 +21,10 @@ module.exports = function(RED: Red) {
           );
           this.status({ fill: "red", shape: "ring", text: "error" });
         }
+      });
+
+      this.on("close", () => {
+        this.status({});
       });
     }
   }

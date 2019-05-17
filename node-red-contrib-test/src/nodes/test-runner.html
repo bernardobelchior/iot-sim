@@ -8,6 +8,7 @@
         flow: { value: "", required: true},
         outputs: {value: 1, required: true},
       },
+      inputs: 1,
       icon: "switch.png",
       label: function() {
         return this.name || "Test Runner";
@@ -44,5 +45,6 @@
     <p>Runs tests sequentially. Every test starts with a "test-start" node and ends with a "test-end" node. If two tests can be run simultaneously,
     connect the "test-start" to the same output, otherwise (to run them sequentially) hook each one up to a different output.
     Only one "test-runner" can be present in a flow at a given time.
+    <b>In order to start the test runner, a message with payload "start_tests" must be sent to it.</b>
     </p>
 </script>

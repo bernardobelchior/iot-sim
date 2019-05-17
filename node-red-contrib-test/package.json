@@ -43,7 +43,8 @@
       "spy": "dist/nodes/spy.js",
       "assert": "dist/nodes/assert.js",
       "await": "dist/nodes/await.js",
-      "mock": "dist/nodes/mock.js"
+      "mock": "dist/nodes/mock.js",
+      "report-generator": "dist/nodes/report-generator.js"
     }
   }
 }

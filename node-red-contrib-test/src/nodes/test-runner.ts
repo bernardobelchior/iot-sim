@@ -1,6 +1,6 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
-import { createRunTestMessage } from "../util";
+import { createRunTestMessage, TestFailure } from "../util";
 
 interface Config extends NodeProperties {
   outputs: number;
@@ -8,14 +8,36 @@ interface Config extends NodeProperties {
 
 module.exports = function(RED: Red) {
   class TestRunnerNode extends Node {
+    failures: TestFailure[] = [];
+
     constructor(config: Config) {
       super(RED);
 
       this.createNode(config);
       let output = -1;
 
-      const testDone = () => {
-        if (output === config.outputs) {
+      this.status({ fill: "yellow", shape: "ring", text: "waiting" });
+
+      const testDone = (failed?: TestFailure) => {
+        if (output === config.outputs - 1) {
+          if (this.failures.length === 0) {
+            this.status({
+              fill: "green",
+              shape: "ring",
+              text: "all tests passed"
+            });
+          } else {
+            this.status({
+              fill: "red",
+              shape: "ring",
+              text: `${this.failures.length} tests failed`
+            });
+
+            if (this.context().flow.generateReport) {
+              this.context().flow.generateReport(this.failures);
+            }
+          }
+
           return;
         }
 
@@ -23,18 +45,26 @@ module.exports = function(RED: Red) {
 
         const msgs = [];
         for (let i = 0; i < config.outputs; i++) {
-          // tslint:disable-next-line:no-null-keyword
-          msgs.push(null);
+          msgs.push(undefined);
         }
 
         msgs[output] = createRunTestMessage();
+
+        if (failed) {
+          this.failures.push(failed);
+        }
 
         this.send(msgs);
       };
 
       this.context().flow.testDone = testDone;
 
-      setTimeout(testDone, 0);
+      this.once("input", msg => {
+        if (msg.payload === "start_tests") {
+          this.status({ fill: "yellow", shape: "dot", text: "started" });
+          testDone();
+        }
+      });
     }
   }
 

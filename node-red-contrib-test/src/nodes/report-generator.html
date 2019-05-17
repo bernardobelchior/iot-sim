@@ -1,0 +1,27 @@
+<script type="text/javascript">
+  (function() {
+    RED.nodes.registerType("report-generator", {
+      category: "Testing",
+      color: "#87a980",
+      defaults: {
+        name: { value: "report-generator" },
+      },
+      outputs: 1,
+      icon: "file.png",
+      label: function() {
+        return this.name || "Generate Report";
+      }
+    });
+  })();
+</script>
+
+<script type="text/x-red" data-template-name="report-generator">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="report-generator">
+    <p>Generates reports</p>
+</script>

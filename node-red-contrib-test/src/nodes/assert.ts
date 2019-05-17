@@ -3,7 +3,7 @@ import { Node } from "node-red-contrib-typescript-node";
 import * as util from "util";
 import * as vm from "vm";
 import { Context, Script } from "vm";
-import { createRunTestMessage, isRunTestMessage } from "../util";
+import { createRunTestMessage, TestFailure, isRunTestMessage } from "../util";
 
 interface Config extends NodeProperties {
   func: string;
@@ -33,14 +33,20 @@ module.exports = function(RED: Red) {
 
         if (result) {
           this.status({ fill: "green", shape: "ring", text: "passed" });
+          this.send(createRunTestMessage());
         } else {
           this.error(
             `assert failed with the following message: "${JSON.stringify(msg)}"`
           );
           this.status({ fill: "red", shape: "ring", text: "failed" });
-        }
 
-        this.send(createRunTestMessage());
+          const failure: TestFailure = {
+            function: config.func,
+            msg
+          };
+
+          this.context().flow.testDone(failure);
+        }
       });
 
       this.on("close", () => {
