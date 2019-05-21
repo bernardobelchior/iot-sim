@@ -3,6 +3,7 @@ import { Node } from "node-red-contrib-typescript-node";
 import * as util from "util";
 import * as vm from "vm";
 import { Context, Script } from "vm";
+import * as chai from "chai";
 import {
   createRunTestMessage,
   TestFailure,
@@ -42,21 +43,26 @@ module.exports = function(RED: Red) {
           return;
         }
 
-        if (result) {
-          this.status({ fill: "green", shape: "ring", text: "passed" });
-          this.send(createRunTestMessage());
-        } else {
-          this.error(
-            `assert failed with the following message: "${JSON.stringify(msg)}"`
-          );
+        if (result instanceof Error) {
+          // this.error(
+          //   `assert failed with the following message: "${JSON.stringify(msg)}"`
+          // );
           this.status({ fill: "red", shape: "ring", text: "failed" });
 
+          this.error(result);
+
+          console.log(result.stack);
           const failure: TestFailure = {
             function: config.func,
-            msg
+            error: result,
+            msg,
+            nodeId: config.id
           };
 
           this.context().flow.testRunner.testDone(failure);
+        } else {
+          this.status({ fill: "green", shape: "ring", text: "passed" });
+          this.send(createRunTestMessage());
         }
       });
 
@@ -85,14 +91,39 @@ module.exports = function(RED: Red) {
         return context.results;
       } catch (err) {
         // remove unwanted part
-        const index = err.stack.search(
-          /\n\s*at ContextifyScript.Script.runInContext/
-        );
+        const index = err.stack.search(/\n\s*at Script.runInContext/);
         err.stack = err.stack
           .slice(0, index)
           .split("\n")
           .slice(0, -1)
           .join("\n");
+
+        if (err.name === "AssertionError") {
+          /* Remove information about where the error was thrown. */
+          const [_, __, ___, ____, ...errStack] = err.stack.split("\n");
+
+          /* Remove 1 from the error line. This is needed because the first line
+           * is not written by the user, but is also not seen by them. */
+          const lines = errStack.length;
+          const lineToUpdate = errStack[lines - 1];
+
+          const [_fullMatch, line, column]: string[] = /:(\d+):(\d+)$/.exec(
+            lineToUpdate
+          );
+
+          const newLine = lineToUpdate.replace(
+            /:(\d+):(\d+)$/,
+            `:${Number.parseInt(line) - 1}:${column}`
+          );
+
+          err.stack = errStack
+            .slice(0, -1)
+            .concat([newLine])
+            .join("\n");
+
+          return err;
+        }
+
         const stack = err.stack.split(/\r?\n/);
 
         // store the error in msg to be used in flows
@@ -168,12 +199,15 @@ module.exports = function(RED: Red) {
 
     private createContext(): Context {
       const node = this;
+      chai.config.truncateThreshold = 1000;
+      const expect = chai.expect;
 
       const sandbox: Context = {
         console: console,
         util: util,
         Buffer: Buffer,
         Date: Date,
+        expect: expect,
         RED: {
           util: RED.util
         },

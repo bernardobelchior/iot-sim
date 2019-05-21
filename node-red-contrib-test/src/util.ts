@@ -3,6 +3,8 @@ type Command = "run" | "reset";
 export interface TestFailure {
   msg: any;
   function: string;
+  error: Error;
+  nodeId: string;
 }
 
 interface ResetTestMsg extends GenericTestMsg<"reset"> {}
@@ -13,7 +15,7 @@ interface TestMsg extends GenericTestMsg<Command> {}
 
 interface GenericTestMsg<Cmd extends Command> {
   payload?: any;
-  test: {
+  _test: {
     cmd: Cmd;
   };
 }
@@ -21,7 +23,7 @@ interface GenericTestMsg<Cmd extends Command> {
 function createTestMessage(command: Command, payload?: any): TestMsg {
   return {
     payload,
-    test: {
+    _test: {
       cmd: command
     }
   };
@@ -36,9 +38,9 @@ export function createRunTestMessage(payload?: any): TestMsg {
 }
 
 export function isRunTestMessage(msg: any): msg is RunTestMsg {
-  return msg.test && msg.test.cmd === "run";
+  return msg._test && msg._test.cmd === "run";
 }
 
 export function isResetTestMessage(msg: any): msg is ResetTestMsg {
-  return msg.test && msg.test.cmd === "reset";
+  return msg._test && msg._test.cmd === "reset";
 }

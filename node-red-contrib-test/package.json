@@ -17,6 +17,7 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts"
   },
   "devDependencies": {
+    "@types/chai": "^4.1.7",
     "@types/lodash": "^4.14.123",
     "@types/node": "^11.13.8",
     "@types/node-red": "^0.20.0",
@@ -46,5 +47,8 @@
       "mock": "dist/nodes/mock.js",
       "report-generator": "dist/nodes/report-generator.js"
     }
+  },
+  "dependencies": {
+    "chai": "^4.2.0"
   }
 }
