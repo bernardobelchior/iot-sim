@@ -10,7 +10,8 @@ import assert = require("assert");
 interface Config extends NodeProperties {
   flow: string;
   node: string;
-  temperature: string;
+  payload: any;
+  topic: string;
 }
 
 module.exports = function(RED: Red) {
@@ -32,12 +33,8 @@ module.exports = function(RED: Red) {
 
         if (isRunTestMessage(msg)) {
           node.send({
-            payload: JSON.stringify({
-              messageType: "propertyStatus",
-              data: {
-                temperature: parseFloat(config.temperature)
-              }
-            })
+            payload: config.payload,
+            topic: config.topic
           });
 
           this.send(createRunTestMessage());

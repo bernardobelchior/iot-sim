@@ -5,9 +5,11 @@
       color: "#87a980",
       defaults: {
         name: { value: "mock" },
-        flow: { value: "", required: true},
+        flow: { value: "", required: true },
         node: { value: "", required: true },
-        temperature: { value: "", required: true }
+        payload: { value: "", validate: RED.validators.typedInput("payloadType") },
+        payloadType: { value: "str" },
+        topic: { value: "" }
       },
       inputs: 1,
       outputs: 1,
@@ -24,7 +26,7 @@
 
         flows.forEach(flowId => {
           const selected = flow === flowId ? "selected='selected'" : "";
-          $("#node-input-flow").append("<option value='" + flowId + "'"+ selected + ">" + flowId + "</option>");
+          $("#node-input-flow").append("<option value='" + flowId + "'" + selected + ">" + flowId + "</option>");
         });
 
         $("#node-input-flow").on("change", function(evt) {
@@ -36,6 +38,27 @@
             }
           });
         });
+
+        if (this.payloadType == null) {
+          if (this.payload === "") {
+            this.payloadType = "date";
+          } else {
+            this.payloadType = "str";
+          }
+        } else if (this.payloadType === "string" || this.payloadType === "none") {
+          this.payloadType = "str";
+        }
+
+        const payloadTypeNode = $("#node-input-payloadType");
+        const payloadNode = $("#node-input-payload");
+        payloadTypeNode.val(this.payloadType);
+        payloadNode.typedInput({
+          default: "str",
+          typeField: payloadTypeNode,
+          types: ["flow", "global", "str", "num", "bool", "json", "bin", "date", "env"]
+        });
+
+        payloadNode.typedInput("type", this.payloadType);
       }
     });
   })();
@@ -56,14 +79,20 @@
         <select id="node-input-node" name="node" placeholder="Node">
         </select>
     </div>
-    <div class="form-row">
-        <label for="node-input-temperature"><i class="icon-tag"></i> Temperature</label>
-        <input id="node-input-temperature" type="number" name="temperature" placeholder="Temperature" value="25"/>
+     <div class="form-row">
+        <label for="node-input-payload"><i class="fa fa-envelope"></i> Payload </label>
+        <input type="text" id="node-input-payload" style="width:70%">
+        <input type="hidden" id="node-input-payloadType">
+    </div>
+        <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic </label>
+        <input type="text" id="node-input-topic">
     </div>
 
 </script>
 
 <script type="text/x-red" data-help-name="mock">
     <p></p>
+
 
 </script>
