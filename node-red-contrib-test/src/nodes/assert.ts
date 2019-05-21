@@ -3,7 +3,12 @@ import { Node } from "node-red-contrib-typescript-node";
 import * as util from "util";
 import * as vm from "vm";
 import { Context, Script } from "vm";
-import { createRunTestMessage, TestFailure, isRunTestMessage } from "../util";
+import {
+  createRunTestMessage,
+  TestFailure,
+  isRunTestMessage,
+  isResetTestMessage
+} from "../util";
 
 interface Config extends NodeProperties {
   func: string;
@@ -19,12 +24,18 @@ module.exports = function(RED: Red) {
       super(RED);
 
       this.createNode(config);
+      this.reset();
 
-      this.status({ fill: "yellow", shape: "ring", text: "pending" });
+      const script = this.createScript(config.func);
+      const context = this.createContext();
 
       this.on("input", msg => {
-        const script = this.createScript(config.func);
-        const context = this.createContext();
+        if (isResetTestMessage(msg)) {
+          this.reset();
+          this.send(msg);
+          return;
+        }
+
         const result = this.runScript(script, context, msg);
 
         if (!isRunTestMessage(msg)) {
@@ -45,7 +56,7 @@ module.exports = function(RED: Red) {
             msg
           };
 
-          this.context().flow.testDone(failure);
+          this.context().flow.testRunner.testDone(failure);
         }
       });
 
@@ -53,6 +64,10 @@ module.exports = function(RED: Red) {
         this.outstandingIntervals.forEach(clearInterval);
         this.outstandingTimers.forEach(clearTimeout);
       });
+    }
+
+    private reset() {
+      this.status({ fill: "yellow", shape: "ring", text: "pending" });
     }
 
     private runScript(script: Script, context: Context, msg: any): any {

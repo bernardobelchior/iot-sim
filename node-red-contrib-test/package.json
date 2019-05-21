@@ -37,7 +37,7 @@
   ],
   "node-red": {
     "nodes": {
-      "test-runner": "dist/nodes/test-runner.js",
+      "test-runner": "dist/nodes/test-runner/test-runner.js",
       "test-end": "dist/nodes/test-end.js",
       "test-start": "dist/nodes/test-start.js",
       "spy": "dist/nodes/spy.js",

@@ -3,7 +3,11 @@ import { Node } from "node-red-contrib-typescript-node";
 import * as util from "util";
 import * as vm from "vm";
 import { Context, Script } from "vm";
-import { createRunTestMessage, isRunTestMessage } from "../util";
+import {
+  createRunTestMessage,
+  isResetTestMessage,
+  isRunTestMessage
+} from "../util";
 
 interface Config extends NodeProperties {
   timeout: string;
@@ -21,6 +25,12 @@ module.exports = function(RED: Red) {
       const timeout = Number.parseInt(config.timeout);
 
       this.on("input", msg => {
+        if (isResetTestMessage(msg)) {
+          this.reset();
+          this.send(msg);
+          return;
+        }
+
         if (isRunTestMessage(msg)) {
           this.timeoutId = setTimeout(() => {
             this.timeoutId = undefined;
@@ -31,16 +41,21 @@ module.exports = function(RED: Red) {
         }
 
         if (this.timeoutId && this.lastMsg) {
-          clearTimeout(this.timeoutId);
-          this.send(createRunTestMessage(this.lastMsg.payload));
-          this.timeoutId = undefined;
-          this.lastMsg = undefined;
+          const msg = this.lastMsg;
+          this.reset();
+          this.send(createRunTestMessage(msg.payload));
         }
       });
 
       this.on("close", () => {
         clearTimeout(this.timeoutId);
       });
+    }
+
+    private reset() {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = undefined;
+      this.lastMsg = undefined;
     }
   }
 

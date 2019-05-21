@@ -1,6 +1,10 @@
 import { NodeProperties, Red } from "node-red";
 import { Node } from "node-red-contrib-typescript-node";
-import { createRunTestMessage, isRunTestMessage } from "../util";
+import {
+  createRunTestMessage,
+  isResetTestMessage,
+  isRunTestMessage
+} from "../util";
 import assert = require("assert");
 
 interface Config extends NodeProperties {
@@ -20,6 +24,11 @@ module.exports = function(RED: Red) {
 
       this.on("input", msg => {
         assert(node !== null);
+
+        if (isResetTestMessage(msg)) {
+          this.send(msg);
+          return;
+        }
 
         if (isRunTestMessage(msg)) {
           node.send({
