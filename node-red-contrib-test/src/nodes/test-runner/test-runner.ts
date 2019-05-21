@@ -90,10 +90,10 @@ module.exports = function(RED: Red) {
           shape: "ring",
           text: `${failures.length} tests failed`
         });
+      }
 
-        if (this.context().flow.generateReport) {
-          this.context().flow.generateReport(failures);
-        }
+      if (this.context().flow.generateReport) {
+        this.context().flow.generateReport(failures);
       }
     }
   }
