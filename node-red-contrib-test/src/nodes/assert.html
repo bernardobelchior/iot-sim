@@ -2,7 +2,7 @@
   (function() {
     RED.nodes.registerType("assert", {
       category: "Testing",
-      color: "#E24945",
+      color: "#a6bbcf",
       defaults: {
         name: { value: "assert" },
         func: {value:"\nreturn false;"},
@@ -114,6 +114,9 @@
 </script>
 
 <script type="text/x-red" data-help-name="assert">
-    <p></p>
+    <p>Asserts that a invariant holds. Uses "expect" from <a href="https://chaijs.com">Chai</a> to test the assertions.
+       Failures can be caught using the "report-generator" where information regarding the node ID, error line, etc. can
+       be found.
+    </p>
 
 </script>

@@ -66,27 +66,13 @@
     "qos": "2",
     "datatype": "auto",
     "broker": "4dea3a04.3282f4",
-    "x": 70,
+    "x": 130,
     "y": 120,
     "wires": [
       [
         "2724a6c2.abfac2"
       ]
     ]
-  },
-  {
-    "id": "d7baba46.bf3858",
-    "type": "debug",
-    "z": "c1b88cb0.ed8a8",
-    "name": "",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "false",
-    "x": 700,
-    "y": 120,
-    "wires": []
   },
   {
     "id": "6bbab98f.48df18",
@@ -96,11 +82,11 @@
     "func": "if (msg.payload.data.temperature > 25) {\n    return {\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                openWindow: {}\n            }\n        }\n    }    \n}",
     "outputs": 1,
     "noerr": 0,
-    "x": 440,
+    "x": 500,
     "y": 120,
     "wires": [
       [
-        "d7baba46.bf3858"
+        "52de9496.98db94"
       ]
     ]
   },
@@ -111,8 +97,9 @@
     "name": "Send Temperature = 20",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
-    "temperature": "20",
-    "x": 830,
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":20}}",
+    "payloadType": "json",
+    "x": 1130,
     "y": 180,
     "wires": [
       [
@@ -125,9 +112,9 @@
     "type": "assert",
     "z": "ce229d39.d0adc8",
     "name": "assert",
-    "func": "return !msg.payload || !msg.payload.data ||\n  !msg.payload.data.openWindow;",
+    "func": "expect(msg).not.to.have.nested.property(\"payload.data.openWindow\");",
     "noerr": 0,
-    "x": 1330,
+    "x": 1510,
     "y": 180,
     "wires": [
       [
@@ -139,10 +126,10 @@
     "id": "1e01f275.85a0ae",
     "type": "spy",
     "z": "ce229d39.d0adc8",
-    "name": "Spy Has Received OpenWindow",
+    "name": "Spy Window",
     "flow": "c1b88cb0.ed8a8",
-    "node": "d7baba46.bf3858",
-    "x": 720,
+    "node": "52de9496.98db94",
+    "x": 950,
     "y": 100,
     "wires": [
       [
@@ -160,8 +147,9 @@
     "name": "Send Temperature = 30",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
-    "temperature": "30",
-    "x": 830,
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":30}}",
+    "payloadType": "json",
+    "x": 1130,
     "y": 460,
     "wires": [
       [
@@ -174,9 +162,9 @@
     "type": "assert",
     "z": "ce229d39.d0adc8",
     "name": "assert",
-    "func": "return !!msg.payload.data && \n  !!msg.payload.data.openWindow;",
+    "func": "expect(msg).to.have.nested.property(\"payload.data.openWindow\");",
     "noerr": 0,
-    "x": 1330,
+    "x": 1510,
     "y": 460,
     "wires": [
       [
@@ -188,8 +176,8 @@
     "id": "4d0b8534.908fb4",
     "type": "test-start",
     "z": "ce229d39.d0adc8",
-    "name": "Expect OpenWindow to fire when temperature > 25",
-    "x": 380,
+    "name": "Expect window to open when temperature > 25",
+    "x": 640,
     "y": 460,
     "wires": [
       [
@@ -201,8 +189,8 @@
     "id": "8fe5feac.3d824",
     "type": "test-start",
     "z": "ce229d39.d0adc8",
-    "name": "Expect OpenWindow not to fire when temperature < 25",
-    "x": 390,
+    "name": "Expect window not to open when temperature < 25",
+    "x": 650,
     "y": 180,
     "wires": [
       [
@@ -214,10 +202,10 @@
     "id": "9fcc2e5c.f80d58",
     "type": "spy",
     "z": "ce229d39.d0adc8",
-    "name": "Spy Has Received OpenWindow",
+    "name": "Spy Window",
     "flow": "c1b88cb0.ed8a8",
-    "node": "d7baba46.bf3858",
-    "x": 720,
+    "node": "52de9496.98db94",
+    "x": 950,
     "y": 520,
     "wires": [
       [
@@ -235,7 +223,7 @@
     "name": "",
     "flow": "c1b88cb0.ed8a8",
     "outputs": 3,
-    "x": 70,
+    "x": 350,
     "y": 280,
     "wires": [
       [
@@ -254,7 +242,7 @@
     "type": "test-end",
     "z": "ce229d39.d0adc8",
     "name": "test-end",
-    "x": 1480,
+    "x": 1660,
     "y": 180,
     "wires": []
   },
@@ -263,7 +251,7 @@
     "type": "test-end",
     "z": "ce229d39.d0adc8",
     "name": "test-end",
-    "x": 1480,
+    "x": 1660,
     "y": 460,
     "wires": []
   },
@@ -273,7 +261,7 @@
     "z": "ce229d39.d0adc8",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
+    "x": 1350,
     "y": 460,
     "wires": [
       [
@@ -287,7 +275,7 @@
     "z": "ce229d39.d0adc8",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
+    "x": 1350,
     "y": 180,
     "wires": [
       [
@@ -303,7 +291,7 @@
     "property": "payload",
     "action": "obj",
     "pretty": false,
-    "x": 230,
+    "x": 290,
     "y": 120,
     "wires": [
       [
@@ -318,8 +306,9 @@
     "name": "Send Temperature = 25",
     "flow": "c1b88cb0.ed8a8",
     "node": "43b62fbb.87f1d8",
-    "temperature": "25",
-    "x": 830,
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":25}}",
+    "payloadType": "json",
+    "x": 1130,
     "y": 280,
     "wires": [
       [
@@ -332,9 +321,9 @@
     "type": "assert",
     "z": "ce229d39.d0adc8",
     "name": "assert",
-    "func": "return !msg.payload || !msg.payload.data ||\n  !msg.payload.data.openWindow;",
+    "func": "expect(msg).not.to.have.nested.property(\"payload.data.openWindow\");",
     "noerr": 0,
-    "x": 1330,
+    "x": 1510,
     "y": 280,
     "wires": [
       [
@@ -346,8 +335,8 @@
     "id": "4a9d3ac2.deed94",
     "type": "test-start",
     "z": "ce229d39.d0adc8",
-    "name": "Expect OpenWindow not to fire when temperature = 25",
-    "x": 390,
+    "name": "Expect window not to open when temperature = 25",
+    "x": 650,
     "y": 280,
     "wires": [
       [
@@ -359,10 +348,10 @@
     "id": "cb809446.ef47a",
     "type": "spy",
     "z": "ce229d39.d0adc8",
-    "name": "Spy Has Received OpenWindow",
+    "name": "Spy Window",
     "flow": "c1b88cb0.ed8a8",
-    "node": "d7baba46.bf3858",
-    "x": 720,
+    "node": "52de9496.98db94",
+    "x": 950,
     "y": 340,
     "wires": [
       [
@@ -378,7 +367,7 @@
     "type": "test-end",
     "z": "ce229d39.d0adc8",
     "name": "test-end",
-    "x": 1480,
+    "x": 1660,
     "y": 280,
     "wires": []
   },
@@ -388,12 +377,72 @@
     "z": "ce229d39.d0adc8",
     "name": "await",
     "timeout": "3000",
-    "x": 1170,
+    "x": 1350,
     "y": 280,
     "wires": [
       [
         "157e5a16.1689e6"
       ]
     ]
+  },
+  {
+    "id": "52de9496.98db94",
+    "type": "mqtt out",
+    "z": "c1b88cb0.ed8a8",
+    "name": "Window",
+    "topic": "/things/window",
+    "qos": "",
+    "retain": "",
+    "broker": "4dea3a04.3282f4",
+    "x": 720,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "c766ba3a.67f09",
+    "type": "inject",
+    "z": "ce229d39.d0adc8",
+    "name": "",
+    "topic": "",
+    "payload": "start_tests",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "x": 150,
+    "y": 280,
+    "wires": [
+      [
+        "761c2d4.b37f3d4"
+      ]
+    ]
+  },
+  {
+    "id": "2754e671.c3b69a",
+    "type": "report-generator",
+    "z": "ce229d39.d0adc8",
+    "name": "report-generator",
+    "x": 600,
+    "y": 680,
+    "wires": [
+      [
+        "6099b3f2.cc2f8c"
+      ]
+    ]
+  },
+  {
+    "id": "6099b3f2.cc2f8c",
+    "type": "debug",
+    "z": "ce229d39.d0adc8",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 920,
+    "y": 680,
+    "wires": []
   }
 ]

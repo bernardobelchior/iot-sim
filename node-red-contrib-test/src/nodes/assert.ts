@@ -44,14 +44,9 @@ module.exports = function(RED: Red) {
         }
 
         if (result instanceof Error) {
-          // this.error(
-          //   `assert failed with the following message: "${JSON.stringify(msg)}"`
-          // );
           this.status({ fill: "red", shape: "ring", text: "failed" });
 
           this.error(result);
-
-          console.log(result.stack);
           const failure: TestFailure = {
             function: config.func,
             error: result,

@@ -2,7 +2,7 @@
   (function() {
     RED.nodes.registerType("await", {
       category: "Testing",
-      color: "#87a980",
+      color: "#a6bbcf",
       defaults: {
         name: { value: "await" },
         timeout: { value: "3000", required: true }
@@ -27,6 +27,9 @@
 </script>
 
 <script type="text/x-red" data-help-name="await">
-    <p></p>
-
+    <p>
+    Awaits for a message and a "run" test message. If the timeout is reached without receiving a message,
+    only a "run" test message is forwarded. It is usually followed by an Assert node to check whether or
+    not the message has been received.
+    </p>
 </script>
