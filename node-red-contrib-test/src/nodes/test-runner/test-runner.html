@@ -5,21 +5,12 @@
       color: "#a6bbcf",
       defaults: {
         name: { value: "test-runner" },
-        flow: { value: "", required: true},
         outputs: {value: 1, required: true},
       },
       inputs: 1,
       icon: "switch.png",
       label: function() {
         return this.name || "Test Runner";
-      },
-      oneditprepare: function() {
-        const flows = new Set();
-        RED.nodes.eachNode(n => flows.add(n.z));
-
-        flows.forEach(flowId => {
-          $("#node-input-flow").append("<option value='" + flowId + "'>" + flowId + "</option>");
-        });
       }
     });
   })();
@@ -29,11 +20,6 @@
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-flow"><i class="icon-tag"></i> Flow</label>
-        <select id="node-input-flow" name="flow" placeholder="Flow">
-        </select>
     </div>
     <div class="form-row">
         <label for="node-input-outputs"><i class="icon-tag"></i> Outputs</label>

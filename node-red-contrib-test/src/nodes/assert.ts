@@ -6,9 +6,9 @@ import { Context, Script } from "vm";
 import * as chai from "chai";
 import {
   createRunTestMessage,
-  TestFailure,
+  isResetTestMessage,
   isRunTestMessage,
-  isResetTestMessage
+  TestFailure
 } from "../util";
 
 interface Config extends NodeProperties {
@@ -37,27 +37,28 @@ module.exports = function(RED: Red) {
           return;
         }
 
-        const result = this.runScript(script, context, msg);
-
         if (!isRunTestMessage(msg)) {
           return;
         }
 
-        if (result instanceof Error) {
+        try {
+          this.runScript(script, context, msg);
+
+          this.status({ fill: "green", shape: "ring", text: "passed" });
+          this.send(createRunTestMessage());
+        } catch (error) {
+          console.log(error);
           this.status({ fill: "red", shape: "ring", text: "failed" });
 
-          this.error(result);
+          this.error(error);
           const failure: TestFailure = {
             function: config.func,
-            error: result,
+            error,
             msg,
             nodeId: config.id
           };
 
           this.context().flow.testRunner.testDone(failure);
-        } else {
-          this.status({ fill: "green", shape: "ring", text: "passed" });
-          this.send(createRunTestMessage());
         }
       });
 
@@ -93,63 +94,63 @@ module.exports = function(RED: Red) {
           .slice(0, -1)
           .join("\n");
 
-        if (err.name === "AssertionError") {
-          /* Remove information about where the error was thrown. */
-          const [_, __, ___, ____, ...errStack] = err.stack.split("\n");
+        // if (err.name === "AssertionError") {
+        /* Remove information about where the error was thrown. */
+        const [_, __, ___, ____, ...errStack] = err.stack.split("\n");
 
-          /* Remove 1 from the error line. This is needed because the first line
-           * is not written by the user, but is also not seen by them. */
-          const lines = errStack.length;
-          const lineToUpdate = errStack[lines - 1];
+        /* Remove 1 from the error line. This is needed because the first line
+         * is not written by the user, but is also not seen by them. */
+        const lines = errStack.length;
+        const lineToUpdate = errStack[lines - 1];
 
-          const [_fullMatch, line, column]: string[] = /:(\d+):(\d+)$/.exec(
-            lineToUpdate
-          );
+        const [_fullMatch, line, column]: string[] = /:(\d+):(\d+)$/.exec(
+          lineToUpdate
+        );
 
-          const newLine = lineToUpdate.replace(
-            /:(\d+):(\d+)$/,
-            `:${Number.parseInt(line) - 1}:${column}`
-          );
+        const newLine = lineToUpdate.replace(
+          /:(\d+):(\d+)$/,
+          `:${Number.parseInt(line) - 1}:${column}`
+        );
 
-          err.stack = errStack
-            .slice(0, -1)
-            .concat([newLine])
-            .join("\n");
+        err.stack = errStack
+          .slice(0, -1)
+          .concat([newLine])
+          .join("\n");
 
-          return err;
-        }
+        throw err;
+        // }
 
-        const stack = err.stack.split(/\r?\n/);
+        // const stack = err.stack.split(/\r?\n/);
 
-        // store the error in msg to be used in flows
-        msg.error = err;
+        // // store the error in msg to be used in flows
+        // msg.error = err;
 
-        let line = 0;
-        let errorMessage;
-        if (stack.length > 0) {
-          while (
-            line < stack.length &&
-            stack[line].indexOf("ReferenceError") !== 0
-          ) {
-            line++;
-          }
+        // let line = 0;
+        // let errorMessage;
+        // if (stack.length > 0) {
+        //   while (
+        //     line < stack.length &&
+        //     stack[line].indexOf("ReferenceError") !== 0
+        //   ) {
+        //     line++;
+        //   }
 
-          if (line < stack.length) {
-            errorMessage = stack[line];
-            const m = /:(\d+):(\d+)$/.exec(stack[line + 1]);
-            if (m) {
-              const lineno = Number(m[1]) - 1;
-              const cha = m[2];
-              errorMessage += " (line " + lineno + ", col " + cha + ")";
-            }
-          }
-        }
+        //   if (line < stack.length) {
+        //     errorMessage = stack[line];
+        //     const m = /:(\d+):(\d+)$/.exec(stack[line + 1]);
+        //     if (m) {
+        //       const lineno = Number(m[1]) - 1;
+        //       const cha = m[2];
+        //       errorMessage += " (line " + lineno + ", col " + cha + ")";
+        //     }
+        //   }
+        // }
 
-        if (!errorMessage) {
-          errorMessage = err.toString();
-        }
+        // if (!errorMessage) {
+        //   errorMessage = err.toString();
+        // }
 
-        this.error(errorMessage, msg);
+        // this.error(errorMessage, msg);
       }
     }
 

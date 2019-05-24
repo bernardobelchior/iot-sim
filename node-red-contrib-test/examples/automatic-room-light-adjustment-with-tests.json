@@ -1,0 +1,1148 @@
+[
+  {
+    "id": "555d02ed.5912bc",
+    "type": "tab",
+    "label": "Automatic Room Light Adjustment",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "c0488ca6.8385f",
+    "type": "tab",
+    "label": "[Test] Automatic Room Light Adjustment",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "4dea3a04.3282f4",
+    "type": "mqtt-broker",
+    "z": "",
+    "name": "Read Server",
+    "broker": "localhost",
+    "port": "1883",
+    "clientid": "",
+    "usetls": false,
+    "compatmode": true,
+    "keepalive": "60",
+    "cleansession": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": ""
+  },
+  {
+    "id": "593a7b2.2110584",
+    "type": "mqtt in",
+    "z": "555d02ed.5912bc",
+    "name": "Thermometer",
+    "topic": "/things/thermometer",
+    "qos": "2",
+    "datatype": "auto",
+    "broker": "4dea3a04.3282f4",
+    "x": 130,
+    "y": 200,
+    "wires": [
+      [
+        "149e8846.44d8a"
+      ]
+    ]
+  },
+  {
+    "id": "f3d4047d.56232",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Open window if temp > 25ºC",
+    "func": "if (msg.payload.data.temperature > 25) {\n    flow.set(\"windowState\", \"open\");\n    \n    return {\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                open: {}\n            }\n        }\n    }    \n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 500,
+    "y": 240,
+    "wires": [
+      [
+        "6ca5de16.61d6b8"
+      ]
+    ]
+  },
+  {
+    "id": "149e8846.44d8a",
+    "type": "json",
+    "z": "555d02ed.5912bc",
+    "name": "",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 290,
+    "y": 200,
+    "wires": [
+      [
+        "f3d4047d.56232",
+        "da1a265d.10c4d"
+      ]
+    ]
+  },
+  {
+    "id": "6ca5de16.61d6b8",
+    "type": "mqtt out",
+    "z": "555d02ed.5912bc",
+    "name": "Window",
+    "topic": "/things/window",
+    "qos": "",
+    "retain": "",
+    "broker": "4dea3a04.3282f4",
+    "x": 720,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "f94e3425.d88f8",
+    "type": "mqtt out",
+    "z": "555d02ed.5912bc",
+    "name": "Blinds",
+    "topic": "/things/blinds",
+    "qos": "",
+    "retain": "",
+    "broker": "4dea3a04.3282f4",
+    "x": 1170,
+    "y": 440,
+    "wires": []
+  },
+  {
+    "id": "9de8ae30.f14c28",
+    "type": "mqtt out",
+    "z": "555d02ed.5912bc",
+    "name": "Lamp",
+    "topic": "/things/lamp",
+    "qos": "",
+    "retain": "",
+    "broker": "4dea3a04.3282f4",
+    "x": 1070,
+    "y": 340,
+    "wires": []
+  },
+  {
+    "id": "da1a265d.10c4d",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Close window if temp < 15ºC",
+    "func": "if (msg.payload.data.temperature < 15) {\n    flow.set(\"windowState\", \"closed\");\n    \n    return {\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                close: {}\n            }\n        }\n    }    \n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 500,
+    "y": 160,
+    "wires": [
+      [
+        "6ca5de16.61d6b8"
+      ]
+    ]
+  },
+  {
+    "id": "75bbeb4d.5dbe64",
+    "type": "mqtt in",
+    "z": "555d02ed.5912bc",
+    "name": "Light Sensor",
+    "topic": "/things/lightsensor",
+    "qos": "2",
+    "datatype": "auto",
+    "broker": "4dea3a04.3282f4",
+    "x": 130,
+    "y": 100,
+    "wires": [
+      [
+        "43637c52.e3d9fc"
+      ]
+    ]
+  },
+  {
+    "id": "43637c52.e3d9fc",
+    "type": "json",
+    "z": "555d02ed.5912bc",
+    "name": "",
+    "property": "payload",
+    "action": "obj",
+    "pretty": false,
+    "x": 290,
+    "y": 100,
+    "wires": [
+      [
+        "366b1af9.9d48b6"
+      ]
+    ]
+  },
+  {
+    "id": "c841baec.43bce",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Open blinds if too dark and window is closed; otherwise turn on lamp",
+    "func": "// illuminance\nif (msg.payload < 320) {\n    if (flow.get(\"windowState\") === \"closed\") {\n        flow.set(\"lampState\", \"on\");\n        return [\n            {\n                payload: {\n                    messageType: \"requestAction\",\n                        data: {\n                            turnOn: {}\n                        }\n                    }\n            },\n            null\n        ];\n    } else {\n        return [null, {\n            payload: {\n                messageType: \"requestAction\",\n                data: {\n                    open: {}\n                }\n            }\n        }];    \n    }\n}",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 590,
+    "y": 320,
+    "wires": [
+      [
+        "9de8ae30.f14c28"
+      ],
+      [
+        "f94e3425.d88f8"
+      ]
+    ],
+    "outputLabels": [
+      "Lamp",
+      "Blinds"
+    ]
+  },
+  {
+    "id": "71336620.28d1f",
+    "type": "inject",
+    "z": "555d02ed.5912bc",
+    "name": "Get Illuminance every 5s",
+    "topic": "",
+    "payload": "illuminance",
+    "payloadType": "flow",
+    "repeat": "5",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "x": 170,
+    "y": 380,
+    "wires": [
+      [
+        "c841baec.43bce",
+        "3e5d195d.110156"
+      ]
+    ]
+  },
+  {
+    "id": "366b1af9.9d48b6",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Store illuminance in flow context",
+    "func": "flow.set(\"illuminance\", msg.payload.data.illuminance);",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 510,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "54083b4c.1ec60c",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Close blinds if too bright and window is closed",
+    "func": "if (msg.payload > 500 && flow.get(\"windowState\") === \"closed\") {\n    return {\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                close: {}\n            }\n        }\n    }    \n}",
+    "outputs": 1,
+    "noerr": 0,
+    "x": 900,
+    "y": 460,
+    "wires": [
+      [
+        "f94e3425.d88f8"
+      ]
+    ]
+  },
+  {
+    "id": "b9604a88.bb9a3",
+    "type": "comment",
+    "z": "555d02ed.5912bc",
+    "name": "Automatic Room Light Adjustment",
+    "info": "",
+    "x": 200,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "3e5d195d.110156",
+    "type": "function",
+    "z": "555d02ed.5912bc",
+    "name": "Turn off lamp if too bright",
+    "func": "if (msg.payload > 500 && flow.get(\"lampState\") === \"off\") {\n    flow.set(\"lampState\", \"off\");\n    return [{\n        payload: {\n            messageType: \"requestAction\",\n            data: {\n                turnOff: {}\n            }\n        }\n    }, null];    \n} else {\n    return [null, msg];\n}",
+    "outputs": 2,
+    "noerr": 0,
+    "x": 570,
+    "y": 420,
+    "wires": [
+      [
+        "9de8ae30.f14c28"
+      ],
+      [
+        "54083b4c.1ec60c"
+      ]
+    ],
+    "outputLabels": [
+      "Lamp",
+      "Blinds"
+    ]
+  },
+  {
+    "id": "8e8873fc.fc1098",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Send Temperature = 14ºC",
+    "flow": "555d02ed.5912bc",
+    "node": "593a7b2.2110584",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":14}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1120,
+    "y": 60,
+    "wires": [
+      [
+        "fbf0396f.6ced9"
+      ]
+    ]
+  },
+  {
+    "id": "eec6993b.baa89",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy Window",
+    "flow": "555d02ed.5912bc",
+    "node": "6ca5de16.61d6b8",
+    "x": 890,
+    "y": 120,
+    "wires": [
+      [
+        "8e8873fc.fc1098"
+      ],
+      [
+        "fbf0396f.6ced9"
+      ]
+    ]
+  },
+  {
+    "id": "f96e054a.be8ac",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect window to close when temperature < 15ºC",
+    "x": 550,
+    "y": 120,
+    "wires": [
+      [
+        "eec6993b.baa89"
+      ]
+    ]
+  },
+  {
+    "id": "cfc2112e.f4c2c",
+    "type": "test-runner",
+    "z": "c0488ca6.8385f",
+    "name": "",
+    "outputs": 7,
+    "x": 170,
+    "y": 500,
+    "wires": [
+      [
+        "f96e054a.be8ac"
+      ],
+      [
+        "e2d29ece.1d8668"
+      ],
+      [
+        "c7df467a.f95c9"
+      ],
+      [
+        "544eec6.9fb8b14"
+      ],
+      [
+        "22139ba9.332f5c"
+      ],
+      [
+        "a6a31415.5e47e"
+      ],
+      [
+        "8bae419e.204dd8"
+      ]
+    ]
+  },
+  {
+    "id": "feb18bd5.0d97d",
+    "type": "inject",
+    "z": "c0488ca6.8385f",
+    "name": "",
+    "topic": "",
+    "payload": "start_tests",
+    "payloadType": "str",
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "1",
+    "x": 90,
+    "y": 660,
+    "wires": [
+      [
+        "cfc2112e.f4c2c"
+      ]
+    ]
+  },
+  {
+    "id": "ca43d179.15ffc",
+    "type": "report-generator",
+    "z": "c0488ca6.8385f",
+    "name": "report-generator",
+    "x": 120,
+    "y": 40,
+    "wires": [
+      [
+        "d6708e41.56edc8"
+      ]
+    ]
+  },
+  {
+    "id": "d6708e41.56edc8",
+    "type": "debug",
+    "z": "c0488ca6.8385f",
+    "name": "",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "false",
+    "x": 440,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "fbf0396f.6ced9",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1370,
+    "y": 120,
+    "wires": [
+      [
+        "a1938729.df9738"
+      ]
+    ]
+  },
+  {
+    "id": "a1938729.df9738",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert window receives \"close\" action",
+    "func": "expect(msg.payload).to.deep.equal(\n    {\n        messageType: \"requestAction\",\n            data: {\n                close: {}\n        }\n    }\n);",
+    "noerr": 0,
+    "x": 1640,
+    "y": 120,
+    "wires": [
+      [
+        "5584cfa4.67bd68"
+      ]
+    ]
+  },
+  {
+    "id": "5584cfa4.67bd68",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 1920,
+    "y": 120,
+    "wires": []
+  },
+  {
+    "id": "a20590af.11508",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Send Temperature = 26ºC",
+    "flow": "555d02ed.5912bc",
+    "node": "593a7b2.2110584",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":26}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1120,
+    "y": 200,
+    "wires": [
+      [
+        "fb2d8dac.b4042"
+      ]
+    ]
+  },
+  {
+    "id": "32deb8f8.b6b13",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy Window",
+    "flow": "555d02ed.5912bc",
+    "node": "6ca5de16.61d6b8",
+    "x": 870,
+    "y": 260,
+    "wires": [
+      [
+        "a20590af.11508"
+      ],
+      [
+        "fb2d8dac.b4042"
+      ]
+    ]
+  },
+  {
+    "id": "e2d29ece.1d8668",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect window to open when temperature > 25ºC",
+    "x": 550,
+    "y": 220,
+    "wires": [
+      [
+        "32deb8f8.b6b13"
+      ]
+    ]
+  },
+  {
+    "id": "fb2d8dac.b4042",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1350,
+    "y": 260,
+    "wires": [
+      [
+        "9ca92a4a.920a98"
+      ]
+    ]
+  },
+  {
+    "id": "9ca92a4a.920a98",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert window receives \"open\" action",
+    "func": "expect(msg.payload).to.deep.equal(\n    {\n        messageType: \"requestAction\",\n            data: {\n                open: {}\n        }\n    }\n);",
+    "noerr": 0,
+    "x": 1630,
+    "y": 260,
+    "wires": [
+      [
+        "694b1a3.58485e4"
+      ]
+    ]
+  },
+  {
+    "id": "694b1a3.58485e4",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 1920,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "711ef48d.3359d4",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy Window",
+    "flow": "555d02ed.5912bc",
+    "node": "6ca5de16.61d6b8",
+    "x": 930,
+    "y": 380,
+    "wires": [
+      [
+        "955842a2.2d47e8"
+      ],
+      [
+        "9c8054b0.a42d18"
+      ]
+    ]
+  },
+  {
+    "id": "c7df467a.f95c9",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect window to do nothing when 15ºC < temperature < 25ºC",
+    "x": 590,
+    "y": 380,
+    "wires": [
+      [
+        "711ef48d.3359d4"
+      ]
+    ]
+  },
+  {
+    "id": "9c8054b0.a42d18",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1350,
+    "y": 380,
+    "wires": [
+      [
+        "8f0526f0.a47d"
+      ]
+    ]
+  },
+  {
+    "id": "8f0526f0.a47d",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert window receives no action",
+    "func": "expect(msg.payload).to.not.exist;",
+    "noerr": 0,
+    "x": 1620,
+    "y": 380,
+    "wires": [
+      [
+        "9bcea5c5.3982"
+      ]
+    ]
+  },
+  {
+    "id": "9bcea5c5.3982",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 1920,
+    "y": 380,
+    "wires": []
+  },
+  {
+    "id": "955842a2.2d47e8",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Send Temperature = 20ºC",
+    "flow": "555d02ed.5912bc",
+    "node": "593a7b2.2110584",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":20}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1120,
+    "y": 320,
+    "wires": [
+      [
+        "9c8054b0.a42d18"
+      ]
+    ]
+  },
+  {
+    "id": "544eec6.9fb8b14",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect illuminance to be stored and retrieved from flow context",
+    "x": 590,
+    "y": 500,
+    "wires": [
+      [
+        "9958b8df.ebec3"
+      ]
+    ]
+  },
+  {
+    "id": "9958b8df.ebec3",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Turn off lamp\" Function",
+    "flow": "555d02ed.5912bc",
+    "node": "3e5d195d.110156",
+    "x": 980,
+    "y": 500,
+    "wires": [
+      [
+        "156085c5.cedaa2"
+      ],
+      [
+        "74471b1d.9b1de4"
+      ]
+    ]
+  },
+  {
+    "id": "156085c5.cedaa2",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Send Illuminance = 400lux",
+    "flow": "555d02ed.5912bc",
+    "node": "75bbeb4d.5dbe64",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"illuminance\":400}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1160,
+    "y": 440,
+    "wires": [
+      [
+        "74471b1d.9b1de4"
+      ]
+    ]
+  },
+  {
+    "id": "74471b1d.9b1de4",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 6s",
+    "timeout": "6000",
+    "x": 1340,
+    "y": 500,
+    "wires": [
+      [
+        "c607190.eb6e7e8"
+      ]
+    ]
+  },
+  {
+    "id": "c607190.eb6e7e8",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert illuminance = 400",
+    "func": "expect(msg.payload).to.equal(400);",
+    "noerr": 0,
+    "x": 1590,
+    "y": 500,
+    "wires": [
+      [
+        "5c94f22f.b99524"
+      ]
+    ]
+  },
+  {
+    "id": "5c94f22f.b99524",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 1920,
+    "y": 500,
+    "wires": []
+  },
+  {
+    "id": "22139ba9.332f5c",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect blinds to be open, if it is too dark and window is closed",
+    "x": 590,
+    "y": 660,
+    "wires": [
+      [
+        "86c8b779.0f889"
+      ]
+    ]
+  },
+  {
+    "id": "86c8b779.0f889",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Blinds\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "f94e3425.d88f8",
+    "x": 990,
+    "y": 660,
+    "wires": [
+      [
+        "4c208c2a.bc77fc"
+      ],
+      [
+        "91f64712.222d38"
+      ]
+    ]
+  },
+  {
+    "id": "3bc8790e.515e9e",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Mock Illuminance = 100lux",
+    "flow": "555d02ed.5912bc",
+    "node": "71336620.28d1f",
+    "payload": "100",
+    "payloadType": "num",
+    "topic": "",
+    "x": 1300,
+    "y": 640,
+    "wires": [
+      [
+        "61e8680a.348fb"
+      ]
+    ]
+  },
+  {
+    "id": "61e8680a.348fb",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Close Window",
+    "flow": "555d02ed.5912bc",
+    "node": "593a7b2.2110584",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":10}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1280,
+    "y": 700,
+    "wires": [
+      [
+        "91f64712.222d38"
+      ]
+    ]
+  },
+  {
+    "id": "91f64712.222d38",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1280,
+    "y": 760,
+    "wires": [
+      [
+        "71bb8aa6.a12074"
+      ]
+    ]
+  },
+  {
+    "id": "71bb8aa6.a12074",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert blinds receives \"open\" action",
+    "func": "expect(msg.payload).to.deep.equal(\n    {\n        messageType: \"requestAction\",\n        data: {\n            open: {}\n        }\n    }\n);",
+    "noerr": 0,
+    "x": 1530,
+    "y": 760,
+    "wires": [
+      [
+        "ede2d4a6.9b854"
+      ]
+    ]
+  },
+  {
+    "id": "8008b01.eaf9fd",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 2340,
+    "y": 660,
+    "wires": []
+  },
+  {
+    "id": "9e02d7ea.61a778",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert lamp does not receive \"turnOn\" action",
+    "func": "expect(msg.payload).to.be.undefined;",
+    "noerr": 0,
+    "x": 2070,
+    "y": 660,
+    "wires": [
+      [
+        "8008b01.eaf9fd"
+      ]
+    ]
+  },
+  {
+    "id": "4c208c2a.bc77fc",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Lamp\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "9de8ae30.f14c28",
+    "x": 1270,
+    "y": 580,
+    "wires": [
+      [
+        "3bc8790e.515e9e"
+      ],
+      [
+        "ede2d4a6.9b854"
+      ]
+    ]
+  },
+  {
+    "id": "ede2d4a6.9b854",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1800,
+    "y": 660,
+    "wires": [
+      [
+        "9e02d7ea.61a778"
+      ]
+    ]
+  },
+  {
+    "id": "a6a31415.5e47e",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect lamp to be turned on, if it is too dark but window is open",
+    "x": 590,
+    "y": 920,
+    "wires": [
+      [
+        "8bd34aee.3038f"
+      ]
+    ]
+  },
+  {
+    "id": "8bd34aee.3038f",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Blinds\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "f94e3425.d88f8",
+    "x": 990,
+    "y": 920,
+    "wires": [
+      [
+        "a716f41e.03ed08"
+      ],
+      [
+        "7c018074.e55188"
+      ]
+    ]
+  },
+  {
+    "id": "fbbb4f0b.856e4",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Mock Illuminance = 100lux",
+    "flow": "555d02ed.5912bc",
+    "node": "71336620.28d1f",
+    "payload": "100",
+    "payloadType": "num",
+    "topic": "",
+    "x": 1300,
+    "y": 900,
+    "wires": [
+      [
+        "f298dc73.672b88"
+      ]
+    ]
+  },
+  {
+    "id": "f298dc73.672b88",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Open Window",
+    "flow": "555d02ed.5912bc",
+    "node": "593a7b2.2110584",
+    "payload": "{\"messageType\":\"propertyStatus\",\"data\":{\"temperature\":30}}",
+    "payloadType": "json",
+    "topic": "",
+    "x": 1280,
+    "y": 960,
+    "wires": [
+      [
+        "7c018074.e55188"
+      ]
+    ]
+  },
+  {
+    "id": "7c018074.e55188",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1280,
+    "y": 1020,
+    "wires": [
+      [
+        "505f4c89.18f574"
+      ]
+    ]
+  },
+  {
+    "id": "505f4c89.18f574",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert blinds do not receive \"open\" action",
+    "func": "expect(msg.payload).to.be.undefined;",
+    "noerr": 0,
+    "x": 1540,
+    "y": 1020,
+    "wires": [
+      [
+        "62665a7b.0de22c"
+      ]
+    ]
+  },
+  {
+    "id": "9ca6d6a5.6eea08",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 2340,
+    "y": 920,
+    "wires": []
+  },
+  {
+    "id": "905361d8.4241f",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert lamp receives \"turnOn\" action",
+    "func": "expect(msg.payload).to.deep.equal(\n    {\n        messageType: \"requestAction\",\n        data: {\n            turnOn: {}\n        }\n    }\n);",
+    "noerr": 0,
+    "x": 2050,
+    "y": 920,
+    "wires": [
+      [
+        "9ca6d6a5.6eea08"
+      ]
+    ]
+  },
+  {
+    "id": "62665a7b.0de22c",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1800,
+    "y": 920,
+    "wires": [
+      [
+        "905361d8.4241f"
+      ]
+    ]
+  },
+  {
+    "id": "a716f41e.03ed08",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Lamp\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "9de8ae30.f14c28",
+    "x": 1270,
+    "y": 840,
+    "wires": [
+      [
+        "fbbb4f0b.856e4"
+      ],
+      [
+        "62665a7b.0de22c"
+      ]
+    ]
+  },
+  {
+    "id": "8bae419e.204dd8",
+    "type": "test-start",
+    "z": "c0488ca6.8385f",
+    "name": "Expect lamp to be turned off, if it is too bright",
+    "x": 530,
+    "y": 1200,
+    "wires": [
+      [
+        "7b71675a.72f708"
+      ]
+    ]
+  },
+  {
+    "id": "7b71675a.72f708",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Blinds\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "f94e3425.d88f8",
+    "x": 990,
+    "y": 1200,
+    "wires": [
+      [
+        "34923c35.ecdf9c"
+      ],
+      [
+        "309488dc.00f2d8"
+      ]
+    ]
+  },
+  {
+    "id": "1e19fbb4.6a805c",
+    "type": "mock",
+    "z": "c0488ca6.8385f",
+    "name": "Mock Illuminance = 1000lux",
+    "flow": "555d02ed.5912bc",
+    "node": "71336620.28d1f",
+    "payload": "1000",
+    "payloadType": "num",
+    "topic": "",
+    "x": 1300,
+    "y": 1200,
+    "wires": [
+      [
+        "309488dc.00f2d8"
+      ]
+    ]
+  },
+  {
+    "id": "309488dc.00f2d8",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1280,
+    "y": 1300,
+    "wires": [
+      [
+        "c65c3a60.9992b8"
+      ]
+    ]
+  },
+  {
+    "id": "c65c3a60.9992b8",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert blinds do not receive \"open\" action",
+    "func": "expect(msg.payload).to.be.undefined;",
+    "noerr": 0,
+    "x": 1540,
+    "y": 1300,
+    "wires": [
+      [
+        "706d13e1.a810b4"
+      ]
+    ]
+  },
+  {
+    "id": "c86a31b4.91c46",
+    "type": "test-end",
+    "z": "c0488ca6.8385f",
+    "name": "Test End",
+    "x": 2340,
+    "y": 1200,
+    "wires": []
+  },
+  {
+    "id": "f063fc9c.073c58",
+    "type": "assert",
+    "z": "c0488ca6.8385f",
+    "name": "assert lamp receives \"turnOff\" action",
+    "func": "expect(msg.payload).to.deep.equal(\n    {\n        messageType: \"requestAction\",\n        data: {\n            turnOff: {}\n        }\n    }\n);",
+    "noerr": 0,
+    "x": 2050,
+    "y": 1200,
+    "wires": [
+      [
+        "c86a31b4.91c46"
+      ]
+    ]
+  },
+  {
+    "id": "706d13e1.a810b4",
+    "type": "await",
+    "z": "c0488ca6.8385f",
+    "name": "await 1s",
+    "timeout": "1000",
+    "x": 1800,
+    "y": 1200,
+    "wires": [
+      [
+        "f063fc9c.073c58"
+      ]
+    ]
+  },
+  {
+    "id": "34923c35.ecdf9c",
+    "type": "spy",
+    "z": "c0488ca6.8385f",
+    "name": "Spy \"Lamp\" Node ",
+    "flow": "555d02ed.5912bc",
+    "node": "9de8ae30.f14c28",
+    "x": 1270,
+    "y": 1120,
+    "wires": [
+      [
+        "1e19fbb4.6a805c"
+      ],
+      [
+        "706d13e1.a810b4"
+      ]
+    ]
+  }
+]
